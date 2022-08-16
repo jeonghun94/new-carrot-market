@@ -36,7 +36,7 @@ async function handler(
       },
     });
 
-    console.log(product, "dsdsds");
+    // console.log(product, "dsdsds");
     res.json({
       ok: true,
       product,
