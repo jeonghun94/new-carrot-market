@@ -15,6 +15,7 @@ export default function useMutation<T = any>(
     data: undefined,
     error: undefined,
   });
+
   function mutation(data: any) {
     setSate((prev) => ({ ...prev, loading: true }));
     fetch(url, {
