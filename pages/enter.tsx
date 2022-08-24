@@ -88,7 +88,7 @@ const Enter: NextPage = () => {
                   className={cls(
                     "pb-4 font-medium text-sm border-b-2",
                     method === "email"
-                      ? " border-blue-500 text-blue-400"
+                      ? " border-red-500 text-red-400"
                       : "border-transparent hover:text-gray-400 text-gray-500"
                   )}
                   onClick={onEmailClick}
@@ -99,7 +99,7 @@ const Enter: NextPage = () => {
                   className={cls(
                     "pb-4 font-medium text-sm border-b-2",
                     method === "phone"
-                      ? " border-blue-500 text-blue-400"
+                      ? " border-red-500 text-red-400"
                       : "border-transparent hover:text-gray-400 text-gray-500"
                   )}
                   onClick={onPhoneClick}
