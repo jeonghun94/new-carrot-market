@@ -102,7 +102,7 @@ const EditProfile: NextPage = () => {
           )}
           <label
             htmlFor="picture"
-            className="cursor-pointer py-2 px-3 border hover:bg-gray-50 border-gray-300 rounded-md shadow-sm text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-gray-700"
+            className="cursor-pointer py-2 px-3 border hover:bg-gray-50 border-gray-300 rounded-md shadow-sm text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-gray-700"
           >
             Change
             <input
@@ -137,7 +137,7 @@ const EditProfile: NextPage = () => {
           kind="phone"
         />
         {errors.formErrors ? (
-          <span className="my-2 text-red-500 font-medium text-center block">
+          <span className="my-2 text-blue-500 font-medium text-center block">
             {errors.formErrors.message}
           </span>
         ) : null}

@@ -79,7 +79,7 @@ const ItemDetail: NextPage = () => {
                 className={cls(
                   "p-3 rounded-md flex items-center hover:bg-gray-100 justify-center ",
                   data?.isLiked
-                    ? "text-red-500  hover:text-red-600"
+                    ? "text-blue-500  hover:text-blue-600"
                     : "text-gray-400  hover:text-gray-500"
                 )}
               >
