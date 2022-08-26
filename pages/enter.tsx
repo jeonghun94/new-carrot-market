@@ -6,6 +6,9 @@ import Input from "@components/input";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
 import { useRouter } from "next/router";
+import dynamic from "next/dynamic";
+
+const Bs = dynamic(() => import("@components/bs"), { ssr: false });
 
 interface EnterForm {
   email?: string;
@@ -45,7 +48,6 @@ const Enter: NextPage = () => {
     if (tokenLoading) return;
     confirmToken(validForm);
   };
-  console.log(loading);
 
   const router = useRouter();
   useEffect(() => {
@@ -88,7 +90,7 @@ const Enter: NextPage = () => {
                   className={cls(
                     "pb-4 font-medium text-sm border-b-2",
                     method === "email"
-                      ? " border-red-500 text-blue-400"
+                      ? " border-blue-500 text-blue-400"
                       : "border-transparent hover:text-gray-400 text-gray-500"
                   )}
                   onClick={onEmailClick}
@@ -99,7 +101,7 @@ const Enter: NextPage = () => {
                   className={cls(
                     "pb-4 font-medium text-sm border-b-2",
                     method === "phone"
-                      ? " border-red-500 text-blue-400"
+                      ? " border-blue-500 text-blue-400"
                       : "border-transparent hover:text-gray-400 text-gray-500"
                   )}
                   onClick={onPhoneClick}
@@ -124,14 +126,17 @@ const Enter: NextPage = () => {
                 />
               ) : null}
               {method === "phone" ? (
-                <Input
-                  register={register("phone")}
-                  name="phone"
-                  label="Phone number"
-                  type="number"
-                  kind="phone"
-                  required
-                />
+                <>
+                  <Bs />
+                  <Input
+                    register={register("phone")}
+                    name="phone"
+                    label="Phone number"
+                    type="number"
+                    kind="phone"
+                    required
+                  />
+                </>
               ) : null}
               {method === "email" ? (
                 <Button text={loading ? "Loading" : "Get login link"} />

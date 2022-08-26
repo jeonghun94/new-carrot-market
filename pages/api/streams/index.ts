@@ -49,6 +49,11 @@ async function handler(
     const streams = await client.stream.findMany({
       // take: 10,
       // skip: 20,
+      where: {
+        NOT: {
+          cloudflareId: null,
+        },
+      },
     });
     res.json({ ok: true, streams });
   }
