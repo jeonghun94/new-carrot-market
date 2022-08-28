@@ -36,7 +36,7 @@ const ItemDetail: NextPage = () => {
     boundMutate((prev) => prev && { ...prev, isLiked: !prev.isLiked }, false);
   };
   return (
-    <Layout canGoBack>
+    <Layout canGoBack seoTitle={`${data?.product?.name}`}>
       <div className="px-4  py-4">
         <div className="mb-8">
           <div className="relative pb-80">
