@@ -19,6 +19,9 @@ export default function Layout({
   children,
   seoTitle,
 }: LayoutProps) {
+  const headTitle = `${
+    seoTitle ? `${seoTitle} | Carrot Market` : "Carrot Market"
+  }`;
   const router = useRouter();
   const onClick = () => {
     router.back();
@@ -26,7 +29,7 @@ export default function Layout({
   return (
     <div>
       <Head>
-        <title>{seoTitle} | Carrot Market</title>
+        <title>{headTitle}</title>
       </Head>
       <div className="bg-white w-full h-12 max-w-xl justify-center text-lg px-10 font-medium  fixed text-gray-800 border-b top-0  flex items-center">
         {canGoBack ? (
