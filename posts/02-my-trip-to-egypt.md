@@ -7,3 +7,7 @@ category: travel
 # Travel more. Buy less stuff.
 
 Get fat.
+
+- i
+- like
+- potatoes
