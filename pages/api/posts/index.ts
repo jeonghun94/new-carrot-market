@@ -24,6 +24,7 @@ async function handler(
         },
       },
     });
+    await res.revalidate("/community");
     res.json({
       ok: true,
       post,
@@ -33,8 +34,8 @@ async function handler(
     const {
       query: { latitude, longitude },
     } = req;
-    const parsedLatitude = parseFloat(latitude.toString());
-    const parsedLongitue = parseFloat(longitude.toString());
+    // const parsedLatitude = parseFloat(latitude.toString());
+    // const parsedLongitue = parseFloat(longitude.toString());
     const posts = await client.post.findMany({
       include: {
         user: {
@@ -51,16 +52,16 @@ async function handler(
           },
         },
       },
-      where: {
-        latitude: {
-          gte: parsedLatitude - 0.01,
-          lte: parsedLatitude + 0.01,
-        },
-        longitude: {
-          gte: parsedLongitue - 0.01,
-          lte: parsedLongitue + 0.01,
-        },
-      },
+      // where: {
+      //   latitude: {
+      //     gte: parsedLatitude - 0.01,
+      //     lte: parsedLatitude + 0.01,
+      //   },
+      //   longitude: {
+      //     gte: parsedLongitue - 0.01,
+      //     lte: parsedLongitue + 0.01,
+      //   },
+      // },
     });
     res.json({
       ok: true,
