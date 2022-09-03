@@ -11,6 +11,7 @@ import client from "@libs/server/client";
 interface ReviewWithUser extends Review {
   createdBy: User;
 }
+
 interface ReviewsResponse {
   ok: boolean;
   reviews: ReviewWithUser[];
