@@ -65,9 +65,8 @@ const Enter: NextPage = () => {
   return (
     <div className="mt-16 px-4">
       <h3 className="text-3xl font-bold text-center">
-        Welcome
         <br />
-        Carrot Market
+        당근마켓
       </h3>
       <div className="mt-12">
         {data?.ok ? (
@@ -89,31 +88,29 @@ const Enter: NextPage = () => {
         ) : (
           <>
             <div className="flex flex-col items-center">
-              <h5 className="text-sm text-gray-500 font-medium">
-                Enter using:
-              </h5>
+              <h5 className="text-sm text-gray-500 font-medium">로그인 방법</h5>
               <div className="grid border-b  w-full mt-8 grid-cols-2 ">
                 <button
                   className={cls(
                     "pb-4 font-medium text-sm border-b-2",
                     method === "email"
-                      ? " border-blue-500 text-blue-400"
+                      ? " border-orange-500 text-orange-400"
                       : "border-transparent hover:text-gray-400 text-gray-500"
                   )}
                   onClick={onEmailClick}
                 >
-                  Email
+                  이메일
                 </button>
                 <button
                   className={cls(
                     "pb-4 font-medium text-sm border-b-2",
                     method === "phone"
-                      ? " border-blue-500 text-blue-400"
+                      ? " border-orange-500 text-orange-400"
                       : "border-transparent hover:text-gray-400 text-gray-500"
                   )}
                   onClick={onPhoneClick}
                 >
-                  Phone
+                  휴대폰
                 </button>
               </div>
             </div>
@@ -127,8 +124,9 @@ const Enter: NextPage = () => {
                     required: true,
                   })}
                   name="email"
-                  label="Email address"
+                  label="Email"
                   type="email"
+                  placeholder="jeongh1021@naver.com"
                   required
                 />
               ) : null}
@@ -162,7 +160,7 @@ const Enter: NextPage = () => {
             <div className="absolute w-full border-t border-gray-300" />
             <div className="relative -top-3 text-center ">
               <span className="bg-white px-2 text-sm text-gray-500">
-                Or enter with
+                소셜 로그인
               </span>
             </div>
           </div>
