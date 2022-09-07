@@ -5,6 +5,7 @@ import Script from "next/script";
 
 function MyApp({ Component, pageProps }: AppProps) {
   console.log("APP IS RUNNING");
+  console.log(pageProps);
   return (
     <SWRConfig
       value={{
@@ -12,7 +13,8 @@ function MyApp({ Component, pageProps }: AppProps) {
           fetch(url).then((response) => response.json()),
       }}
     >
-      <div className="w-full max-w-xl mx-auto">
+      <div>
+        {/* <div className="w-full max-w-xl mx-auto"> */}
         <Component {...pageProps} />
       </div>
       <Script
