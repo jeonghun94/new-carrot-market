@@ -87,9 +87,10 @@ const Enter: NextPage = () => {
           </form>
         ) : (
           <>
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-left -mt-10 -mb-6">
               <h5 className="text-sm text-gray-500 font-medium">
                 당근마켓은 휴대폰 번호로 가입해요. 번호는 안전하게 보관되며
+                <br />
                 어디에도 공개되지 않아요.
               </h5>
             </div>
@@ -97,13 +98,11 @@ const Enter: NextPage = () => {
               onSubmit={handleSubmit(onValid)}
               className="flex flex-col mt-8 space-y-4"
             >
-              <Input
-                register={register("phone")}
-                name="phone"
-                label=""
-                type="number"
-                kind="phone"
-                required
+              <input
+                className="p-3 rounded-md border-2 border-black"
+                type={"number"}
+                placeholder={"휴대폰 번호를 입력해주세요"}
+                autoFocus={true}
               />
               <button className="p-3 bg-gray-200 text-white rounded-md">
                 {loading ? "loading" : "인증문자 받기"}
