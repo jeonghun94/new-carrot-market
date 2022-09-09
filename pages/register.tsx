@@ -21,6 +21,7 @@ const Bs = dynamic(
 interface EnterForm {
   email?: string;
   phone?: string;
+  authValue?: number;
 }
 
 interface TokenForm {
@@ -32,11 +33,23 @@ interface MutationResult {
 }
 
 const Enter: NextPage = () => {
+  const { register, handleSubmit, reset } = useForm<EnterForm>();
+  const [auth, setAuth] = useState(false);
+  const [authValue, setAuthValue] = useState(false);
+
+  const authValChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const { value } = e.currentTarget;
+    if (value !== "" && value.length > 0) {
+      setAuthValue(true);
+    } else {
+      setAuthValue(false);
+    }
+  };
+
   const [enter, { loading, data, error }] =
     useMutation<MutationResult>("/api/users/enter");
   const [confirmToken, { loading: tokenLoading, data: tokenData }] =
     useMutation<MutationResult>("/api/users/confirm");
-  const { register, handleSubmit, reset } = useForm<EnterForm>();
   const { register: tokenRegister, handleSubmit: tokenHandleSubmit } =
     useForm<TokenForm>();
   const [method, setMethod] = useState<"email" | "phone">("email");
@@ -50,7 +63,9 @@ const Enter: NextPage = () => {
   };
   const onValid = (validForm: EnterForm) => {
     if (loading) return;
-    enter(validForm);
+    // enter(validForm);
+    setAuth(true);
+    console.log(validForm);
   };
   const onTokenValid = (validForm: TokenForm) => {
     if (tokenLoading) return;
@@ -103,26 +118,63 @@ const Enter: NextPage = () => {
                 type={"number"}
                 placeholder={"휴대폰 번호를 입력해주세요"}
                 autoFocus={true}
+                {...register("phone", {
+                  required: true,
+                })}
               />
-              <button className="p-3 bg-gray-200 text-white rounded-md">
-                {loading ? "loading" : "인증문자 받기"}
+              <button
+                className={
+                  auth
+                    ? `p-3 rounded-md bg-white border border-gray-300 font-semibold`
+                    : `p-3 rounded-md bg-gray-200 text-white `
+                }
+              >
+                {auth ? "인증문자 다시 받기" : "인증문자 받기"}
               </button>
             </form>
           </>
         )}
 
-        <div className="mt-8">
-          <div className="relative">
-            <div className="relative -top-3 text-center ">
-              <span className="bg-white px-2 text-sm text-black">
-                휴대폰 번호가 변경되었나요?
-              </span>
-              <Link href={""}>
-                <a className="text-sm underline">이메일로 계정찾기</a>
-              </Link>
+        {auth ? (
+          <div className="w-full my-5">
+            <form className="flex flex-col gap-3">
+              <input
+                className="p-3 rounded-md border-2 border-black"
+                type={"number"}
+                placeholder={"인증번호를 입력해주세요"}
+                {...register("authValue", {
+                  required: true,
+                })}
+                onChange={authValChange}
+              />
+              <h5 className="text-sm text-gray-400 font-medium">
+                어떤 경우에도 타인에게 공유하지 마세요!
+              </h5>
+              <button
+                className={
+                  authValue
+                    ? "p-3 bg-orange-500 text-white rounded-md"
+                    : "p-3 bg-gray-200 text-white rounded-md"
+                }
+              >
+                {loading ? "loading" : "인증번호 확인"}
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="mt-8">
+            <div className="relative">
+              <div className="relative -top-3 text-center ">
+                <span className="bg-white px-2 text-sm text-black">
+                  휴대폰 번호가 변경되었나요?
+                </span>
+                <Link href={""}>
+                  <a className="text-sm underline">이메일로 계정찾기</a>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
