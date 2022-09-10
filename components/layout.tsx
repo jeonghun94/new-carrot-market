@@ -109,32 +109,6 @@ export default function Layout({
               <span>동네생활</span>
             </a>
           </Link>
-          <Link href="/chats">
-            <a
-              className={cls(
-                "flex flex-col items-center space-y-2 ",
-                router.pathname === "/chats"
-                  ? "text-orange-500"
-                  : "hover:text-gray-500 transition-colors"
-              )}
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                ></path>
-              </svg>
-              <span>채팅</span>
-            </a>
-          </Link>
           <Link href="/streams">
             <a
               className={cls(
@@ -161,6 +135,33 @@ export default function Layout({
               <span>라이브</span>
             </a>
           </Link>
+          <Link href="/chats">
+            <a
+              className={cls(
+                "flex flex-col items-center space-y-2 ",
+                router.pathname === "/chats"
+                  ? "text-orange-500"
+                  : "hover:text-gray-500 transition-colors"
+              )}
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                ></path>
+              </svg>
+              <span>채팅</span>
+            </a>
+          </Link>
+
           <Link href="/profile">
             <a
               className={cls(
@@ -184,7 +185,7 @@ export default function Layout({
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 ></path>
               </svg>
-              <span>나의 캐럿</span>
+              <span>나의 당근</span>
             </a>
           </Link>
         </nav>

@@ -30,12 +30,15 @@ interface TokenForm {
 
 interface MutationResult {
   ok: boolean;
+  payload?: number;
+  message?: string;
 }
 
 const Enter: NextPage = () => {
   const { register, handleSubmit, reset } = useForm<EnterForm>();
-  const [auth, setAuth] = useState(false);
   const [authValue, setAuthValue] = useState(false);
+  const [auth, setAuth] = useState(false);
+  const router = useRouter();
 
   const authValChange = (e: React.FormEvent<HTMLInputElement>) => {
     const { value } = e.currentTarget;
@@ -52,18 +55,10 @@ const Enter: NextPage = () => {
     useMutation<MutationResult>("/api/users/confirm");
   const { register: tokenRegister, handleSubmit: tokenHandleSubmit } =
     useForm<TokenForm>();
-  const [method, setMethod] = useState<"email" | "phone">("email");
-  const onEmailClick = () => {
-    reset();
-    setMethod("email");
-  };
-  const onPhoneClick = () => {
-    reset();
-    setMethod("phone");
-  };
+
   const onValid = (validForm: EnterForm) => {
     if (loading) return;
-    // enter(validForm);
+    enter(validForm);
     setAuth(true);
     console.log(validForm);
   };
@@ -72,92 +67,106 @@ const Enter: NextPage = () => {
     confirmToken(validForm);
   };
 
-  const router = useRouter();
   useEffect(() => {
     if (tokenData?.ok) {
       router.push("/");
     }
   }, [tokenData, router]);
+
+  // const [minutes, setMinutes] = useState(5);
+  // const [seconds, setSeconds] = useState(0);
+
+  // useEffect(() => {
+  //   const countdown = setInterval(() => {
+  //     if (parseInt(seconds) > 0) {
+  //       setSeconds(parseInt(seconds) - 1);
+  //     }
+  //     if (parseInt(seconds) === 0) {
+  //       if (parseInt(minutes) === 0) {
+  //         clearInterval(countdown);
+  //       } else {
+  //         setMinutes(parseInt(minutes) - 1);
+  //         setSeconds(59);
+  //       }
+  //     }
+  //   }, 1000);
+  //   return () => clearInterval(countdown);
+  // }, [minutes, seconds]);
+
   return (
     <div className="mt-16 px-4">
       <h3 className="text-2xl font-bold text-left">
         휴대폰 번호를 인증해주세요.
       </h3>
       <div className="mt-12">
-        {data?.ok ? (
+        <>
+          <div className="flex flex-col items-left -mt-10 -mb-6">
+            <h5 className="text-sm text-gray-500 font-medium">
+              당근마켓은 휴대폰 번호로 가입해요. 번호는 안전하게 보관되며
+              <br />
+              어디에도 공개되지 않아요.
+            </h5>
+          </div>
           <form
-            onSubmit={tokenHandleSubmit(onTokenValid)}
+            onSubmit={handleSubmit(onValid)}
             className="flex flex-col mt-8 space-y-4"
           >
-            <Input
-              register={tokenRegister("token", {
-                required: true,
+            <input
+              className="p-3 rounded-md border-2 border-black"
+              type={"number"}
+              placeholder={"휴대폰 번호를 입력해주세요"}
+              autoFocus={true}
+              {...register("phone", {
+                required: {
+                  value: true,
+                  message: "휴대폰 번호를 입력해주세요",
+                },
               })}
-              name="token"
-              label="Confirmation Token"
-              type="number"
-              required
             />
-            <Button text={tokenLoading ? "Loading" : "Confirm Token"} />
+            {error && <span className="text-red-500">{error.message}</span>}
+            <button
+              className={cls(
+                `p-3 rounded-md ${
+                  auth
+                    ? ` bg-white border border-gray-300 font-semibold`
+                    : `bg-gray-200 text-white`
+                }`
+              )}
+            >
+              {auth
+                ? `인증문자 다시 받기 `
+                : loading
+                ? "loading"
+                : "인증문자 받기"}
+            </button>
           </form>
-        ) : (
-          <>
-            <div className="flex flex-col items-left -mt-10 -mb-6">
-              <h5 className="text-sm text-gray-500 font-medium">
-                당근마켓은 휴대폰 번호로 가입해요. 번호는 안전하게 보관되며
-                <br />
-                어디에도 공개되지 않아요.
-              </h5>
-            </div>
+        </>
+
+        {auth ? (
+          <div className="w-full my-5">
             <form
-              onSubmit={handleSubmit(onValid)}
-              className="flex flex-col mt-8 space-y-4"
+              onSubmit={tokenHandleSubmit(onTokenValid)}
+              className="flex flex-col gap-3"
             >
               <input
                 className="p-3 rounded-md border-2 border-black"
                 type={"number"}
-                placeholder={"휴대폰 번호를 입력해주세요"}
-                autoFocus={true}
-                {...register("phone", {
-                  required: true,
-                })}
-              />
-              <button
-                className={
-                  auth
-                    ? `p-3 rounded-md bg-white border border-gray-300 font-semibold`
-                    : `p-3 rounded-md bg-gray-200 text-white `
-                }
-              >
-                {auth ? "인증문자 다시 받기" : "인증문자 받기"}
-              </button>
-            </form>
-          </>
-        )}
-
-        {auth ? (
-          <div className="w-full my-5">
-            <form className="flex flex-col gap-3">
-              <input
-                className="p-3 rounded-md border-2 border-black"
-                type={"number"}
                 placeholder={"인증번호를 입력해주세요"}
-                {...register("authValue", {
+                {...tokenRegister("token", {
                   required: true,
                 })}
+                // value={data?.payload}
                 onChange={authValChange}
               />
               <h5 className="text-sm text-gray-400 font-medium">
                 어떤 경우에도 타인에게 공유하지 마세요!
               </h5>
               <button
-                className={
-                  authValue
-                    ? "p-3 bg-orange-500 text-white rounded-md"
-                    : "p-3 bg-gray-200 text-white rounded-md"
-                }
+                className={`p-3 text-white rounded-md bg-${
+                  authValue ? "orange-500" : "gray-200"
+                }`}
               >
-                {loading ? "loading" : "인증번호 확인"}
+                {tokenLoading ? "loading" : "인증번호 확인"}
               </button>
             </form>
           </div>
