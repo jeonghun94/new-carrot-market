@@ -1,22 +1,11 @@
 import type { NextPage } from "next";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import Button from "@components/button";
-import Input from "@components/input";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-
-const Bs = dynamic(
-  //@ts-ignore
-  () =>
-    new Promise((resolve) =>
-      setTimeout(() => resolve(import("@components/bs")), 3000)
-    ),
-  { ssr: false, suspense: true, loading: () => <span>loading</span> }
-);
 
 interface EnterForm {
   email?: string;
@@ -35,7 +24,12 @@ interface MutationResult {
 }
 
 const Enter: NextPage = () => {
-  const { register, handleSubmit, reset } = useForm<EnterForm>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<EnterForm>({ mode: "onChange" });
   const [authValue, setAuthValue] = useState(false);
   const [auth, setAuth] = useState(false);
   const router = useRouter();
@@ -60,8 +54,8 @@ const Enter: NextPage = () => {
     if (loading) return;
     enter(validForm);
     setAuth(true);
-    console.log(validForm);
   };
+
   const onTokenValid = (validForm: TokenForm) => {
     if (tokenLoading) return;
     confirmToken(validForm);
@@ -72,26 +66,6 @@ const Enter: NextPage = () => {
       router.push("/");
     }
   }, [tokenData, router]);
-
-  // const [minutes, setMinutes] = useState(5);
-  // const [seconds, setSeconds] = useState(0);
-
-  // useEffect(() => {
-  //   const countdown = setInterval(() => {
-  //     if (parseInt(seconds) > 0) {
-  //       setSeconds(parseInt(seconds) - 1);
-  //     }
-  //     if (parseInt(seconds) === 0) {
-  //       if (parseInt(minutes) === 0) {
-  //         clearInterval(countdown);
-  //       } else {
-  //         setMinutes(parseInt(minutes) - 1);
-  //         setSeconds(59);
-  //       }
-  //     }
-  //   }, 1000);
-  //   return () => clearInterval(countdown);
-  // }, [minutes, seconds]);
 
   return (
     <div className="mt-16 px-4">
@@ -111,19 +85,34 @@ const Enter: NextPage = () => {
             onSubmit={handleSubmit(onValid)}
             className="flex flex-col mt-8 space-y-4"
           >
-            <input
-              className="p-3 rounded-md border-2 border-black"
-              type={"number"}
-              placeholder={"휴대폰 번호를 입력해주세요"}
-              autoFocus={true}
-              {...register("phone", {
-                required: {
-                  value: true,
-                  message: "휴대폰 번호를 입력해주세요",
-                },
-              })}
-            />
-            {error && <span className="text-red-500">{error.message}</span>}
+            {!auth ? (
+              <input
+                className="p-3 rounded-md border-2 border-black"
+                type={"number"}
+                placeholder={"휴대폰 번호를 입력해주세요"}
+                autoFocus={true}
+                {...register("phone", {
+                  required: {
+                    value: true,
+                    message: "휴대폰 번호는 필수 입력값입니다.",
+                  },
+                  pattern: {
+                    value: /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/,
+                    message: "휴대폰 번호를 정확히 입력해주세요",
+                  },
+                  maxLength: {
+                    value: 11,
+                    message: "휴대폰 번호를 정확히 입력해주세요",
+                  },
+                })}
+              />
+            ) : null}
+            {errors?.phone ? (
+              <span className="text-xs text-red-500">
+                {errors.phone.message}
+              </span>
+            ) : null}
+
             <button
               className={cls(
                 `p-3 rounded-md ${
