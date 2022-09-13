@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
 import { useRouter } from "next/router";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 
 interface EnterForm {
@@ -29,7 +28,7 @@ const Enter: NextPage = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<EnterForm>({ mode: "onChange" });
+  } = useForm<EnterForm>({ mode: "onBlur" });
   const [authValue, setAuthValue] = useState(false);
   const [auth, setAuth] = useState(false);
   const router = useRouter();
@@ -155,7 +154,7 @@ const Enter: NextPage = () => {
                   authValue ? "orange-500" : "gray-200"
                 }`}
               >
-                {tokenLoading ? "loading" : "인증번호 확인"}
+                {tokenLoading ? "잠시만 기다려 주세요." : "인증번호 확인"}
               </button>
             </form>
           </div>

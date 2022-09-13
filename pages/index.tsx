@@ -6,6 +6,8 @@ import useUser from "@libs/client/useUser";
 import Head from "next/head";
 import useSWR from "swr";
 import { Product } from "@prisma/client";
+import { convertTime } from "@libs/client/utils";
+// import dayjs from "dayjs";
 
 export interface ProductWithCount extends Product {
   _count: {
@@ -31,6 +33,9 @@ const Home: NextPage = () => {
             title={product.name}
             price={product.price}
             hearts={product._count.favs}
+            image={product.image}
+            createdAt={convertTime(product.createdAt.toString())}
+            // createdAt={dayjs(product.createdAt.toString()).format("YYYY-MM-DD")}
           />
         ))}
         <FloatingButton href="/products/upload">

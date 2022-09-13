@@ -5,7 +5,6 @@ import Script from "next/script";
 
 function MyApp({ Component, pageProps }: AppProps) {
   console.log("APP IS RUNNING");
-  console.log(pageProps);
   return (
     <SWRConfig
       value={{
