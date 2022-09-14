@@ -27,8 +27,8 @@ export default function Item({
       <a className="flex px-4 pt-5 cursor-pointer justify-between">
         <div className="flex space-x-4">
           <Image
-            width={96}
-            height={96}
+            width={120}
+            height={114}
             src={
               image
                 ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${image}/avatar`
