@@ -10,6 +10,7 @@ import { cls, convertTime } from "@libs/client/utils";
 import useUser from "@libs/client/useUser";
 import Image from "next/image";
 import client from "@libs/server/client";
+import NextNProgress from "nextjs-progressbar";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -57,25 +58,36 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
       </div>
       <div className="px-4 py-4">
         <div className="mb-8 ">
-          <div className="flex cursor-pointer py-3 -mt-4 border-b items-center space-x-3 border border-red-300">
-            <Image
-              width={48}
-              height={48}
-              src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product?.user?.avatar}/avatar`}
-              className="w-12 h-12 rounded-full bg-slate-300"
-            />
-            <div className="border border-red-300 start ">
-              <p className="text-sm font-medium text-gray-700">
-                {product?.user?.name}
-              </p>
-              <Link href={`/users/profiles/${product?.user?.id}`}>
-                <a className="text-xs font-medium text-gray-500">
-                  View profile &rarr;
-                </a>
-              </Link>
+          <div className="flex cursor-pointer py-3 -mt-4 border-b items-center justify-between ">
+            <div className="flex gap-3 items-center">
+              <Image
+                width={48}
+                height={48}
+                src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product?.user?.avatar}/avatar`}
+                className="w-12 h-12 rounded-full bg-slate-300"
+              />
+              <div className="">
+                <p className="text-sm font-semibold text-gray-700">
+                  {product?.user?.name}
+                </p>
+                <Link href={`/users/profiles/${product?.user?.id}`}>
+                  <a className="text-xs font-medium text-gray-500">
+                    프로필 보기
+                  </a>
+                </Link>
+              </div>
             </div>
-            <div className="border border-red-300 w-full">
-              <h1>dd</h1>
+            <div>
+              <div className="flex gap-1">
+                <div className="flex flex-col items-end">
+                  <h1 className="text-green-500">40°</h1>
+                  <progress className="w-9 h-1" max={100} value={50} />
+                </div>
+                <div className="text-xl">😀</div>
+              </div>
+              <div className="text-[1px] text-end text-gray-300 underline">
+                매너온도
+              </div>
             </div>
           </div>
           <div className="mt-5">
@@ -87,6 +99,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                 디지털/기기ㆍ끌올 {convertTime(product?.createdAt.toString())}
               </span>
             </span>
+
             <p className=" my-6 text-black">{product?.description}</p>
           </div>
         </div>
@@ -110,11 +123,11 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
           <div>
             <div className="flex items-center justify-between px-4 py-3 border-t border-gray-300">
               <div className="w-full flex items-center justify-between ">
-                <div className="border-r border-gray-200">
+                <div className="flex gap-4">
                   <button
                     onClick={onFavClick}
                     className={cls(
-                      "p-3 rounded-md flex items-center hover:bg-gray-100 justify-center ",
+                      "p-3 rounded-md flex items-center hover:bg-gray-100 justify-center  border-r border-gray-200 ",
                       isLiked
                         ? "text-red-500  hover:text-red-600"
                         : "text-gray-400  hover:text-gray-500"
@@ -151,17 +164,18 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                       </svg>
                     )}
                   </button>
+                  <div className="flex items-start flex-col justify-start">
+                    <p className="text-md font-semibold text-black">
+                      {product?.price.toLocaleString("ko-KR")}원
+                    </p>
+                    <Link href={`/users/profiles/${product?.user?.id}`}>
+                      <a className="text-xs font-bold text-orange-500 underline">
+                        가격 제안하기
+                      </a>
+                    </Link>
+                  </div>
                 </div>
-                <div className="-ml-72  flex items-start flex-col justify-start">
-                  <p className="text-md font-semibold text-black">
-                    {product?.price.toLocaleString("ko-KR")}원
-                  </p>
-                  <Link href={`/users/profiles/${product?.user?.id}`}>
-                    <a className="text-xs font-bold text-orange-500 underline">
-                      가격 제안하기
-                    </a>
-                  </Link>
-                </div>
+
                 <div>
                   <button className="py-2 px-4 text-white bg-orange-500 rounded-md">
                     채팅하기
