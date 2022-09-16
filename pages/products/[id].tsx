@@ -80,8 +80,8 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
             <div>
               <div className="flex gap-1">
                 <div className="flex flex-col items-end">
-                  <h1 className="text-green-500">40°</h1>
-                  <progress className="w-9 h-1" max={100} value={50} />
+                  <h1 className="text-sm text-green-500">40°</h1>
+                  <progress className="w-9 h-1" max={100} value={40} />
                 </div>
                 <div className="text-xl">😀</div>
               </div>
@@ -103,8 +103,10 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
             <p className=" my-6 text-black">{product?.description}</p>
           </div>
         </div>
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Similar items</h2>
+        <div className="border-t border-gray-200 pt-5">
+          <h2 className="text-md font-bold text-gray-900">
+            {product?.user.name}님, 이건 어때요?
+          </h2>
           <div className=" mt-6 grid grid-cols-2 gap-4">
             {relatedProducts?.map((product) => (
               <div key={product.id}>
@@ -118,7 +120,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
           </div>
         </div>
       </div>
-      <div className="w-full h-20 fixed bottom-0 ">
+      <div className="w-full h-20 fixed bottom-0 bg-white">
         <div>
           <div>
             <div className="flex items-center justify-between px-4 py-3 border-t border-gray-300">
