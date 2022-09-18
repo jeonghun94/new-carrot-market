@@ -18,6 +18,7 @@ model User {
   email           String?     @unique
   name            String
   avatar          String?
+  temperature     Float?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   tokens          Token[]

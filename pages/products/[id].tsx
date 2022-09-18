@@ -80,8 +80,12 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
             <div>
               <div className="flex gap-1">
                 <div className="flex flex-col items-end">
-                  <h1 className="text-sm text-green-500">40°</h1>
-                  <progress className="w-9 h-1" max={100} value={40} />
+                  <h1 className="text-sm text-green-500">{`${product?.user.temperature}°`}</h1>
+                  <progress
+                    className="w-9 h-1"
+                    max={100}
+                    value={product?.user?.temperature?.toString()}
+                  />
                 </div>
                 <div className="text-xl">😀</div>
               </div>
@@ -215,6 +219,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
           id: true,
           name: true,
           avatar: true,
+          temperature: true,
         },
       },
     },
