@@ -11,6 +11,7 @@ import useUser from "@libs/client/useUser";
 import Image from "next/image";
 import client from "@libs/server/client";
 import NextNProgress from "nextjs-progressbar";
+import { read } from "fs";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -89,8 +90,20 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                 </div>
                 <div className="text-xl">😀</div>
               </div>
-              <div className="text-[1px] text-end text-gray-300 underline">
+              {/* <div className="text-[1px] text-end text-gray-300 underline">
                 매너온도
+              </div> */}
+              <div className="group relative ">
+                <p className="text-[1px] text-end text-gray-300 underline ">
+                  매너온도
+                </p>
+                <p className="absolute top-5 right-1 hidden w-max p-2 text-[1px] rounded-md bg-gray-800 text-white group-hover:block">
+                  매너온도는 당근마켓 사용자로부터 받은 칭찬,
+                  <br />
+                  후기, 비매너 평가, 운영자 제재 등을 종합해서
+                  <br />
+                  만든 매너 지표에요.
+                </p>
               </div>
             </div>
           </div>
@@ -107,22 +120,26 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
             <p className=" my-6 text-black">{product?.description}</p>
           </div>
         </div>
-        <div className="border-t border-gray-200 pt-5">
-          <h2 className="text-md font-bold text-gray-900">
-            {product?.user.name}님, 이건 어때요?
-          </h2>
-          <div className=" mt-6 grid grid-cols-2 gap-4">
-            {relatedProducts?.map((product) => (
-              <div key={product.id}>
-                <div className="h-56 w-full mb-4 bg-slate-300" />
-                <h3 className="text-gray-700 -mb-1">{product.name}</h3>
-                <span className="text-sm font-medium text-gray-900">
-                  ${product.price}
-                </span>
+        {relatedProducts.length > 0 ? (
+          <div className="border-t border-gray-200 pt-5">
+            <>
+              <h2 className="text-md font-bold text-gray-900">
+                {product?.user.name}님, 이건 어때요?
+              </h2>
+              <div className=" mt-6 grid grid-cols-2 gap-4">
+                {relatedProducts?.map((product) => (
+                  <div key={product.id}>
+                    <div className="h-56 w-full mb-4 bg-slate-300" />
+                    <h3 className="text-gray-700 -mb-1">{product.name}</h3>
+                    <span className="text-sm font-medium text-gray-900">
+                      ${product.price}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </>
           </div>
-        </div>
+        ) : null}
       </div>
       <div className="w-full h-20 fixed bottom-0 bg-white">
         <div>
