@@ -1,31 +1,35 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
-import Button from "@components/button";
+import { cls, convertPrice, convertTime } from "@libs/client/utils";
+import useMutation from "@libs/client/useMutation";
+import { Product, User } from "@prisma/client";
+import useSWR, { useSWRConfig } from "swr";
+import useUser from "@libs/client/useUser";
+import noImage from "public/no-image.png";
+import client from "@libs/server/client";
 import Layout from "@components/layout";
 import { useRouter } from "next/router";
-import useSWR, { useSWRConfig } from "swr";
-import Link from "next/link";
-import { Product, User } from "@prisma/client";
-import useMutation from "@libs/client/useMutation";
-import { cls, convertTime } from "@libs/client/utils";
-import useUser from "@libs/client/useUser";
 import Image from "next/image";
-import client from "@libs/server/client";
-import NextNProgress from "nextjs-progressbar";
-import { read } from "fs";
+import Link from "next/link";
+import Products from "@components/products";
 
 interface ProductWithUser extends Product {
   user: User;
+  _count: {
+    favs: number;
+  };
 }
 interface ItemDetailResponse {
   ok: boolean;
   product: ProductWithUser;
   relatedProducts: Product[];
+  mySaleProducts: Product[];
   isLiked: boolean;
 }
 
 const ItemDetail: NextPage<ItemDetailResponse> = ({
   product,
   relatedProducts,
+  mySaleProducts,
   isLiked,
 }) => {
   const { user, isLoading } = useUser();
@@ -44,7 +48,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   if (router.isFallback) {
     return (
       <Layout title="Loaidng for youuuuuuu">
-        <span>I love you</span>
+        <h1 className="flex justify-center items-center">Wait a Seconds</h1>
       </Layout>
     );
   }
@@ -58,7 +62,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
         />
       </div>
       <div className="px-4 py-4">
-        <div className="mb-8 ">
+        <div className="mb-0">
           <div className="flex cursor-pointer py-3 -mt-4 border-b items-center justify-between ">
             <div className="flex gap-3 items-center">
               <Image
@@ -90,9 +94,6 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                 </div>
                 <div className="text-xl">😀</div>
               </div>
-              {/* <div className="text-[1px] text-end text-gray-300 underline">
-                매너온도
-              </div> */}
               <div className="group relative ">
                 <p className="text-[1px] text-end text-gray-300 underline ">
                   매너온도
@@ -111,33 +112,80 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
             <h1 className="text-2xl font-bold text-gray-900">
               {product?.name}
             </h1>
-            <span className="text-xs block mt-3 text-gray-400">
-              <span>
-                디지털/기기ㆍ끌올 {convertTime(product?.createdAt.toString())}
-              </span>
+            <span className="text-xs mt-3 text-gray-400">
+              디지털/기기ㆍ끌올 {convertTime(product?.createdAt.toString())}
             </span>
-
-            <p className=" my-6 text-black">{product?.description}</p>
+            <p className="mt-3 text-black">{product?.description}</p>
+            <span className="text-xs text-gray-400">
+              {product?._count?.favs > 0
+                ? `관심 ${product._count.favs} ∙ `
+                : null}
+              조회 10
+            </span>
           </div>
         </div>
-        {relatedProducts.length > 0 ? (
-          <div className="border-t border-gray-200 pt-5">
-            <>
+        {/* <Products /> */}
+        {mySaleProducts.length > 0 ? (
+          <div className="border-t border-gray-200 pt-5 mt-5">
+            <div className="flex justify-between">
               <h2 className="text-md font-bold text-gray-900">
-                {product?.user.name}님, 이건 어때요?
+                {user?.name}님의 판매 상품
               </h2>
-              <div className=" mt-6 grid grid-cols-2 gap-4">
-                {relatedProducts?.map((product) => (
-                  <div key={product.id}>
-                    <div className="h-56 w-full mb-4 bg-slate-300" />
-                    <h3 className="text-gray-700 -mb-1">{product.name}</h3>
-                    <span className="text-sm font-medium text-gray-900">
-                      ${product.price}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </>
+              <h2>
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  ></path>
+                </svg>
+              </h2>
+            </div>
+            <div className=" mt-6 grid grid-cols-2 gap-4">
+              {mySaleProducts?.map((product) => (
+                <div key={product.id}>
+                  <Image
+                    width={340}
+                    height={240}
+                    src={
+                      product.image
+                        ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product.image}/public `
+                        : noImage
+                    }
+                    className="rounded-md"
+                  />
+                  <h3 className="text-gray-700 my-2">{product.name}</h3>
+                  <span className="-mt-1 mb-2 text-sm font-bold text-gray-900">
+                    {convertPrice(product?.price)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+        {relatedProducts.length > 0 ? (
+          <div className="border-t border-gray-200 pt-5 mt-5">
+            <h2 className="text-md font-bold text-gray-900">
+              {product?.user.name}님, 이건 어때요?
+            </h2>
+            <div className=" mt-6 grid grid-cols-2 gap-4">
+              {relatedProducts?.map((product) => (
+                <div key={product.id}>
+                  <div className="h-56 w-full mb-4 bg-slate-300" />
+                  <h3 className="text-gray-700 -mb-1">{product.name}</h3>
+                  <span className="text-sm font-medium text-gray-900">
+                    {convertPrice(product?.price)}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         ) : null}
       </div>
@@ -189,7 +237,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                   </button>
                   <div className="flex items-start flex-col justify-start">
                     <p className="text-md font-semibold text-black">
-                      {product?.price.toLocaleString("ko-KR")}원
+                      {convertPrice(product?.price)}
                     </p>
                     <Link href={`/users/profiles/${product?.user?.id}`}>
                       <a className="text-xs font-bold text-orange-500 underline">
@@ -226,6 +274,7 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
       props: {},
     };
   }
+
   const product = await client.product.findUnique({
     where: {
       id: +ctx.params.id.toString(),
@@ -239,13 +288,21 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
           temperature: true,
         },
       },
+      _count: {
+        select: {
+          favs: true,
+        },
+      },
     },
   });
+
+  console.log(product);
   const terms = product?.name.split(" ").map((word) => ({
     name: {
       contains: word,
     },
   }));
+
   const relatedProducts = await client.product.findMany({
     where: {
       OR: terms,
@@ -256,12 +313,25 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
       },
     },
   });
+
+  const mySaleProducts = await client.product.findMany({
+    where: {
+      user: {
+        id: product?.user?.id,
+      },
+      NOT: {
+        id: product?.id,
+      },
+    },
+  });
+
   const isLiked = false;
   // await new Promise((resolve) => setTimeout(resolve, 10000));
   return {
     props: {
       product: JSON.parse(JSON.stringify(product)),
       relatedProducts: JSON.parse(JSON.stringify(relatedProducts)),
+      mySaleProducts: JSON.parse(JSON.stringify(mySaleProducts)),
       isLiked,
     },
   };

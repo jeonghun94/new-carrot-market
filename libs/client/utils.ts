@@ -26,3 +26,7 @@ export const convertTime = (value: string) => {
 
   return `${Math.floor(betweenTimeDay / 365)}년전`;
 };
+
+export const convertPrice = (price: number) => {
+  return `${price.toLocaleString("ko-KR")}원`;
+};
