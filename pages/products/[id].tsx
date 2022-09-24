@@ -1,16 +1,16 @@
-import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
+import type { NextPage, NextPageContext } from "next";
 import { cls, convertPrice, convertTime } from "@libs/client/utils";
 import useMutation from "@libs/client/useMutation";
 import { Product, User } from "@prisma/client";
 import useSWR, { useSWRConfig } from "swr";
 import useUser from "@libs/client/useUser";
-import noImage from "public/no-image.png";
 import client from "@libs/server/client";
 import Layout from "@components/layout";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
 import Products from "@components/products";
+import { withSsrSession } from "@libs/server/withSession";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -124,70 +124,12 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
             </span>
           </div>
         </div>
-        {/* <Products /> */}
-        {mySaleProducts.length > 0 ? (
-          <div className="border-t border-gray-200 pt-5 mt-5">
-            <div className="flex justify-between">
-              <h2 className="text-md font-bold text-gray-900">
-                {user?.name}님의 판매 상품
-              </h2>
-              <h2>
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5l7 7-7 7"
-                  ></path>
-                </svg>
-              </h2>
-            </div>
-            <div className=" mt-6 grid grid-cols-2 gap-4">
-              {mySaleProducts?.map((product) => (
-                <div key={product.id}>
-                  <Image
-                    width={340}
-                    height={240}
-                    src={
-                      product.image
-                        ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product.image}/public `
-                        : noImage
-                    }
-                    className="rounded-md"
-                  />
-                  <h3 className="text-gray-700 my-2">{product.name}</h3>
-                  <span className="-mt-1 mb-2 text-sm font-bold text-gray-900">
-                    {convertPrice(product?.price)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : null}
-        {relatedProducts.length > 0 ? (
-          <div className="border-t border-gray-200 pt-5 mt-5">
-            <h2 className="text-md font-bold text-gray-900">
-              {product?.user.name}님, 이건 어때요?
-            </h2>
-            <div className=" mt-6 grid grid-cols-2 gap-4">
-              {relatedProducts?.map((product) => (
-                <div key={product.id}>
-                  <div className="h-56 w-full mb-4 bg-slate-300" />
-                  <h3 className="text-gray-700 -mb-1">{product.name}</h3>
-                  <span className="text-sm font-medium text-gray-900">
-                    {convertPrice(product?.price)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : null}
+        <Products
+          products={mySaleProducts}
+          isMe={true}
+          name={product?.user.name}
+        />
+        <Products products={relatedProducts} isMe={false} name={user?.name} />
       </div>
       <div className="w-full h-20 fixed bottom-0 bg-white">
         <div>
@@ -261,23 +203,16 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   );
 };
 
-export const getStaticPaths: GetStaticPaths = () => {
-  return {
-    paths: [],
-    fallback: true,
-  };
-};
-
-export const getStaticProps: GetStaticProps = async (ctx) => {
-  if (!ctx?.params?.id) {
-    return {
-      props: {},
-    };
-  }
+export const getServerSideProps = withSsrSession(async function ({
+  req,
+  query,
+}: NextPageContext) {
+  console.log(req?.session.user?.id, "유저아이디");
 
   const product = await client.product.findUnique({
     where: {
-      id: +ctx.params.id.toString(),
+      // @ts-ignore
+      id: +query.id,
     },
     include: {
       user: {
@@ -295,8 +230,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
       },
     },
   });
+  7;
 
-  console.log(product);
   const terms = product?.name.split(" ").map((word) => ({
     name: {
       contains: word,
@@ -309,6 +244,11 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
       AND: {
         id: {
           not: product?.id,
+        },
+        user: {
+          NOT: {
+            id: req?.session.user?.id,
+          },
         },
       },
     },
@@ -325,16 +265,14 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     },
   });
 
-  const isLiked = false;
-  // await new Promise((resolve) => setTimeout(resolve, 10000));
   return {
     props: {
       product: JSON.parse(JSON.stringify(product)),
       relatedProducts: JSON.parse(JSON.stringify(relatedProducts)),
       mySaleProducts: JSON.parse(JSON.stringify(mySaleProducts)),
-      isLiked,
+      isLiked: false,
     },
   };
-};
+});
 
 export default ItemDetail;
