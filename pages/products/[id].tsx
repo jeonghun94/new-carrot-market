@@ -128,6 +128,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
           products={mySaleProducts}
           isMe={true}
           name={product?.user.name}
+          sellerId={product?.user.id}
         />
         <Products products={relatedProducts} isMe={false} name={user?.name} />
       </div>
@@ -207,8 +208,6 @@ export const getServerSideProps = withSsrSession(async function ({
   req,
   query,
 }: NextPageContext) {
-  console.log(req?.session.user?.id, "유저아이디");
-
   const product = await client.product.findUnique({
     where: {
       // @ts-ignore

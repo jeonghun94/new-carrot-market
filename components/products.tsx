@@ -2,16 +2,30 @@ import { convertPrice } from "@libs/client/utils";
 import noImage from "public/no-image.png";
 import { Product } from "@prisma/client";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React from "react";
 
 export default function Products({
   products,
   isMe,
   name,
+  sellerId,
 }: {
   products: Product[];
   isMe: boolean;
   name?: string;
+  sellerId?: number;
 }) {
+  const router = useRouter();
+  const handleClick = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push({
+      pathname: "/products/history",
+      query: { sellerId },
+    });
+  };
+
   return (
     <>
       {products?.length > 0 ? (
@@ -21,7 +35,7 @@ export default function Products({
               <h2 className="text-md font-bold text-gray-900">
                 {name}님의 판매 상품
               </h2>
-              <h2>
+              <a onClick={handleClick}>
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -36,7 +50,7 @@ export default function Products({
                     d="M9 5l7 7-7 7"
                   ></path>
                 </svg>
-              </h2>
+              </a>
             </div>
           ) : (
             <h2 className="text-md font-bold text-gray-900">
