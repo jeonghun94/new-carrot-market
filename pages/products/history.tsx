@@ -3,18 +3,22 @@ import client from "@libs/server/client";
 import Layout from "@components/layout";
 import { useState } from "react";
 import { Product } from "@prisma/client";
-import { cls } from "@libs/client/utils";
+import { cls, convertPrice } from "@libs/client/utils";
 import Image from "next/image";
 import noImage from "public/no-image.png";
 
+interface ProductWithCount extends Product {
+  _count: {
+    favs: number;
+  };
+}
+
 interface SellerProduct {
-  products: Product[];
+  products: ProductWithCount[];
 }
 
 const History: NextPage<SellerProduct> = ({ products }) => {
   const [tab, setTab] = useState(1);
-
-  console.log(products);
 
   const foucsTab = (tab: number, index: number) => {
     const foucs =
@@ -23,7 +27,7 @@ const History: NextPage<SellerProduct> = ({ products }) => {
         : "text-gray-500  border-b border-gray-300";
 
     return (
-      "text-xs font-bold uppercase px-5 py-3 block leading-normal " + foucs
+      "text-sm font-bold uppercase px-5 py-3 block leading-normal " + foucs
     );
   };
 
@@ -82,7 +86,18 @@ const History: NextPage<SellerProduct> = ({ products }) => {
                       )}
                     />
                   </div>
-                  <div className=" w-2/3 bg-red-400">dsds</div>
+                  <div className=" w-2/3 relative">
+                    <p>{product.name}</p>
+                    <p className="text-xs my-1 text-gray-400">조회 10</p>
+                    <p className="font-semibold">
+                      {convertPrice(product.price)}
+                    </p>
+                    <p className="absolute right-2 bottom-0">
+                      {product._count.favs > 0
+                        ? `♡${product._count.favs}`
+                        : null}
+                    </p>
+                  </div>
                 </div>
               ))}
 
@@ -109,15 +124,19 @@ const History: NextPage<SellerProduct> = ({ products }) => {
 
 export const getServerSideProps = async (ctx: NextPageContext) => {
   const { sellerId } = ctx.query;
-  // console.log(Number(sellerId));
 
   const products = await client.product.findMany({
     where: {
       userId: Number(sellerId),
     },
+    include: {
+      _count: {
+        select: {
+          favs: true,
+        },
+      },
+    },
   });
-
-  // console.log(products);
 
   return {
     props: {

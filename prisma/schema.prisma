@@ -60,6 +60,8 @@ model Product {
   sales       Sale[]
   purchases   Purchase[]
   records     Record[]
+  views       Int       @default(0)
+  
   @@index([userId])
 }
 

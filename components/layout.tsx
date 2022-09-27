@@ -27,7 +27,7 @@ export default function Layout({
     router.back();
   };
   return (
-    <div className="mb-24">
+    <div>
       <Head>
         <title>{headTitle}</title>
       </Head>
