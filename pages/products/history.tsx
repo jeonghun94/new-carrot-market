@@ -6,6 +6,7 @@ import { Product } from "@prisma/client";
 import { cls, convertPrice } from "@libs/client/utils";
 import Image from "next/image";
 import noImage from "public/no-image.png";
+import { useRouter } from "next/router";
 
 interface ProductWithCount extends Product {
   _count: {
@@ -19,6 +20,14 @@ interface SellerProduct {
 
 const History: NextPage<SellerProduct> = ({ products }) => {
   const [tab, setTab] = useState(1);
+  const router = useRouter();
+
+  const productDetail = (id: number) => {
+    router.push(`/products/${id}`);
+  };
+
+  const saleProducts = products.filter((product) => product.status === true);
+  const soldProducts = products.filter((product) => product.status === false);
 
   const foucsTab = (tab: number, index: number) => {
     const foucs =
@@ -50,6 +59,49 @@ const History: NextPage<SellerProduct> = ({ products }) => {
     );
   };
 
+  const productsL = (products: ProductWithCount[], tabIndex: number) => {
+    return products.map((product) => (
+      <div
+        key={product.id}
+        className={`${cls(
+          tab === tabIndex ? "block" : "hidden"
+        )} w-full h-40 p-4 mb-2.5 bg-white flex gap-3 cursor-pointer `}
+        onClick={() => productDetail(product.id)}
+        id={`link${tabIndex}`}
+      >
+        <div className="w-1/3 rounded-md">
+          <Image
+            width={180}
+            height={135}
+            src={
+              product.image
+                ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product.image}/avatar`
+                : noImage
+            }
+            className={cls(
+              `w-12 h-12 rounded-md ${product.image ? " bg-slate-300" : ""}`
+            )}
+          />
+        </div>
+        <div className=" w-2/3 relative">
+          <p>{product.name}</p>
+          <p className="text-xs my-1 text-gray-400">조회 10</p>
+          <div className="flex">
+            {!product.status ? (
+              <div className="bg-gray-300 rounded-sm self-center text-sm px-2 mr-1">
+                거래완료
+              </div>
+            ) : null}
+            <div className="font-semibold">{convertPrice(product.price)}</div>
+          </div>
+          <p className="absolute right-2 bottom-0">
+            {product._count.favs > 0 ? `♡${product._count.favs}` : null}
+          </p>
+        </div>
+      </div>
+    ));
+  };
+
   return (
     <Layout canGoBack title="판매 상품 보기">
       <div className="flex flex-wrap">
@@ -62,58 +114,9 @@ const History: NextPage<SellerProduct> = ({ products }) => {
 
           <div className="relative h-screen flex flex-col  break-words bg-gray-100 w-full ">
             <div className="tab-content tab-space">
-              {products.map((product) => (
-                <div
-                  className={`${cls(
-                    tab === 1 ? "block" : "hidden"
-                  )} w-full h-40 p-4 mb-2.5 bg-white flex gap-3 `}
-                  id="link1"
-                >
-                  <div className="w-1/3 rounded-md">
-                    {" "}
-                    <Image
-                      width={180}
-                      height={135}
-                      src={
-                        product.image
-                          ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product.image}/avatar`
-                          : noImage
-                      }
-                      className={cls(
-                        `w-12 h-12 rounded-md ${
-                          product.image ? " bg-slate-300" : ""
-                        }`
-                      )}
-                    />
-                  </div>
-                  <div className=" w-2/3 relative">
-                    <p>{product.name}</p>
-                    <p className="text-xs my-1 text-gray-400">조회 10</p>
-                    <p className="font-semibold">
-                      {convertPrice(product.price)}
-                    </p>
-                    <p className="absolute right-2 bottom-0">
-                      {product._count.favs > 0
-                        ? `♡${product._count.favs}`
-                        : null}
-                    </p>
-                  </div>
-                </div>
-              ))}
-
-              <div className={tab === 2 ? "block" : "hidden"} id="link2">
-                <p>
-                  Completely synergize resource taxing relationships via premier
-                  niche markets. Professionally cultivate one-to-one customer
-                  service with robust ideas.
-                </p>
-              </div>
-              <div className={tab === 3 ? "block" : "hidden"} id="link3">
-                <p>
-                  Efficiently unleash cross-media information without
-                  cross-media value. Quickly maximize timely deliverables for
-                </p>
-              </div>
+              {productsL(products, 1)}
+              {productsL(saleProducts, 2)}
+              {productsL(soldProducts, 3)}
             </div>
           </div>
         </div>

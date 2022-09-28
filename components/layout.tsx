@@ -10,6 +10,8 @@ interface LayoutProps {
   hasTabBar?: boolean;
   children: React.ReactNode;
   seoTitle?: string;
+  // actionBtn?: React.ReactNode;
+  noActionBar?: boolean;
 }
 
 export default function Layout({
@@ -18,6 +20,8 @@ export default function Layout({
   hasTabBar,
   children,
   seoTitle,
+  // actionBtn,
+  noActionBar,
 }: LayoutProps) {
   const headTitle = `${
     seoTitle ? `${seoTitle} | Carrot Market` : "Carrot Market"
@@ -31,29 +35,31 @@ export default function Layout({
       <Head>
         <title>{headTitle}</title>
       </Head>
-      <div className="bg-white w-full h-14 max-w-xl justify-center text-lg px-10 font-medium  fixed text-gray-800 border-b top-0  flex items-center">
-        {canGoBack ? (
-          <button onClick={onClick} className="absolute left-4">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M15 19l-7-7 7-7"
-              ></path>
-            </svg>
-          </button>
-        ) : null}
-        {title ? (
-          <span className={cls(canGoBack ? "mx-auto" : "", "")}>{title}</span>
-        ) : null}
-      </div>
+      {noActionBar ? null : (
+        <div className=" w-full h-14 max-w-xl px-10 flex justify-center items-center fixed top-0 text-lg font-medium text-gray-800  bg-white border-b">
+          {canGoBack ? (
+            <button onClick={onClick} className="absolute left-4">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 19l-7-7 7-7"
+                ></path>
+              </svg>
+            </button>
+          ) : null}
+          {title ? (
+            <span className={cls(canGoBack ? "mx-auto" : "", "")}>{title}</span>
+          ) : null}
+        </div>
+      )}
       <div className={cls("pt-12", hasTabBar ? "pb-24" : "")}>{children}</div>
       {hasTabBar ? (
         <nav className="bg-white max-w-xl text-gray-700 border-t fixed bottom-0 w-full px-10 pb-5 pt-3 flex justify-between text-xs">

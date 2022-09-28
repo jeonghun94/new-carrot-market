@@ -31,11 +31,14 @@ export default function Products({
       {products?.length > 0 ? (
         <div className="border-t border-gray-200 pt-5 mt-5">
           {isMe ? (
-            <div className="flex justify-between">
+            <div
+              className="flex justify-between cursor-pointer"
+              onClick={handleClick}
+            >
               <h2 className="text-md font-bold text-gray-900">
                 {name}님의 판매 상품
               </h2>
-              <a onClick={handleClick}>
+              <a>
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -44,9 +47,9 @@ export default function Products({
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="M9 5l7 7-7 7"
                   ></path>
                 </svg>
@@ -59,7 +62,11 @@ export default function Products({
           )}
           <div className=" mt-6 grid grid-cols-2 gap-4">
             {products.map((product: Product) => (
-              <div key={product.id}>
+              <div
+                key={product.id}
+                className="cursor-pointer"
+                onClick={() => router.push(`/products/${product.id}`)}
+              >
                 <Image
                   width={340}
                   height={270}

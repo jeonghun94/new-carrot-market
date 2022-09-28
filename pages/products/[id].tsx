@@ -11,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Products from "@components/products";
 import { withSsrSession } from "@libs/server/withSession";
+import { useEffect } from "react";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -32,19 +33,25 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   mySaleProducts,
   isLiked,
 }) => {
-  const { user, isLoading } = useUser();
+  const { user } = useUser();
   const router = useRouter();
-  const { mutate } = useSWRConfig();
-  const { data, mutate: boundMutate } = useSWR<ItemDetailResponse>(
+  const { data, mutate } = useSWR<ItemDetailResponse>(
     router.query.id ? `/api/products/${router.query.id}` : null
   );
+
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
+  const [views] = useMutation(`/api/products/${router.query.id}/views`);
+
   const onFavClick = () => {
     if (!data) return;
-    boundMutate((prev) => prev && { ...prev, isLiked: !prev.isLiked }, false);
-    // mutate("/api/users/me", (prev: any) => ({ ok: !prev.ok }), false);
+    mutate((prev) => prev && { ...prev, isLiked: !prev.isLiked }, false);
     toggleFav({});
   };
+
+  useEffect(() => {
+    views({});
+  }, [router]);
+
   if (router.isFallback) {
     return (
       <Layout title="Loaidng for youuuuuuu">
@@ -54,7 +61,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   }
   return (
     <div className="mb-24">
-      <Layout canGoBack seoTitle="Product Detail">
+      <Layout canGoBack seoTitle={`${product.name}`}>
         <div className="relative pb-96">
           <Image
             src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product.image}/public`}
@@ -121,7 +128,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                 {product?._count?.favs > 0
                   ? `관심 ${product._count.favs} ∙ `
                   : null}
-                조회 10
+                조회 {product?.views}
               </span>
             </div>
           </div>
@@ -137,18 +144,18 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
           <div>
             <div>
               <div className="flex items-center justify-between px-4 py-3 border-t border-gray-300">
-                <div className="w-full flex items-center justify-between ">
+                <div className="w-full flex items-center justify-between">
                   <div className="flex gap-4">
                     <button
                       onClick={onFavClick}
                       className={cls(
-                        "p-3 rounded-md flex items-center hover:bg-gray-100 justify-center  border-r border-gray-200 ",
-                        isLiked
-                          ? "text-red-500  hover:text-red-600"
+                        "p-3 rounded-md flex items-center  border-r",
+                        data?.isLiked
+                          ? "text-orange-500  hover:text-orange-600"
                           : "text-gray-400  hover:text-gray-500"
                       )}
                     >
-                      {isLiked ? (
+                      {data?.isLiked ? (
                         <svg
                           className="w-6 h-6"
                           fill="currentColor"
@@ -179,20 +186,31 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                         </svg>
                       )}
                     </button>
-                    <div className="flex items-start flex-col justify-start">
+                    <div className="flex justify-center items-center flex-col">
                       <p className="text-md font-semibold text-black">
                         {convertPrice(product?.price)}
                       </p>
-                      <Link href={`/users/profiles/${product?.user?.id}`}>
-                        <a className="text-xs font-bold text-orange-500 underline">
-                          가격 제안하기
-                        </a>
-                      </Link>
+                      {product?.nego ? (
+                        <Link href={`/users/profiles/${product?.user?.id}`}>
+                          <a className="text-xs font-bold text-orange-500 underline">
+                            가격 제안하기
+                          </a>
+                        </Link>
+                      ) : (
+                        <p className="text-xs text-gray-400 self-start">
+                          가격 제안 불가
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div>
-                    <button className="py-2 px-4 text-white bg-orange-500 rounded-md">
+                    <button
+                      disabled={!product.status ? true : false}
+                      className={`py-2 px-4 text-white ${
+                        product.status ? "bg-orange-500" : "bg-gray-400"
+                      }  rounded-md disabled:text-gray-300`}
+                    >
                       채팅하기
                     </button>
                   </div>
@@ -231,7 +249,6 @@ export const getServerSideProps = withSsrSession(async function ({
       },
     },
   });
-  7;
 
   const terms = product?.name.split(" ").map((word) => ({
     name: {
@@ -257,6 +274,7 @@ export const getServerSideProps = withSsrSession(async function ({
 
   const mySaleProducts = await client.product.findMany({
     where: {
+      status: true,
       user: {
         id: product?.user?.id,
       },

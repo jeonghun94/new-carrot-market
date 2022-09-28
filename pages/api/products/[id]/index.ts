@@ -27,23 +27,6 @@ async function handler(
     },
   });
 
-  const terms = product?.name.split(" ").map((word) => ({
-    name: {
-      contains: word,
-    },
-  }));
-
-  const relatedProducts = await client.product.findMany({
-    where: {
-      OR: terms,
-      AND: {
-        id: {
-          not: product?.id,
-        },
-      },
-    },
-  });
-
   const isLiked = Boolean(
     await client.fav.findFirst({
       where: {
@@ -55,7 +38,7 @@ async function handler(
       },
     })
   );
-  res.json({ ok: true, product, relatedProducts, isLiked });
+  res.json({ ok: true, isLiked });
 }
 
 export default withApiSession(withHandler({ methods: ["GET"], handler }));

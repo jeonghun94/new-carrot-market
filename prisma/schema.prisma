@@ -61,7 +61,10 @@ model Product {
   purchases   Purchase[]
   records     Record[]
   views       Int       @default(0)
-  
+  share       Boolean   @default(false)
+  nego        Boolean   @default(false)
+  status      Boolean   @default(true)
+
   @@index([userId])
 }
 
