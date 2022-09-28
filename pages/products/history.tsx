@@ -85,7 +85,7 @@ const History: NextPage<SellerProduct> = ({ products }) => {
         </div>
         <div className=" w-2/3 relative">
           <p>{product.name}</p>
-          <p className="text-xs my-1 text-gray-400">조회 10</p>
+          <p className="text-xs my-1 text-gray-400">조회 {product.views}</p>
           <div className="flex">
             {!product.status ? (
               <div className="bg-gray-300 rounded-sm self-center text-sm px-2 mr-1">
