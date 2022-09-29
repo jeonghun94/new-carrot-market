@@ -31,7 +31,9 @@ export default function Item({
             height={114}
             src={
               image
-                ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${image}/avatar`
+                ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${
+                    image.split(",")[0]
+                  }/avatar`
                 : noImage
             }
             className={cls(

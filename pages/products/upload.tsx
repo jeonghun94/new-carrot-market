@@ -40,19 +40,32 @@ const Upload: NextPage = () => {
     nego,
     share,
   }: UploadProductForm) => {
-    console.log(name, price, description, nego, share);
+    // 등록 하기 전에 이미지를 먼저 업로드 해야함
+    // console.log(name, price, description, nego, share);
     if (loading) return;
     if (photo && photo.length > 0) {
-      const { uploadURL } = await (await fetch(`/api/files`)).json();
-      const form = new FormData();
-      form.append("file", photo[0], name);
-      form.append("upload_preset", "nextjs");
-      const {
-        result: { id },
-      } = await (await fetch(uploadURL, { method: "POST", body: form })).json();
-      uploadProduct({ name, price, description, photoId: id });
+      const photoIds = [];
+      for (let i = 0; i < photo.length; i++) {
+        const form = new FormData();
+        const { uploadURL } = await (await fetch(`/api/files`)).json();
+        form.append("file", photo[i], name);
+        const {
+          result: { id },
+        } = await (
+          await fetch(uploadURL, { method: "POST", body: form })
+        ).json();
+        photoIds.push(id);
+      }
+      uploadProduct({
+        name,
+        price,
+        description,
+        photoId: photoIds.join(","),
+        nego,
+        share,
+      });
     } else {
-      uploadProduct({ name, price, description });
+      alert("사진등록은 필수입니다.");
     }
   };
   useEffect(() => {
@@ -61,6 +74,7 @@ const Upload: NextPage = () => {
     }
   }, [data, router]);
   const photo = watch("photo");
+  const [photos, setPhotos] = useState(0);
   const [photoPreview, setPhotoPreview] = useState("");
   // const [price, setPrice] = useState("");
 
@@ -72,6 +86,7 @@ const Upload: NextPage = () => {
   const removePhoto = (idx: number) => {
     const newPhotoPreview = photoPreview.split(",");
     newPhotoPreview.splice(idx, 1);
+    setPhotos(photos - 1);
     setPhotoPreview(newPhotoPreview.toString());
   };
 
@@ -81,6 +96,7 @@ const Upload: NextPage = () => {
       for (let i = 0; i < photo.length; i++) {
         files.push(URL.createObjectURL(photo[i]));
       }
+      setPhotos(photo.length);
       setPhotoPreview(files.toString());
     }
   }, [photo]);
@@ -114,27 +130,30 @@ const Upload: NextPage = () => {
         <div className="p-4">
           <div className="w-full mb-5 flex overflow-y-hidden">
             <div>
-              <label className="w-28 h-28 mt-2 cursor-pointer text-gray-600 flex items-center justify-center border border-gray-300 rounded-md">
-                <svg
-                  className="w-8 h-8"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                  ></path>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                  ></path>
-                </svg>
+              <label className=" w-28 h-28 mt-2 cursor-pointer text-gray-600 flex items-center justify-center border border-gray-300 rounded-md">
+                <div className="flex flex-col justify-center items-center gap-1">
+                  <svg
+                    className="w-8 h-8"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                    ></path>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    ></path>
+                  </svg>
+                  <p>{photos}/10</p>
+                </div>
                 <input
                   {...register("photo")}
                   multiple

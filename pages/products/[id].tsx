@@ -12,6 +12,7 @@ import Link from "next/link";
 import Products from "@components/products";
 import { withSsrSession } from "@libs/server/withSession";
 import { useEffect } from "react";
+import SimpleImageSlider from "react-simple-image-slider";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -39,6 +40,15 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
     router.query.id ? `/api/products/${router.query.id}` : null
   );
 
+  const images: any = [];
+  const productImg = product?.image?.split(",");
+  productImg.map((img) => {
+    images.push({
+      url: `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${img}/public`,
+    });
+  });
+  console.log(images);
+
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
   const [views] = useMutation(`/api/products/${router.query.id}/views`);
 
@@ -62,13 +72,27 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   return (
     <div className="mb-24">
       <Layout canGoBack seoTitle={`${product.name}`}>
-        <div className="relative pb-96">
+        {/* {productImg?.map((img, index) => (
           <Image
+            key={index}
+            src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${img}/public`}
+            className="bg-slate-300 object-cover"
+            width={50}
+            height={50}
+          />
+        ))} */}
+        <SimpleImageSlider
+          width={555}
+          height={504}
+          images={images}
+          showBullets={true}
+          showNavs={true}
+        />
+        {/* <Image
             src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product.image}/public`}
             className="bg-slate-300 object-cover"
             layout="fill"
-          />
-        </div>
+          /> */}
         <div className="px-4 py-4">
           <div className="mb-0">
             <div className="flex cursor-pointer py-3 -mt-4 border-b items-center justify-between ">
@@ -93,11 +117,19 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
               <div>
                 <div className="flex gap-1">
                   <div className="flex flex-col items-end">
-                    <h1 className="text-sm text-green-500">{`${product?.user.temperature}°`}</h1>
+                    <h1 className="text-sm text-green-500">{`${
+                      product?.user?.temperature
+                        ? product?.user.temperature
+                        : "36.5"
+                    }°`}</h1>
                     <progress
                       className="w-9 h-1"
                       max={100}
-                      value={product?.user?.temperature?.toString()}
+                      value={
+                        product?.user?.temperature
+                          ? product?.user?.temperature?.toString()
+                          : "36.5"
+                      }
                     />
                   </div>
                   <div className="text-xl">😀</div>
