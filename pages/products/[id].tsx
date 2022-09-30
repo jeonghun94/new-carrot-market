@@ -1,7 +1,7 @@
 import type { NextPage, NextPageContext } from "next";
 import { cls, convertPrice, convertTime } from "@libs/client/utils";
 import useMutation from "@libs/client/useMutation";
-import { Product, User } from "@prisma/client";
+import { Category, Product, User } from "@prisma/client";
 import useSWR, { useSWRConfig } from "swr";
 import useUser from "@libs/client/useUser";
 import client from "@libs/server/client";
@@ -12,10 +12,18 @@ import Link from "next/link";
 import Products from "@components/products";
 import { withSsrSession } from "@libs/server/withSession";
 import { useEffect } from "react";
-import SimpleImageSlider from "react-simple-image-slider";
+import { Swiper, SwiperSlide } from "swiper/react";
+import SwiperCore, { Navigation, Pagination } from "swiper";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/scrollbar";
+
+SwiperCore.use([Navigation, Pagination]);
 
 interface ProductWithUser extends Product {
   user: User;
+  category: Category;
   _count: {
     favs: number;
   };
@@ -47,7 +55,6 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
       url: `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${img}/public`,
     });
   });
-  console.log(images);
 
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
   const [views] = useMutation(`/api/products/${router.query.id}/views`);
@@ -72,37 +79,44 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   return (
     <div className="mb-24">
       <Layout canGoBack seoTitle={`${product.name}`}>
-        {/* {productImg?.map((img, index) => (
-          <Image
-            key={index}
-            src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${img}/public`}
-            className="bg-slate-300 object-cover"
-            width={50}
-            height={50}
-          />
-        ))} */}
-        <SimpleImageSlider
-          width={555}
-          height={504}
-          images={images}
-          showBullets={true}
-          showNavs={true}
-        />
-        {/* <Image
-            src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product.image}/public`}
-            className="bg-slate-300 object-cover"
-            layout="fill"
-          /> */}
+        <Swiper
+          spaceBetween={0}
+          slidesPerView={1}
+          pagination={{ clickable: true }}
+          scrollbar={{ draggable: true }}
+          // navigation={true}
+          // onSlideChange={() => console.log("slide change")}
+          // onSwiper={(swiper) => console.log(swiper)}
+        >
+          {productImg?.map((img, index) => (
+            <SwiperSlide key={index}>
+              <Image
+                key={index}
+                src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${img}/public`}
+                className="bg-slate-300 object-cover"
+                layout="responsive"
+                width={560}
+                height={450}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
         <div className="px-4 py-4">
           <div className="mb-0">
             <div className="flex cursor-pointer py-3 -mt-4 border-b items-center justify-between ">
               <div className="flex gap-3 items-center">
-                <Image
-                  width={48}
-                  height={48}
-                  src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product?.user?.avatar}/avatar`}
-                  className="w-12 h-12 rounded-full bg-slate-300"
-                />
+                {product.user?.avatar ? (
+                  <Image
+                    width={48}
+                    height={48}
+                    src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product?.user?.avatar}/avatar`}
+                    className="w-12 h-12 rounded-full bg-slate-300"
+                  />
+                ) : (
+                  <div className="w-12 h-12 flex justify-center items-center rounded-full bg-gray-300 text-3xl">
+                    🙎🏻‍♂️
+                  </div>
+                )}
                 <div className="">
                   <p className="text-sm font-semibold text-gray-700">
                     {product?.user?.name}
@@ -153,7 +167,8 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                 {product?.name}
               </h1>
               <span className="text-xs mt-3 text-gray-400">
-                디지털/기기ㆍ끌올 {convertTime(product?.createdAt.toString())}
+                {product?.category.name}ㆍ끌올{" "}
+                {convertTime(product?.createdAt.toString())}
               </span>
               <p className="mt-3 text-black">{product?.description}</p>
               <span className="text-xs text-gray-400">
@@ -272,6 +287,11 @@ export const getServerSideProps = withSsrSession(async function ({
           name: true,
           avatar: true,
           temperature: true,
+        },
+      },
+      category: {
+        select: {
+          name: true,
         },
       },
       _count: {
