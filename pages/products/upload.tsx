@@ -41,7 +41,7 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
     getValues,
     setValue,
     formState: { errors },
-  } = useForm<UploadProductForm>();
+  } = useForm<UploadProductForm>({ mode: "onChange" });
 
   const [uploadProduct, { loading, data }] =
     useMutation<UploadProductMutation>("/api/products");
@@ -99,14 +99,7 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
     setCategory(category);
     setValue("categoryId", category.id);
     fadeInOut();
-    console.log(category.id);
   };
-  // const [price, setPrice] = useState("");
-
-  // const onPriceChange = (e: React.FormEvent<HTMLInputElement>) => {
-  //   const { value } = e.currentTarget;
-  //   setPrice(Number(value.replaceAll(",", "")).toLocaleString("ko-KR"));
-  // };
 
   const removePhoto = (idx: number) => {
     const newPhotoPreview = photoPreview.split(",");
@@ -232,11 +225,30 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
 
             <div className="w-full border-0 border-t border-gray-300 py-5 px-2">
               <input
-                {...register("name", { required: true })}
                 type="text"
                 className="outline-none w-full "
                 placeholder="글 제목"
+                {...register("name", {
+                  required: {
+                    value: true,
+                    message: "제목을 입력해주세요.",
+                  },
+                  minLength: {
+                    value: 5,
+                    message: "제목은 5자 이상 입력해주세요.",
+                  },
+                  maxLength: {
+                    value: 50,
+                    message: "제목은 50자 이하로 입력해주세요.",
+                  },
+                })}
               />
+
+              {errors.name?.message && (
+                <span className="text-red-500 text-sm">
+                  {errors.name?.message}
+                </span>
+              )}
             </div>
             <div
               className="w-full border-0 border-t border-gray-300 py-5 px-2 flex justify-between"
@@ -260,32 +272,44 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
             </div>
 
             <div className="w-full border-0 border-t border-gray-300 py-5 px-2 flex  justify-between">
-              <input
-                className="outline-none w-4/5 "
-                type="text"
-                placeholder="₩ 가격 (선택사항)"
-                {...register("price", {
-                  required: {
-                    value: true,
-                    message: "가격을 입력해주세요",
-                  },
-                  maxLength: {
-                    value: 10,
-                    message: "최대 10자리까지 입력 가능합니다.",
-                  },
-                  // pattern: {
-                  //   value: /^[0-9]*$/,
-                  //   message: "숫자만 입력 가능합니다.",
-                  // },
-                })}
-                // value={price}
-                // onChange={onPriceChange}
-              />
-              {errors.price?.message && (
-                <span className="text-red-500 text-xs">
-                  {errors.price?.message}
-                </span>
-              )}
+              <div className="flex flex-col">
+                <input
+                  className="outline-none w-4/5 "
+                  type={"number"}
+                  placeholder="₩ 가격 (선택사항)"
+                  {...register("price", {
+                    required: {
+                      value: true,
+                      message: "가격을 입력해주세요.",
+                    },
+                    maxLength: {
+                      value: 10,
+                      message: "최대 10자리까지 입력 가능합니다.",
+                    },
+                    pattern: {
+                      value: /^[0-9]*$/,
+                      message: "숫자만 입력 가능합니다.",
+                    },
+                    validate: (value) => {
+                      console.log(value);
+
+                      if (value.toString().length > 12) {
+                        return value.toString().substring(0, 12);
+                      }
+
+                      if (value < 0) {
+                        return "0원 이상 입력해주세요.";
+                      }
+                      return true;
+                    },
+                  })}
+                />
+                {errors.price?.message && (
+                  <span className="text-red-500 text-sm">
+                    {errors.price?.message}
+                  </span>
+                )}
+              </div>
               <label className="flex justify-end items-center gap-3 font-semibold w-1/5">
                 <input
                   {...register("share")}
@@ -305,8 +329,18 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
                 />
                 가격 제안받기
               </label>
+              {errors.description?.message && (
+                <span className="text-red-500 text-sm">
+                  {errors.description?.message}
+                </span>
+              )}
               <textarea
-                {...register("description", { required: true })}
+                {...register("description", {
+                  required: {
+                    value: true,
+                    message: "내용을 입력해주세요.",
+                  },
+                })}
                 placeholder={`- 구매시기\n- 사용 여부 (미개봉, 00회, 00개월 사용 등)\n- 정확한 제품명, 음반명\n- 브랜드 및 모델명\n- 사용감 (흠집, 파손 여부, 상세사진)\n※게임, OTT 서비스 등의 계정 및 계정 정보는 공유 하거나 판매할 수 없어요.\n\n신뢰할 수 있는 거래를 위해 자세한 정보를 제공해주세요. 과학기술정보통신부, 한국인터넷진흥원과 함께 해요.`}
                 rows={15}
                 className="outline-none resize-none"
