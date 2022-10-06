@@ -9,21 +9,42 @@ const ChatDetail: NextPage = () => {
         <Message message="Hi how much are you selling them for?" />
         <Message message="I want ￦20,000" reversed />
         <Message message="미쳤어" />
-        <form className="fixed py-2 bg-white  bottom-0 inset-x-0">
+        <form className="fixed  flex justify-between items-center  py-2 px-4 gap-4  bg-white  bottom-4 inset-x-0">
+          <div className="flex place-content-center">
+            <svg
+              className="w-7 h-7 text-gray-400 font-extralight"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              ></path>
+            </svg>
+          </div>
           <div
-            className="flex relative max-w-md items-center w-full mx-auto border rounded-full
-           border-red-500"
+            className="flex max-w-full items-center w-full mx-auto  rounded-full
+            "
           >
             <input
               type="text"
               placeholder="메시지 보내기"
-              className="shadow-sm p-2 rounded-full w-full border-gray-300 focus:ring-orange-500 focus:outline-none pr-12 focus:border-red-500"
+              className="shadow-sm py-2 px-3 rounded-full w-full bg-gray-100 border-gray-300 "
             />
-            <div className="absolute inset-y-0 flex py-1.5 pr-1.5 right-0">
-              <button className="flex focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 items-center bg-orange-500 rounded-full px-3 hover:bg-orange-600 text-sm text-white">
-                &rarr;
-              </button>
-            </div>
+          </div>
+          <div className="flex place-content-center cursor-pointer">
+            <svg
+              className="w-6 h-6 text-gray-300 font-extralight rotate-90"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+            </svg>
           </div>
         </form>
       </div>

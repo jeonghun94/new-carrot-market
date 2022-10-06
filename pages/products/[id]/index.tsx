@@ -28,6 +28,7 @@ interface ProductWithUser extends Product {
     favs: number;
   };
 }
+
 interface ItemDetailResponse {
   ok: boolean;
   product: ProductWithUser;
@@ -252,14 +253,23 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                   </div>
 
                   <div>
-                    <button
-                      disabled={!product.status ? true : false}
-                      className={`py-2 px-4 text-white ${
-                        product.status ? "bg-orange-500" : "bg-gray-400"
-                      }  rounded-md disabled:text-gray-300`}
-                    >
-                      채팅하기
-                    </button>
+                    {product?.user?.id === user?.id ? (
+                      <button className="py-2 px-4 rounded-md text-white bg-orange-500">
+                        채팅 목록 보기
+                      </button>
+                    ) : (
+                      <button
+                        disabled={!product.status ? true : false}
+                        onClick={() => {
+                          router.push(`${router.asPath}/chat`);
+                        }}
+                        className={`py-2 px-4 text-white ${
+                          product.status ? "bg-orange-500" : "bg-gray-400"
+                        }  rounded-md disabled:text-gray-300`}
+                      >
+                        채팅하기
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

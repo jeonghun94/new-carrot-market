@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 
 interface LayoutProps {
-  title?: string;
+  title?: string | React.ReactNode;
   canGoBack?: boolean;
   hasTabBar?: boolean;
   children: React.ReactNode;
