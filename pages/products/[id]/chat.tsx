@@ -1,11 +1,15 @@
 import type { NextApiRequest, NextPage } from "next";
 import Layout from "@components/layout";
-import Message from "@components/message";
-import { useRouter } from "next/router";
 import client from "@libs/server/client";
 import { Product, User } from "@prisma/client";
 import { convertPrice } from "@libs/client/utils";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import useMutation from "@libs/client/useMutation";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { userAgent } from "next/server";
+import useUser from "@libs/client/useUser";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -15,8 +19,40 @@ interface ProductResponse {
   product: ProductWithUser;
 }
 
+interface ChatForm {
+  message: string;
+}
+
 const ChatDetail: NextPage<ProductResponse> = ({ product }) => {
-  console.log(product);
+  const { user } = useUser();
+  const [createChat, { loading, data }] = useMutation(`/api/products/chat`);
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ChatForm>();
+
+  const onValid = ({ message }: ChatForm) => {
+    createChat({
+      message,
+      product,
+    });
+  };
+
+  useEffect(() => {
+    if (data?.ok) {
+      // router.replace(`/chats/${data.chat.id}`);
+      router.push({
+        pathname: `/chats/${data.chat.id}`,
+        query: {
+          // message: data.chat.message,
+          productId: product.id,
+          userId: user?.id,
+        },
+      });
+    }
+  }, [data]);
 
   const CustomTitle = () => {
     const temperature = product?.user?.temperature || 0;
@@ -89,7 +125,10 @@ const ChatDetail: NextPage<ProductResponse> = ({ product }) => {
           </div>
         </div>
 
-        <form className="fixed  flex justify-between items-center  py-2 px-4 gap-4  bg-white  bottom-4 inset-x-0">
+        <form
+          className="fixed  flex justify-between items-center  py-2 px-4 gap-4  bg-white  bottom-4 inset-x-0"
+          onSubmit={handleSubmit(onValid)}
+        >
           <div className="flex place-content-center">
             <svg
               className="w-7 h-7 text-gray-400 font-extralight"
@@ -106,17 +145,34 @@ const ChatDetail: NextPage<ProductResponse> = ({ product }) => {
               ></path>
             </svg>
           </div>
+
           <div
-            className="flex max-w-full items-center w-full mx-auto  rounded-full
+            className="flex flex-col gap-2 max-w-full items-center w-full mx-auto  rounded-full
             "
           >
             <input
               type="text"
               placeholder="메시지 보내기"
               className="shadow-sm py-2 px-3 rounded-full w-full bg-gray-100 border-gray-300 outline-none"
+              {...register("message", {
+                required: {
+                  value: true,
+                  message: "메시지를 입력해주세요.",
+                },
+                minLength: {
+                  value: 3,
+                  message: "3글자 이상 입력해주세요.",
+                },
+              })}
             />
+            {errors.message?.message && (
+              <span className="text-xs text-red-500">
+                {errors.message?.message}
+              </span>
+            )}
           </div>
-          <div className="flex place-content-center cursor-pointer">
+
+          <button className="flex place-content-center cursor-pointer">
             <svg
               className="w-6 h-6 text-gray-300 font-extralight rotate-90"
               fill="currentColor"
@@ -125,7 +181,7 @@ const ChatDetail: NextPage<ProductResponse> = ({ product }) => {
             >
               <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
             </svg>
-          </div>
+          </button>
         </form>
       </div>
     </Layout>
@@ -148,20 +204,8 @@ export const getServerSideProps = async (req: NextApiRequest) => {
           temperature: true,
         },
       },
-      // category: {
-      //   select: {
-      //     name: true,
-      //   },
-      // },
-      // _count: {
-      //   select: {
-      //     favs: true,
-      //   },
-      // },
     },
   });
-
-  console.log(product);
 
   return {
     props: {

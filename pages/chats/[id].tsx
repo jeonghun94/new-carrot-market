@@ -1,14 +1,33 @@
-import type { NextPage } from "next";
+import type { NextApiRequest, NextPage } from "next";
 import Layout from "@components/layout";
 import Message from "@components/message";
+import { NextRequest } from "next/server";
+import { Chat, User } from "@prisma/client";
+import useUser from "@libs/client/useUser";
 
-const ChatDetail: NextPage = () => {
+interface ChatWithUser extends Chat {
+  user: User;
+}
+
+interface ChatResponse {
+  chats: ChatWithUser[];
+}
+
+const ChatDetail: NextPage<ChatResponse> = ({ chats }) => {
+  const { user } = useUser();
+
+  console.log(chats);
   return (
     <Layout canGoBack title="Steve">
       <div className="py-10 pb-16 px-4 space-y-4">
-        <Message message="Hi how much are you selling them for?" />
-        <Message message="I want ￦20,000" reversed />
-        <Message message="미쳤어" />
+        {chats.map((chat) => (
+          <Message
+            key={chat.id}
+            message={chat.message}
+            avatarUrl={chat?.user?.avatar}
+            reversed={chat?.user?.id === user?.id}
+          />
+        ))}
         <form className="fixed  flex justify-between items-center  py-2 px-4 gap-4  bg-white  bottom-4 inset-x-0">
           <div className="flex place-content-center">
             <svg
@@ -50,6 +69,30 @@ const ChatDetail: NextPage = () => {
       </div>
     </Layout>
   );
+};
+
+export const getServerSideProps = async (req: NextApiRequest) => {
+  const {
+    query: { productId, userId },
+  } = req;
+
+  const chats = await client?.chat.findMany({
+    include: {
+      user: true,
+    },
+    where: {
+      productId: Number(productId),
+      userId: Number(userId),
+    },
+  });
+
+  // console.log(chats, "chats");
+
+  return {
+    props: {
+      chats: JSON.parse(JSON.stringify(chats)),
+    },
+  };
 };
 
 export default ChatDetail;
