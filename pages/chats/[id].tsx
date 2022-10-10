@@ -19,7 +19,7 @@ const ChatDetail: NextPage<ChatResponse> = ({ chats }) => {
   console.log(chats);
   return (
     <Layout canGoBack title="Steve">
-      <div className="py-10 pb-16 px-4 space-y-4">
+      <div className="py-10 pb-16 px-4 space-y-1">
         {chats.map((chat) => (
           <Message
             key={chat.id}
