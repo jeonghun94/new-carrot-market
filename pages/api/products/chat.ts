@@ -25,6 +25,7 @@ async function handler(
           id: product.id,
         },
       },
+      code: " d",
     },
   });
 

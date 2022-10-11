@@ -1,16 +1,21 @@
 import Image from "next/image";
 import { cls } from "../libs/client/utils";
+import dayjs from "dayjs";
+import "dayjs/locale/ko";
+dayjs.locale("ko");
 
 interface MessageProps {
   message: string;
   reversed?: boolean;
   avatarUrl?: string | null;
+  sendTime: string;
 }
 
 export default function Message({
   message,
   avatarUrl,
   reversed,
+  sendTime,
 }: MessageProps) {
   return (
     <div
@@ -24,10 +29,10 @@ export default function Message({
           ""
         ) : (
           <Image
-            width={48}
-            height={48}
+            width={33}
+            height={33}
             src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${avatarUrl}/avatar`}
-            className="w-8 h-8 rounded-full bg-slate-300"
+            className="w-6 h-6 rounded-full bg-slate-300"
           />
         )
       ) : (
@@ -35,12 +40,21 @@ export default function Message({
       )}
 
       <div
-        className={cls(
-          "w-1/2 text-sm  p-2 rounded-2xl",
-          reversed ? "bg-orange-500 text-white" : "bg-gray-100"
-        )}
+        className={`flex ${
+          reversed ? "flex-row-reverse gap-2" : ""
+        } items-center space-x-3`}
       >
-        <p>{message}</p>
+        <div
+          className={cls(
+            "w-auto text-sm  p-2 rounded-2xl",
+            reversed ? "bg-orange-500 text-white" : "bg-gray-100"
+          )}
+        >
+          <p>{message}</p>
+        </div>
+        <p className="place-self-end pb-1 text-xs text-gray-400">
+          {dayjs(sendTime).format("A HH:mm")}
+        </p>
       </div>
     </div>
   );

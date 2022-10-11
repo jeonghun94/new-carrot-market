@@ -41,7 +41,7 @@ export default function Layout({
         <div
           className={`w-full h-14 max-w-full px-6 flex  ${
             setting ? "justify-between" : "justify-center"
-          } items-center fixed top-0 text-lg font-medium text-gray-800  bg-white border-b`}
+          } items-center fixed top-0 text-lg font-medium text-gray-800  bg-white border-b z-10`}
         >
           {canGoBack ? (
             <button onClick={onClick} className="absolute left-4">
@@ -94,7 +94,7 @@ export default function Layout({
       )}
       <div className={cls("pt-12", hasTabBar ? "pb-24" : "")}>{children}</div>
       {hasTabBar ? (
-        <nav className="bg-white max-w-full text-gray-700 border-t fixed bottom-0 w-full px-10 pb-5 pt-3 flex justify-between text-xs">
+        <nav className="bg-white max-w-full text-gray-700 border-t fixed bottom-0 w-full px-10 pb-5 pt-3 flex justify-between text-xs z-10">
           <Link href="/">
             <a
               className={cls(
