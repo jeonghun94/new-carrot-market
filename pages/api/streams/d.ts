@@ -12,13 +12,7 @@ async function handler(
     body: { name, price, description },
   } = req;
   if (req.method === "GET") {
-    const streams = await client.stream.deleteMany({
-      where: {
-        id: {
-          notIn: [1, 502],
-        },
-      },
-    });
+    const streams = await client.chat.deleteMany({});
     res.json({ ok: true, streams });
   }
 }

@@ -80,7 +80,7 @@ model Chat {
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
   message   String   @db.MediumText
-  code      String   @default("")
+  code      String   
   read      Boolean  @default(false)
   exit      Boolean  @default(false)
   @@index([userId])
