@@ -96,10 +96,6 @@ async function handler(
       };
     });
 
-    // console.log(sellerId, "sellerId");
-    // console.log(chatDate, "chatDate");
-    // console.log(chatting, "result");
-
     res.json({
       ok: true,
       chat,

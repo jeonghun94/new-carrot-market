@@ -7,10 +7,11 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { userAgent } from "next/server";
 import useUser from "@libs/client/useUser";
 import Message from "@components/message";
+import dayjs from "dayjs";
+import "dayjs/locale/ko";
+dayjs.locale("ko");
 
 interface ProductWithUser extends Product {
   user: User;
@@ -18,6 +19,7 @@ interface ProductWithUser extends Product {
 
 interface ProductResponse {
   product: ProductWithUser;
+  chatting: ChatWithUserDay[];
 }
 
 interface ChatWithUser extends Chat {
@@ -39,12 +41,11 @@ interface ChatForm {
   message: string;
 }
 
-const ChatDetail: NextPage<ProductResponse> = ({ product }) => {
+const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
   const { user } = useUser();
   const [code, setCode] = useState("");
   const [createChat, { loading, data }] =
     useMutation<ChatResponse>(`/api/products/chat`);
-  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -58,22 +59,37 @@ const ChatDetail: NextPage<ProductResponse> = ({ product }) => {
       product,
       code,
     });
-
     setValue("message", "");
+  };
+
+  const paintChatting = (chatting: ChatWithUserDay[]) => {
+    return chatting.map((chat, index) => {
+      return (
+        <div key={index}>
+          <div className="mt-2 text-center text-sm text-gray-400">
+            {chat.day}
+          </div>
+          <div className="space-y-2">
+            {chat.message.map((m) => {
+              return (
+                <Message
+                  key={m.id}
+                  message={m.message}
+                  avatarUrl={m?.user?.avatar}
+                  reversed={m?.user?.id === user?.id}
+                  sendTime={m.createdAt.toLocaleString("ko-KR")}
+                />
+              );
+            })}
+          </div>
+        </div>
+      );
+    });
   };
 
   useEffect(() => {
     if (data?.ok) {
-      // router.replace(`/chats/${data.chat.id}`);
       setCode(data?.chat?.code);
-      // router.push({
-      //   pathname: `/chats/${data.chat.id}`,
-      //   query: {
-      //     // message: data.chat.message,
-      //     productId: product.id,
-      //     userId: user?.id,
-      //   },
-      // });
     }
   }, [data]);
 
@@ -97,7 +113,7 @@ const ChatDetail: NextPage<ProductResponse> = ({ product }) => {
   return (
     <Layout canGoBack title={<CustomTitle />}>
       <div className="mt-1">
-        <div className={code ? "hidden" : "block"}>
+        <div className={code || chatting.length > 0 ? "hidden" : "block"}>
           <div className="flex justify-center items-center fixed text-sm text-center text-gray-400 top-0 w-full min-h-screen  ">
             [거래꿀팁] 당근마켓 채팅이 가장 편하고 안전해요.🥕
             <br />
@@ -151,25 +167,8 @@ const ChatDetail: NextPage<ProductResponse> = ({ product }) => {
         </div>
 
         <div className="pt-4 px-4 space-y-1">
-          {data?.chatting?.map((chat, index) => (
-            <>
-              <div
-                key={index}
-                className="mt-2 text-center text-sm text-gray-400"
-              >
-                {chat.day}
-              </div>
-              {chat.message.map((m) => (
-                <Message
-                  key={m.id}
-                  message={m.message}
-                  avatarUrl={m?.user?.avatar}
-                  reversed={m?.user?.id === user?.id}
-                  sendTime={m.createdAt.toLocaleString("ko-KR")}
-                />
-              ))}
-            </>
-          ))}
+          {chatting ? paintChatting(chatting) : null}
+          {paintChatting(data?.chatting || [])}
 
           <form
             className="fixed  flex justify-between items-center  py-2 px-4 gap-4  bg-white  bottom-4 inset-x-0"
@@ -236,11 +235,97 @@ const ChatDetail: NextPage<ProductResponse> = ({ product }) => {
 };
 
 export const getServerSideProps = async (req: NextApiRequest) => {
-  const { id } = req.query;
+  const { id, code } = req.query;
+  let productId;
+  let chatting: ChatWithUserDay[] = [];
+
+  if (code) {
+    const ds = await fetch("http:localhost:3000/api/products/chat", {
+      method: "POST",
+      // headers: {
+      //   "Content-Type": "application/json",
+      // },
+      body: JSON.stringify({
+        code,
+      }),
+    });
+    console.log(ds, "dsdsdsds");
+    const chat = await client.chat.findFirst({
+      where: {
+        code: code as string,
+      },
+    });
+
+    const sellerId = await client?.product.findUnique({
+      where: {
+        id: Number(chat?.productId),
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    const chatDate = await client?.chat.findMany({
+      select: {
+        createdAt: true,
+      },
+      where: {
+        productId: Number(chat?.productId),
+        OR: [
+          {
+            // userId: Number(user?.id),
+          },
+          {
+            userId: sellerId?.userId,
+          },
+        ],
+      },
+    });
+
+    let convertFormatDate = chatDate?.map((chat) => {
+      return dayjs(chat.createdAt).format("YYYY년MM월DD일");
+    });
+
+    convertFormatDate = convertFormatDate?.filter(
+      (v, i) => convertFormatDate.indexOf(v) === i
+    );
+
+    const chats = await client?.chat.findMany({
+      include: {
+        user: {
+          select: {
+            avatar: true,
+            id: true,
+          },
+        },
+      },
+      where: {
+        code: code as string,
+        productId: Number(chat?.productId),
+        userId: {
+          // in: [Number(user?.id), Number(sellerId?.userId)],
+        },
+      },
+    });
+    productId = chat?.productId;
+
+    let d: ChatWithUserDay[] = [];
+    convertFormatDate?.map((day) => {
+      chatting.push({
+        day,
+        message: chats?.filter((chat) => {
+          return dayjs(chat.createdAt).format("YYYY년MM월DD일") === day;
+        }),
+      });
+    });
+  } else {
+    productId = id;
+    chatting = [];
+  }
 
   const product = await client.product.findUnique({
     where: {
-      id: Number(id),
+      id: Number(productId),
     },
     include: {
       user: {
@@ -257,6 +342,7 @@ export const getServerSideProps = async (req: NextApiRequest) => {
   return {
     props: {
       product: JSON.parse(JSON.stringify(product)),
+      chatting: JSON.parse(JSON.stringify(chatting)),
     },
   };
 };
