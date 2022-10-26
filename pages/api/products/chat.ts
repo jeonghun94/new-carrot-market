@@ -14,7 +14,7 @@ async function handler(
     session: { user },
     body: { message, product, code },
   } = req;
-
+  console.log(req.body);
   console.log(code, "code 들어옴");
 
   const chat = await client.chat.create({

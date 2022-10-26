@@ -240,84 +240,30 @@ export const getServerSideProps = async (req: NextApiRequest) => {
   let chatting: ChatWithUserDay[] = [];
 
   if (code) {
-    const ds = await fetch("http:localhost:3000/api/products/chat", {
-      method: "POST",
-      // headers: {
-      //   "Content-Type": "application/json",
-      // },
-      body: JSON.stringify({
-        code,
-      }),
-    });
-    console.log(ds, "dsdsdsds");
     const chat = await client.chat.findFirst({
       where: {
         code: code as string,
       },
     });
-
-    const sellerId = await client?.product.findUnique({
-      where: {
-        id: Number(chat?.productId),
+    await fetch("http:localhost:3000/api/products/chat2", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      select: {
-        userId: true,
-      },
-    });
-
-    const chatDate = await client?.chat.findMany({
-      select: {
-        createdAt: true,
-      },
-      where: {
-        productId: Number(chat?.productId),
-        OR: [
-          {
-            // userId: Number(user?.id),
-          },
-          {
-            userId: sellerId?.userId,
-          },
-        ],
-      },
-    });
-
-    let convertFormatDate = chatDate?.map((chat) => {
-      return dayjs(chat.createdAt).format("YYYY년MM월DD일");
-    });
-
-    convertFormatDate = convertFormatDate?.filter(
-      (v, i) => convertFormatDate.indexOf(v) === i
-    );
-
-    const chats = await client?.chat.findMany({
-      include: {
-        user: {
-          select: {
-            avatar: true,
-            id: true,
-          },
-        },
-      },
-      where: {
-        code: code as string,
-        productId: Number(chat?.productId),
-        userId: {
-          // in: [Number(user?.id), Number(sellerId?.userId)],
-        },
-      },
-    });
-    productId = chat?.productId;
-
-    let d: ChatWithUserDay[] = [];
-    convertFormatDate?.map((day) => {
-      chatting.push({
-        day,
-        message: chats?.filter((chat) => {
-          return dayjs(chat.createdAt).format("YYYY년MM월DD일") === day;
-        }),
+      body: JSON.stringify({
+        code,
+        productId: chat?.productId,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        chatting = data.chatting;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
       });
-    });
+
+    productId = chat?.productId;
   } else {
     productId = id;
     chatting = [];
