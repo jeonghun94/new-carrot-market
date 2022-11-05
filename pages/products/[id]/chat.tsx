@@ -62,6 +62,8 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
     setValue("message", "");
   };
 
+  console.log(data);
+
   const paintChatting = (chatting: ChatWithUserDay[]) => {
     return chatting.map((chat, index) => {
       return (
@@ -166,8 +168,8 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
           </div>
         </div>
 
-        <div className="pt-4 px-4 space-y-1">
-          {chatting ? paintChatting(chatting) : null}
+        <div className="pt-4 px-4 space-y-1 h-[540px] overflow-y-auto">
+          {data ? null : chatting ? paintChatting(chatting) : null}
           {paintChatting(data?.chatting || [])}
 
           <form
@@ -235,24 +237,19 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
 };
 
 export const getServerSideProps = async (req: NextApiRequest) => {
-  const { id, code } = req.query;
-  let productId;
-  let chatting: ChatWithUserDay[] = [];
+  const { id, productId } = req.query;
 
-  if (code) {
-    const chat = await client.chat.findFirst({
-      where: {
-        code: code as string,
-      },
-    });
+  let chatting: ChatWithUserDay[] = [];
+  console.log("code 들어옴", productId);
+
+  if (productId) {
     await fetch("http:localhost:3000/api/products/chat2", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        code,
-        productId: chat?.productId,
+        productId,
       }),
     })
       .then((response) => response.json())
@@ -262,11 +259,6 @@ export const getServerSideProps = async (req: NextApiRequest) => {
       .catch((error) => {
         console.error("Error:", error);
       });
-
-    productId = chat?.productId;
-  } else {
-    productId = id;
-    chatting = [];
   }
 
   const product = await client.product.findUnique({

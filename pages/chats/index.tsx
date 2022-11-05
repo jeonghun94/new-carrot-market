@@ -1,11 +1,11 @@
 import type { NextPage, NextPageContext } from "next";
-import Layout from "@components/layout";
 import { withSsrSession } from "@libs/server/withSession";
-import client from "@libs/server/client";
 import { Product, User } from "@prisma/client";
-import Image from "next/image";
 import { convertTime } from "@libs/client/utils";
 import { useRouter } from "next/router";
+import Layout from "@components/layout";
+import client from "@libs/server/client";
+import Image from "next/image";
 
 interface ProductChat extends Product, User {
   code: string;
@@ -21,12 +21,11 @@ interface ProductsChatsResponse extends ProductChat {
 }
 
 const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
-  console.log(productChats);
   const router = useRouter();
-  const handleClick = (code: string, id: number) => {
+  const handleClick = (productId: number) => {
     router.push({
-      pathname: `/products/${id}/chat`,
-      query: { code },
+      pathname: `/products/${productId}/chat`,
+      query: { productId },
     });
   };
   return (
@@ -35,7 +34,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
         {productChats.map((productChat, i) => (
           <div
             key={i}
-            onClick={() => handleClick(productChat?.code, productChat?.id)}
+            onClick={() => handleClick(productChat?.product.id)}
             className="py-3 px-5 flex items-center space-x-3 cursor-pointer first:mt-2"
           >
             <div className="w-full flex justify-between space-x-7">
@@ -85,7 +84,7 @@ export const getServerSideProps = withSsrSession(async function ({
   const productChats = [];
 
   const chats = await client.chat.findMany({
-    distinct: ["code"],
+    distinct: ["productId"],
     where: { userId: req?.session.user?.id, exit: false },
     select: {
       code: true,
@@ -95,6 +94,7 @@ export const getServerSideProps = withSsrSession(async function ({
       product: {
         select: {
           image: true,
+          id: true,
         },
       },
       user: {
@@ -106,6 +106,8 @@ export const getServerSideProps = withSsrSession(async function ({
     },
     orderBy: { createdAt: "desc" },
   });
+
+  console.log(chats);
 
   for (const chat of chats) {
     const newMessge = await client.chat.findMany({
@@ -119,7 +121,7 @@ export const getServerSideProps = withSsrSession(async function ({
     productChats.push({ ...chat, newMessages: newMessge.length });
   }
 
-  console.log(productChats);
+  // console.log(productChats);
 
   return {
     props: {
