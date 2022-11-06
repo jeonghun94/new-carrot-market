@@ -1,4 +1,4 @@
-import type { NextPage, NextPageContext } from "next";
+import type { NextApiRequest, NextPage, NextPageContext } from "next";
 import { withSsrSession } from "@libs/server/withSession";
 import { Product, User } from "@prisma/client";
 import { convertTime } from "@libs/client/utils";
@@ -37,7 +37,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
             onClick={() => handleClick(productChat?.product.id)}
             className="py-3 px-5 flex items-center space-x-3 cursor-pointer first:mt-2"
           >
-            <div className="w-full flex justify-between space-x-7">
+            <div className="w-full flex justify-between space-x-7 border-b pb-3">
               <div className="flex justify-start items-center space-x-4">
                 <Image
                   width={48}
@@ -107,21 +107,19 @@ export const getServerSideProps = withSsrSession(async function ({
     orderBy: { createdAt: "desc" },
   });
 
-  console.log(chats);
-
   for (const chat of chats) {
     const newMessge = await client.chat.findMany({
       where: {
         userId: req?.session.user?.id,
+        product: {
+          id: chat.product.id,
+        },
         exit: false,
         read: false,
-        code: chats[0].code,
       },
     });
     productChats.push({ ...chat, newMessages: newMessge.length });
   }
-
-  // console.log(productChats);
 
   return {
     props: {

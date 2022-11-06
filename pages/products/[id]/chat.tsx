@@ -62,8 +62,6 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
     setValue("message", "");
   };
 
-  console.log(data);
-
   const paintChatting = (chatting: ChatWithUserDay[]) => {
     return chatting.map((chat, index) => {
       return (
@@ -237,10 +235,9 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
 };
 
 export const getServerSideProps = async (req: NextApiRequest) => {
-  const { id, productId } = req.query;
+  const { productId } = req.query;
 
   let chatting: ChatWithUserDay[] = [];
-  console.log("code 들어옴", productId);
 
   if (productId) {
     await fetch("http:localhost:3000/api/products/chat2", {

@@ -75,8 +75,6 @@ async function handler(
     };
   });
 
-  console.log(chatting);
-
   res.json({
     ok: true,
     chatting: chatting,
