@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextPage } from "next";
+import type { NextApiRequest, NextPage, NextPageContext } from "next";
 import Layout from "@components/layout";
 import client from "@libs/server/client";
 import { Chat, Product, User } from "@prisma/client";
@@ -11,6 +11,7 @@ import useUser from "@libs/client/useUser";
 import Message from "@components/message";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
+import { withApiSession, withSsrSession } from "@libs/server/withSession";
 dayjs.locale("ko");
 
 interface ProductWithUser extends Product {
@@ -234,8 +235,25 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
   );
 };
 
-export const getServerSideProps = async (req: NextApiRequest) => {
-  const { productId } = req.query;
+export const getServerSideProps = withSsrSession(async function ({
+  req,
+  query,
+}: NextPageContext) {
+  const { productId } = query;
+  const userId = req?.session?.user?.id;
+
+  console.log(userId);
+  console.log(productId);
+
+  await client.chat.updateMany({
+    where: {
+      productId: Number(productId),
+      userId: Number(userId),
+    },
+    data: {
+      read: true,
+    },
+  });
 
   let chatting: ChatWithUserDay[] = [];
 
@@ -280,6 +298,6 @@ export const getServerSideProps = async (req: NextApiRequest) => {
       chatting: JSON.parse(JSON.stringify(chatting)),
     },
   };
-};
+});
 
 export default ChatDetail;
