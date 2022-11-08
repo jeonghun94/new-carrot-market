@@ -123,8 +123,8 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
             피해가 있을 수 있으니 주의하세요!
           </div>
         </div>
-        <div className="w-full border-b p-4 space-y-3">
-          <div className="flex gap-3 w-full ">
+        <div className="w-full sticky top-12 mt-2 z-10 bg-white border-b p-4 space-y-3">
+          <div className=" flex gap-3 w-full ">
             <Image
               width={48}
               height={48}
@@ -167,12 +167,11 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
           </div>
         </div>
 
-        <div className="pt-4 px-4 space-y-1 h-[540px] overflow-y-auto">
+        <div className="pt-4 px-4 space-y-1 pb-20 overflow-y-auto">
           {data ? null : chatting ? paintChatting(chatting) : null}
           {paintChatting(data?.chatting || [])}
-
           <form
-            className="fixed  flex justify-between items-center  py-2 px-4 gap-4  bg-white  bottom-4 inset-x-0"
+            className="fixed flex justify-between items-center py-2 px-4 gap-4  bg-white pb-5 bottom-0 inset-x-0"
             onSubmit={handleSubmit(onValid)}
           >
             <div className="flex place-content-center">
@@ -239,23 +238,19 @@ export const getServerSideProps = withSsrSession(async function ({
   req,
   query,
 }: NextPageContext) {
-  const { productId } = query;
-  const userId = req?.session?.user?.id;
-
-  console.log(userId);
-  console.log(productId);
+  let chatting: ChatWithUserDay[] = [];
+  const userId = req?.session.user?.id;
+  const productId = Number(query.productId);
 
   await client.chat.updateMany({
     where: {
       productId: Number(productId),
-      userId: Number(userId),
+      userId: userId,
     },
     data: {
       read: true,
     },
   });
-
-  let chatting: ChatWithUserDay[] = [];
 
   if (productId) {
     await fetch("http:localhost:3000/api/products/chat2", {
@@ -265,6 +260,7 @@ export const getServerSideProps = withSsrSession(async function ({
       },
       body: JSON.stringify({
         productId,
+        userId,
       }),
     })
       .then((response) => response.json())

@@ -11,12 +11,12 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const {
-    body: { productId, code },
+    body: { productId, userId },
   } = req;
 
-  const sellerId = await client?.product.findUnique({
+  const seller = await client?.product.findUnique({
     where: {
-      id: Number(productId),
+      id: productId,
     },
     select: {
       userId: true,
@@ -28,15 +28,10 @@ async function handler(
       createdAt: true,
     },
     where: {
-      productId: Number(productId),
-      OR: [
-        {
-          // userId: Number(user?.id),
-        },
-        {
-          userId: sellerId?.userId,
-        },
-      ],
+      productId,
+      userId: {
+        in: [seller?.userId, userId],
+      },
     },
   });
 
@@ -58,10 +53,9 @@ async function handler(
       },
     },
     where: {
-      code,
-      productId: Number(productId),
+      productId,
       userId: {
-        // in: [Number(user?.id), Number(sellerId?.userId)],
+        in: [seller?.userId, userId],
       },
     },
   });
@@ -77,7 +71,7 @@ async function handler(
 
   res.json({
     ok: true,
-    chatting: chatting,
+    chatting,
   });
 }
 
