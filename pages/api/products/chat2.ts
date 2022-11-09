@@ -23,25 +23,26 @@ async function handler(
     },
   });
 
-  const chatDate = await client?.chat.findMany({
-    select: {
-      createdAt: true,
-    },
-    where: {
-      productId,
-      userId: {
-        in: [seller?.userId, userId],
+  const chatDate = await client.chat
+    .findMany({
+      select: {
+        createdAt: true,
       },
-    },
-  });
-
-  let convertFormatDate = chatDate?.map((chat) => {
-    return dayjs(chat.createdAt).format("YYYY년MM월DD일");
-  });
-
-  convertFormatDate = convertFormatDate?.filter(
-    (v, i) => convertFormatDate.indexOf(v) === i
-  );
+      where: {
+        productId,
+        userId: {
+          in: [seller?.userId, userId],
+        },
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    })
+    .then((data) =>
+      data
+        .map((i) => dayjs(i.createdAt).format("YYYY년MM월DD일"))
+        .filter((i, index, array) => array.indexOf(i) === index)
+    );
 
   const chats = await client?.chat.findMany({
     include: {
@@ -60,7 +61,7 @@ async function handler(
     },
   });
 
-  const chatting = convertFormatDate?.map((day) => {
+  const chatting = chatDate?.map((day) => {
     return {
       day,
       message: chats?.filter((chat) => {
