@@ -11,7 +11,7 @@ import useUser from "@libs/client/useUser";
 import Message from "@components/message";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import { withApiSession, withSsrSession } from "@libs/server/withSession";
+import { withSsrSession } from "@libs/server/withSession";
 dayjs.locale("ko");
 
 interface ProductWithUser extends Product {
@@ -245,7 +245,7 @@ export const getServerSideProps = withSsrSession(async function ({
   await client.chat.updateMany({
     where: {
       productId: Number(productId),
-      userId: userId,
+      userId,
     },
     data: {
       read: true,
@@ -253,7 +253,7 @@ export const getServerSideProps = withSsrSession(async function ({
   });
 
   if (productId) {
-    await fetch("http:localhost:3000/api/products/chat2", {
+    await fetch("http:localhost:3000/api/products/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

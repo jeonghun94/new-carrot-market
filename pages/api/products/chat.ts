@@ -11,101 +11,89 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const {
+    body: { productId, userId, message, product, code },
     session: { user },
-    body: { message, product, code },
   } = req;
-  console.log(req.body);
-  console.log(code, "code 들어옴");
 
-  const chat = await client.chat.create({
-    data: {
-      message,
-      user: {
-        connect: {
-          id: user?.id,
+  if (message && product) {
+    await client.chat.create({
+      data: {
+        message,
+        user: {
+          connect: {
+            id: user?.id,
+          },
         },
-      },
-      product: {
-        connect: {
-          id: product.id,
+        product: {
+          connect: {
+            id: product.id,
+          },
         },
+        code: !code ? product.id + "/" + user?.id : code,
       },
-      code: !code ? Math.floor(100000 + Math.random() * 900000) + "" : code,
+    });
+  }
+
+  const seller = await client?.product.findUnique({
+    where: {
+      id: productId ? productId : product.id,
+    },
+    select: {
+      userId: true,
     },
   });
 
-  if (chat) {
-    const sellerId = await client?.product.findUnique({
-      where: {
-        id: Number(product.id),
-      },
-      select: {
-        userId: true,
-      },
-    });
-
-    const chatDate = await client?.chat.findMany({
+  const chatDate = await client.chat
+    .findMany({
       select: {
         createdAt: true,
       },
       where: {
-        productId: Number(product.id),
-        OR: [
-          {
-            userId: Number(user?.id),
-          },
-          {
-            userId: sellerId?.userId,
-          },
-        ],
+        productId,
+        userId: {
+          in: [seller?.userId, userId ? userId : user?.id],
+        },
       },
-    });
-
-    let convertFormatDate = chatDate?.map((chat) => {
-      return dayjs(chat.createdAt).format("YYYY년MM월DD일");
-    });
-
-    convertFormatDate = convertFormatDate?.filter(
-      (v, i) => convertFormatDate.indexOf(v) === i
+      // orderBy: {
+      //   createdAt: "asc",
+      // },
+    })
+    .then((data) =>
+      data
+        .map((i) => dayjs(i.createdAt).format("YYYY년MM월DD일"))
+        .filter((i, index, array) => array.indexOf(i) === index)
     );
 
-    const chats = await client?.chat.findMany({
-      include: {
-        user: {
-          select: {
-            avatar: true,
-            id: true,
-          },
+  const chats = await client?.chat.findMany({
+    include: {
+      user: {
+        select: {
+          avatar: true,
+          id: true,
         },
       },
-      where: {
-        code: chat.code,
-        productId: Number(product.id),
-        userId: {
-          in: [Number(user?.id), Number(sellerId?.userId)],
-        },
+    },
+    where: {
+      productId,
+      userId: {
+        in: [seller?.userId, userId ? userId : user?.id],
       },
-    });
+    },
+  });
 
-    const chatting = convertFormatDate?.map((day) => {
-      return {
-        day,
-        message: chats?.filter((chat) => {
-          return dayjs(chat.createdAt).format("YYYY년MM월DD일") === day;
-        }),
-      };
-    });
+  const chatting = chatDate?.map((day) => {
+    return {
+      day,
+      message: chats?.filter((chat) => {
+        return dayjs(chat.createdAt).format("YYYY년MM월DD일") === day;
+      }),
+    };
+  });
 
-    res.json({
-      ok: true,
-      chat,
-      chatting,
-    });
-  } else {
-    res.json({
-      ok: false,
-    });
-  }
+  res.json({
+    ok: true,
+    chatting,
+  });
 }
 
 export default withApiSession(withHandler({ methods: ["POST"], handler }));
