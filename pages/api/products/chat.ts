@@ -15,6 +15,8 @@ async function handler(
     session: { user },
   } = req;
 
+  console.log("req.body", req.body);
+
   if (message && product) {
     await client.chat.create({
       data: {
@@ -49,14 +51,11 @@ async function handler(
         createdAt: true,
       },
       where: {
-        productId,
+        productId: productId ? productId : product.id,
         userId: {
           in: [seller?.userId, userId ? userId : user?.id],
         },
       },
-      // orderBy: {
-      //   createdAt: "asc",
-      // },
     })
     .then((data) =>
       data
@@ -74,7 +73,7 @@ async function handler(
       },
     },
     where: {
-      productId,
+      productId: productId ? productId : product.id,
       userId: {
         in: [seller?.userId, userId ? userId : user?.id],
       },

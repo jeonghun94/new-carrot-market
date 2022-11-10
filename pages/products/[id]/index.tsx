@@ -261,7 +261,11 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                       <button
                         disabled={!product.status ? true : false}
                         onClick={() => {
-                          router.push(`${router.asPath}/chat`);
+                          // router.push(`${router.asPath}/chat`);
+                          router.push({
+                            pathname: `${router.asPath}/chat`,
+                            query: { productId: product?.id },
+                          });
                         }}
                         className={`py-2 px-4 text-white ${
                           product.status ? "bg-orange-500" : "bg-gray-400"

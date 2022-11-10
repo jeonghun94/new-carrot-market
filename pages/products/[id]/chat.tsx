@@ -204,10 +204,6 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
                     value: true,
                     message: "메시지를 입력해주세요.",
                   },
-                  minLength: {
-                    value: 3,
-                    message: "3글자 이상 입력해주세요.",
-                  },
                 })}
               />
               {errors.message?.message && (
@@ -239,18 +235,19 @@ export const getServerSideProps = withSsrSession(async function ({
   query,
 }: NextPageContext) {
   let chatting: ChatWithUserDay[] = [];
-  const userId = req?.session.user?.id;
   const productId = Number(query.productId);
+  const sellerId = Number(query.sellerId);
+  const userId = req?.session.user?.id;
 
-  await client.chat.updateMany({
-    where: {
-      productId: Number(productId),
-      userId,
-    },
-    data: {
-      read: true,
-    },
-  });
+  // await client.chat.updateMany({
+  //   where: {
+  //     productId: Number(productId),
+  //     userId: sellerId,
+  //   },
+  //   data: {
+  //     read: true,
+  //   },
+  // });
 
   if (productId) {
     await fetch("http:localhost:3000/api/products/chat", {
