@@ -35,6 +35,7 @@ interface ItemDetailResponse {
   relatedProducts: Product[];
   mySaleProducts: Product[];
   isLiked: boolean;
+  isChat: boolean;
 }
 
 const ItemDetail: NextPage<ItemDetailResponse> = ({
@@ -42,6 +43,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   relatedProducts,
   mySaleProducts,
   isLiked,
+  isChat,
 }) => {
   const { user } = useUser();
   const router = useRouter();
@@ -271,7 +273,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                           product.status ? "bg-orange-500" : "bg-gray-400"
                         }  rounded-md disabled:text-gray-300`}
                       >
-                        채팅하기
+                        {isChat ? "채팅하기" : "채팅방으로 이동"}
                       </button>
                     )}
                   </div>
@@ -356,6 +358,7 @@ export const getServerSideProps = withSsrSession(async function ({
       relatedProducts: JSON.parse(JSON.stringify(relatedProducts)),
       mySaleProducts: JSON.parse(JSON.stringify(mySaleProducts)),
       isLiked: false,
+      isChat: false,
     },
   };
 });
