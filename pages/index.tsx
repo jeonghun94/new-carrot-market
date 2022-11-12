@@ -12,6 +12,7 @@ import { convertTime } from "@libs/client/utils";
 export interface ProductWithCount extends Product {
   _count: {
     favs: number;
+    chats: number;
   };
 }
 
@@ -35,6 +36,7 @@ const Home: NextPage = () => {
             hearts={product._count.favs}
             image={product.image}
             createdAt={convertTime(product.createdAt.toString())}
+            chats={product._count.chats}
             // createdAt={dayjs(product.createdAt.toString()).format("YYYY-MM-DD")}
           />
         ))}

@@ -34,6 +34,7 @@ interface ItemDetailResponse {
   product: ProductWithUser;
   relatedProducts: Product[];
   mySaleProducts: Product[];
+  mySaleProductsChats: number;
   isLiked: boolean;
   isChat: boolean;
 }
@@ -42,6 +43,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   product,
   relatedProducts,
   mySaleProducts,
+  mySaleProductsChats,
   isLiked,
   isChat,
 }) => {
@@ -257,7 +259,10 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                   <div>
                     {product?.user?.id === user?.id ? (
                       <button className="py-2 px-4 rounded-md text-white bg-orange-500">
-                        채팅 목록 보기
+                        채팅 목록 보기{" "}
+                        {mySaleProductsChats > 0
+                          ? `(${mySaleProductsChats})`
+                          : null}
                       </button>
                     ) : (
                       <button
@@ -352,11 +357,28 @@ export const getServerSideProps = withSsrSession(async function ({
     },
   });
 
+  const mySaleProductsChats = await client.chat
+    .findMany({
+      where: {
+        productId: product?.id,
+      },
+    })
+    .then((res) => res.length);
+
+  console.log(mySaleProductsChats, "mySaleProductsChats");
+
+  const d = await client.chat.findFirst({
+    where: {
+      productId: product?.id,
+    },
+  });
+
   return {
     props: {
       product: JSON.parse(JSON.stringify(product)),
       relatedProducts: JSON.parse(JSON.stringify(relatedProducts)),
       mySaleProducts: JSON.parse(JSON.stringify(mySaleProducts)),
+      mySaleProductsChats,
       isLiked: false,
       isChat: false,
     },
