@@ -2,27 +2,46 @@ import { NextApiRequest, NextApiResponse } from "next";
 import withHandler, { ResponseType } from "@libs/server/withHandler";
 import client from "@libs/server/client";
 import { withApiSession } from "@libs/server/withSession";
+import Products from "@components/products";
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
   if (req.method === "GET") {
-    const products = await client.product.findMany({
-      where: {
-        NOT: {
-          status: false,
-        },
-      },
-      include: {
-        _count: {
-          select: {
-            favs: true,
-            chats: true,
-          },
-        },
+    const chat = await client.chat.findMany({
+      distinct: ["userId", "productId"],
+      select: {
+        productId: true,
+        userId: true,
       },
     });
+
+    const products = await client.product
+      .findMany({
+        where: {
+          NOT: {
+            status: false,
+          },
+        },
+        include: {
+          _count: {
+            select: {
+              favs: true,
+              chats: true,
+            },
+          },
+        },
+      })
+      .then((data) => {
+        return data.map((product) => {
+          return {
+            ...product,
+            chats: chat.filter((item) => item.productId === product.id).length,
+          };
+        });
+      });
+
     res.json({ ok: true, products });
   }
 
