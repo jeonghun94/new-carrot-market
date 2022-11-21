@@ -239,15 +239,15 @@ export const getServerSideProps = withSsrSession(async function ({
   const sellerId = Number(query.sellerId);
   const userId = req?.session.user?.id;
 
-  // await client.chat.updateMany({
-  //   where: {
-  //     productId: Number(productId),
-  //     userId: sellerId,
-  //   },
-  //   data: {
-  //     read: true,
-  //   },
-  // });
+  await client.chat.updateMany({
+    where: {
+      productId: Number(productId),
+      userId: sellerId,
+    },
+    data: {
+      read: true,
+    },
+  });
 
   if (productId) {
     await fetch("http:localhost:3000/api/products/chat", {

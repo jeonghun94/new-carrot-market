@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import withHandler, { ResponseType } from "@libs/server/withHandler";
 import client from "@libs/server/client";
 import { withApiSession } from "@libs/server/withSession";
-import Products from "@components/products";
 
 async function handler(
   req: NextApiRequest,
@@ -51,7 +50,6 @@ async function handler(
       session: { user },
     } = req;
 
-    console.log(req.body);
     const product = await client.product.create({
       data: {
         name,
@@ -65,7 +63,6 @@ async function handler(
       },
     });
 
-    // console.log(product, "dsdsds");
     res.json({
       ok: true,
       product,

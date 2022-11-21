@@ -31,7 +31,7 @@ async function handler(
             id: product.id,
           },
         },
-        code: !code ? product.id + "/" + user?.id : code,
+        code: !code ? product.id + "/" + user?.id + "/" + product.userId : code,
       },
     });
   }
