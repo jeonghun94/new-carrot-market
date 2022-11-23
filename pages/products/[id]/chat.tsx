@@ -94,6 +94,10 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
     }
   }, [data]);
 
+  useEffect(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+  }, []);
+
   const CustomTitle = () => {
     const temperature = product?.user?.temperature || 0;
     const bg = temperature > 40 ? "bg-orange-100" : "bg-green-100";
@@ -113,7 +117,7 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
 
   return (
     <Layout canGoBack title={<CustomTitle />}>
-      <div className="mt-1">
+      <div className="mt-1 ">
         <div className={code || chatting.length > 0 ? "hidden" : "block"}>
           <div className="flex justify-center items-center fixed text-sm text-center text-gray-400 top-0 w-full min-h-screen  ">
             [거래꿀팁] 당근마켓 채팅이 가장 편하고 안전해요.🥕
@@ -167,7 +171,7 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
           </div>
         </div>
 
-        <div className="pt-4 px-4 space-y-1 pb-20 overflow-y-auto">
+        <div className="pt-4 px-4 space-y-1 pb-20">
           {data ? null : chatting ? paintChatting(chatting) : null}
           {paintChatting(data?.chatting || [])}
           <form

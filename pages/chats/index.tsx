@@ -22,6 +22,7 @@ interface ProductChat {
   };
   product: ProductWithUser;
   newMessages: number;
+  lastChat: string;
 }
 interface ProductsChatsResponse extends ProductChat {
   productChats: ProductChat[];
@@ -66,7 +67,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
                       춘의동 ∙ {convertTime(productChat?.createdAt.toString())}
                     </span>
                   </p>
-                  <p className="text-sm">{productChat?.message}</p>
+                  <p className="text-sm">{productChat?.lastChat}</p>
                 </div>
               </div>
 
@@ -102,7 +103,10 @@ export const getServerSideProps = withSsrSession(async function ({
 
   let chats = await client.chat.findMany({
     distinct: ["productId"],
-    where: { userId: req?.session.user?.id, exit: false },
+    where: {
+      userId: req?.session.user?.id,
+      exit: false,
+    },
     select: {
       user: {
         select: {
@@ -110,7 +114,6 @@ export const getServerSideProps = withSsrSession(async function ({
         },
       },
       code: true,
-      message: true,
       createdAt: true,
       read: true,
       product: {
@@ -135,9 +138,9 @@ export const getServerSideProps = withSsrSession(async function ({
     chats = await client.chat.findMany({
       distinct: ["productId"],
       where: {
-        product: {
-          userId: req?.session.user?.id,
-        },
+        // product: {
+        //   userId: req?.session.user?.id,
+        // },
         exit: false,
       },
       select: {
@@ -147,7 +150,6 @@ export const getServerSideProps = withSsrSession(async function ({
           },
         },
         code: true,
-        message: true,
         createdAt: true,
         read: true,
         product: {
@@ -169,23 +171,46 @@ export const getServerSideProps = withSsrSession(async function ({
     });
   }
 
-  console.log(req?.session.user?.id);
+  console.log(req?.session.user?.id, "###################");
   console.log(chats, "ds");
 
   for (const chat of chats) {
-    const newMessge = await client.chat.findMany({
-      where: {
-        // userId: req?.session.user?.id,
-        userId: chat.product.userId,
-        product: {
-          id: chat.product.id,
+    // 새로운 메세지 갯수
+    const newMessages = await client.chat
+      .findMany({
+        select: {
+          id: true,
         },
-        exit: false,
-        read: false,
+        where: {
+          userId: chat.product.userId,
+          productId: chat.product.id,
+          exit: false,
+          read: false,
+        },
+      })
+      .then((res) => res.length);
+    console.log(newMessages);
+
+    // 마지막 채팅 구하기
+    const lastChat = await client.chat.findFirst({
+      distinct: ["productId"],
+      select: {
+        message: true,
+      },
+      where: {
+        productId: chat.product.id,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
-    productChats.push({ ...chat, newMessages: newMessge.length });
+    // 채팅 내용 재설정
+    productChats.push({
+      ...chat,
+      newMessages,
+      lastChat: lastChat?.message,
+    });
   }
 
   console.log(productChats, "ㅇㄴ");
