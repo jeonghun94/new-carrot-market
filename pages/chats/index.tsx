@@ -189,7 +189,6 @@ export const getServerSideProps = withSsrSession(async function ({
         },
       })
       .then((res) => res.length);
-    console.log(newMessages);
 
     // 마지막 채팅 구하기
     const lastChat = await client.chat.findFirst({
