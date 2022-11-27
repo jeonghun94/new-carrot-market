@@ -46,14 +46,23 @@ const Enter: NextPage = () => {
     useMutation<MutationResult>("/api/users/enter");
   const [confirmToken, { loading: tokenLoading, data: tokenData }] =
     useMutation<MutationResult>("/api/users/confirm");
-  const { register: tokenRegister, handleSubmit: tokenHandleSubmit } =
-    useForm<TokenForm>();
+  const {
+    register: tokenRegister,
+    handleSubmit: tokenHandleSubmit,
+    setValue: tokenSetValue,
+  } = useForm<TokenForm>();
 
   const onValid = (validForm: EnterForm) => {
     if (loading) return;
     enter(validForm);
     setAuth(true);
   };
+
+  useEffect(() => {
+    if (data?.ok) {
+      tokenSetValue("token", data?.payload + "");
+    }
+  }, [data]);
 
   const onTokenValid = (validForm: TokenForm) => {
     if (tokenLoading) return;
