@@ -13,6 +13,7 @@ async function handler(
       payload: token,
     },
   });
+  console.log(foundToken);
   if (!foundToken) return res.status(404).end();
   req.session.user = {
     id: foundToken.userId,

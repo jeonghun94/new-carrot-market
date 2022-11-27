@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import withHandler, { ResponseType } from "@libs/server/withHandler";
-import client from "@libs/server/client";
 import { withApiSession } from "@libs/server/withSession";
+import client from "@libs/server/client";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 dayjs.locale("ko");
@@ -11,11 +11,9 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const {
-    body: { productId, userId, message, product, code },
+    body: { productId, userId, message, product, code, codeP },
     session: { user },
   } = req;
-
-  console.log("req.body", req.body);
 
   if (message && product) {
     await client.chat.create({
@@ -36,14 +34,30 @@ async function handler(
     });
   }
 
-  const seller = await client?.product.findUnique({
-    where: {
-      id: productId ? productId : product.id,
-    },
+  console.log(codeP);
+
+  const sellerId = await client?.product
+    .findUnique({
+      where: {
+        id: productId ? productId : product.id,
+      },
+      select: {
+        userId: true,
+      },
+    })
+    .then((res) => res?.userId);
+
+  const chatCode = await client?.chat.findMany({
+    distinct: ["code"],
     select: {
-      userId: true,
+      code: true,
+    },
+    where: {
+      productId: productId ? productId : product.id,
     },
   });
+
+  console.log(chatCode), "chatCode" + userId;
 
   const chatDate = await client.chat
     .findMany({
@@ -53,7 +67,7 @@ async function handler(
       where: {
         productId: productId ? productId : product.id,
         userId: {
-          in: [seller?.userId, userId ? userId : user?.id],
+          in: [sellerId, userId ? userId : user?.id],
         },
       },
     })
@@ -75,7 +89,7 @@ async function handler(
     where: {
       productId: productId ? productId : product.id,
       userId: {
-        in: [seller?.userId, userId ? userId : user?.id],
+        in: [sellerId, userId ? userId : user?.id],
       },
     },
   });
@@ -95,4 +109,9 @@ async function handler(
   });
 }
 
-export default withApiSession(withHandler({ methods: ["POST"], handler }));
+export default withApiSession(
+  withHandler({
+    methods: ["POST", "GET"],
+    handler,
+  })
+);

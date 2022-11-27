@@ -63,6 +63,19 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
     setValue("message", "");
   };
 
+  const scrollToBottom = () => window.scrollTo(0, document.body.scrollHeight);
+
+  useEffect(() => {
+    if (data?.ok) {
+      setCode(data?.chat?.code);
+      scrollToBottom();
+    }
+  }, [data]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
+
   const paintChatting = (chatting: ChatWithUserDay[]) => {
     return chatting.map((chat, index) => {
       return (
@@ -87,16 +100,6 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
       );
     });
   };
-
-  useEffect(() => {
-    if (data?.ok) {
-      setCode(data?.chat?.code);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    window.scrollTo(0, document.body.scrollHeight);
-  }, []);
 
   const CustomTitle = () => {
     const temperature = product?.user?.temperature || 0;
@@ -241,6 +244,7 @@ export const getServerSideProps = withSsrSession(async function ({
   let chatting: ChatWithUserDay[] = [];
   const productId = Number(query.productId);
   const sellerId = Number(query.sellerId);
+  const code = query.code;
   const userId = req?.session.user?.id;
 
   await client.chat.updateMany({
@@ -262,6 +266,7 @@ export const getServerSideProps = withSsrSession(async function ({
       body: JSON.stringify({
         productId,
         userId,
+        codeP: code,
       }),
     })
       .then((response) => response.json())

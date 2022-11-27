@@ -1,12 +1,13 @@
-import type { NextApiRequest, NextPage, NextPageContext } from "next";
+import type { NextPage, NextPageContext } from "next";
 import { withSsrSession } from "@libs/server/withSession";
 import { Product, User } from "@prisma/client";
 import { convertTime } from "@libs/client/utils";
 import { useRouter } from "next/router";
+import noImage from "public/no-image.png";
 import Layout from "@components/layout";
 import client from "@libs/server/client";
-import noImage from "public/no-image.png";
 import Image from "next/image";
+import useUser from "@libs/client/useUser";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -30,10 +31,12 @@ interface ProductsChatsResponse extends ProductChat {
 
 const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
   const router = useRouter();
-  const handleClick = (productId: number, sellerId: number) => {
+  const user = useUser();
+  console.log(user);
+  const handleClick = (productId: number, sellerId: number, code: string) => {
     router.push({
       pathname: `/products/${productId}/chat`,
-      query: { productId, sellerId },
+      query: { productId, sellerId, code },
     });
   };
   return (
@@ -43,7 +46,11 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
           <div
             key={i}
             onClick={() =>
-              handleClick(productChat?.product.id, productChat?.product.userId)
+              handleClick(
+                productChat?.product.id,
+                productChat?.product.userId,
+                productChat?.code
+              )
             }
             className="py-3 px-5 border-b flex items-center space-x-3 cursor-pointer first:mt-2 "
           >
@@ -101,10 +108,17 @@ export const getServerSideProps = withSsrSession(async function ({
 }: NextPageContext) {
   const productChats = [];
 
+  console.log(req?.session.user?.id);
+
+  // 판매자인 경우
   let chats = await client.chat.findMany({
     distinct: ["productId"],
     where: {
-      userId: req?.session.user?.id,
+      product: {
+        user: {
+          id: req?.session.user?.id,
+        },
+      },
       exit: false,
     },
     select: {
@@ -134,13 +148,14 @@ export const getServerSideProps = withSsrSession(async function ({
     orderBy: { createdAt: "desc" },
   });
 
+  console.log(chats, "reloading");
+
+  // 판매자아닌 경우
   if (chats.length === 0) {
     chats = await client.chat.findMany({
       distinct: ["productId"],
       where: {
-        // product: {
-        //   userId: req?.session.user?.id,
-        // },
+        userId: req?.session.user?.id,
         exit: false,
       },
       select: {
@@ -171,8 +186,7 @@ export const getServerSideProps = withSsrSession(async function ({
     });
   }
 
-  console.log(req?.session.user?.id, "###################");
-  console.log(chats, "ds");
+  console.log(chats, "reloadingsdfsdfsdfs");
 
   for (const chat of chats) {
     // 새로운 메세지 갯수
@@ -211,8 +225,6 @@ export const getServerSideProps = withSsrSession(async function ({
       lastChat: lastChat?.message,
     });
   }
-
-  console.log(productChats, "ㅇㄴ");
 
   return {
     props: {
