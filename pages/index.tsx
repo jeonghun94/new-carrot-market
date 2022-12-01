@@ -2,7 +2,6 @@ import type { NextPage } from "next";
 import FloatingButton from "@components/floating-button";
 import Item from "@components/item";
 import Layout from "@components/layout";
-import useUser from "@libs/client/useUser";
 import useSWR from "swr";
 import { Product } from "@prisma/client";
 import { convertTime } from "@libs/client/utils";
@@ -21,6 +20,7 @@ interface ProductResponse {
 
 const Home: NextPage = () => {
   const { data } = useSWR<ProductResponse>("/api/products");
+
   return (
     <Layout title="홈" hasTabBar seoTitle="Home">
       <div className="flex flex-col space-y-5 divide-y">

@@ -3,7 +3,6 @@ import type { AppProps } from "next/app";
 import { SWRConfig } from "swr";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  // console.log("APP IS RUNNING");
   return (
     <SWRConfig
       value={{
@@ -11,7 +10,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           fetch(url).then((response) => response.json()),
       }}
     >
-      {/* <div className="w-full max-w-xl mx-auto"> */}
       <div>
         <Component {...pageProps} />
       </div>

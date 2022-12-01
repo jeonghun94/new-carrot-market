@@ -1,7 +1,7 @@
 import { NextPage } from "next";
+import logo from "public/carrot-logo.png";
 import Image from "next/image";
 import Link from "next/link";
-import logo from "public/carrot-logo.png";
 
 const Home: NextPage = () => {
   return (
@@ -27,7 +27,7 @@ const Home: NextPage = () => {
           <span className="px-1 text-sm dark:text-gray-300">
             이미 계정이 있나요?
           </span>
-          <Link href={`/enter`}>
+          <Link href={`/register`}>
             <a className="text-sm text-orange-500 font-bold">로그인</a>
           </Link>
         </div>
