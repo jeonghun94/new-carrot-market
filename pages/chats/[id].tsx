@@ -29,7 +29,6 @@ interface ChatResponse {
 }
 
 const ChatDetail: NextPage<ChatResponse> = ({ chats, product }) => {
-  console.log(product);
   const { user } = useUser();
 
   const CustomTitle = () => {

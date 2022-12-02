@@ -9,7 +9,6 @@ interface ProfileResponse {
 }
 
 export default function useUser() {
-  console.log("useUser");
   const { data, error } = useSWR<ProfileResponse>("/api/users/me");
   const router = useRouter();
   useEffect(() => {

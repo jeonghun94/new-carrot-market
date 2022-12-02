@@ -1,16 +1,28 @@
 import type { NextPage, NextPageContext } from "next";
 import { withSsrSession } from "@libs/server/withSession";
-import { Product, User } from "@prisma/client";
+import { Chat, Product, User } from "@prisma/client";
 import { convertTime } from "@libs/client/utils";
 import { useRouter } from "next/router";
 import noImage from "public/no-image.png";
 import Layout from "@components/layout";
 import client from "@libs/server/client";
 import Image from "next/image";
-import useUser from "@libs/client/useUser";
 
 interface ProductWithUser extends Product {
   user: User;
+}
+
+interface ChatWithProductUser extends Chat {
+  user: {
+    name: string;
+    id: number;
+    avatar: string;
+  };
+  product: {
+    name: string;
+    id: number;
+    image: string;
+  };
 }
 
 interface ProductChat {
@@ -20,19 +32,19 @@ interface ProductChat {
   read: boolean;
   user: {
     name: string;
+    avatar: string;
   };
   product: ProductWithUser;
   newMessages: number;
   lastChat: string;
 }
+
 interface ProductsChatsResponse extends ProductChat {
   productChats: ProductChat[];
 }
 
 const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
   const router = useRouter();
-  const user = useUser();
-  console.log(user);
   const handleClick = (productId: number, sellerId: number, code: string) => {
     router.push({
       pathname: `/products/${productId}/chat`,
@@ -60,8 +72,8 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
                   width={48}
                   height={48}
                   src={
-                    productChat.product.user.avatar
-                      ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${productChat?.product.user?.avatar}/avatar`
+                    productChat.user.avatar
+                      ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${productChat.user.avatar}/avatar`
                       : noImage
                   }
                   className="w-12 h-12 rounded-full bg-slate-300"
@@ -72,6 +84,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
                     <span className="ml-1 text-sm text-gray-400 font-normal">
                       {" "}
                       춘의동 ∙ {convertTime(productChat?.createdAt.toString())}
+                      {productChat.product.userId}
                     </span>
                   </p>
                   <p className="text-sm">{productChat?.lastChat}</p>
@@ -96,7 +109,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
         ))
       ) : (
         <div className="min-w-max min-h-screen flex justify-center items-center -mt-12">
-          <p>채팅 목록이 없습니다.</p>
+          <p>참여 중인 채팅이 없습니다.</p>
         </div>
       )}
     </Layout>
@@ -106,87 +119,70 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
 export const getServerSideProps = withSsrSession(async function ({
   req,
 }: NextPageContext) {
+  const userId = req?.session.user?.id;
+  const chats: any[] = [];
   const productChats = [];
-
-  console.log(req?.session.user?.id);
-
-  // 판매자인 경우
-  let chats = await client.chat.findMany({
-    distinct: ["productId"],
+  const products = await client.product.findMany({
     where: {
-      product: {
-        user: {
-          id: req?.session.user?.id,
-        },
-      },
-      exit: false,
+      userId,
     },
     select: {
-      user: {
-        select: {
-          name: true,
-        },
-      },
-      code: true,
-      createdAt: true,
-      read: true,
-      product: {
-        select: {
-          image: true,
-          id: true,
-          userId: true,
-          user: {
-            select: {
-              name: true,
-              avatar: true,
-              id: true,
-            },
-          },
-        },
-      },
+      id: true,
     },
-    orderBy: { createdAt: "desc" },
   });
 
-  console.log(chats, "reloading");
+  const seller = false;
 
-  // 판매자아닌 경우
-  if (chats.length === 0) {
-    chats = await client.chat.findMany({
-      distinct: ["productId"],
-      where: {
-        userId: req?.session.user?.id,
-        exit: false,
-      },
+  for (const product of products) {
+    const myCode = `${product.id}/${userId}/${userId}`;
+
+    const chatss = await client.chat.findMany({
+      distinct: ["productId", "code"],
+      where: seller
+        ? {
+            userId,
+            exit: false,
+          }
+        : {
+            productId: product.id,
+            exit: false,
+          },
       select: {
+        code: true,
+        message: true,
+        createdAt: true,
         user: {
           select: {
+            id: true,
             name: true,
+            avatar: true,
           },
         },
-        code: true,
-        createdAt: true,
-        read: true,
         product: {
           select: {
-            image: true,
             id: true,
             userId: true,
-            user: {
-              select: {
-                name: true,
-                avatar: true,
-                id: true,
-              },
-            },
+            image: true,
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    chatss.map((chat) => {
+      // seller
+      //   ? chats.push(chat)
+      //   : chat.code !== myCode
+      //   ? chats.push(chat)
+      //   : null;
+      if (chat.code !== myCode) {
+        chats.push(chat);
+      }
     });
   }
-
-  console.log(chats, "reloadingsdfsdfsdfs");
+  console.log(chats);
 
   for (const chat of chats) {
     // 새로운 메세지 갯수
@@ -205,26 +201,33 @@ export const getServerSideProps = withSsrSession(async function ({
       .then((res) => res.length);
 
     // 마지막 채팅 구하기
-    const lastChat = await client.chat.findFirst({
-      distinct: ["productId"],
-      select: {
-        message: true,
-      },
-      where: {
-        productId: chat.product.id,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const lastChat = await client.chat
+      .findFirst({
+        distinct: ["productId"],
+        select: {
+          message: true,
+        },
+        where: {
+          productId: chat.product.id,
+          code: {
+            contains: chat.code,
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      })
+      .then((res) => res?.message);
 
     // 채팅 내용 재설정
     productChats.push({
       ...chat,
       newMessages,
-      lastChat: lastChat?.message,
+      lastChat,
     });
   }
+
+  console.log(productChats, "dsdsdsd");
 
   return {
     props: {

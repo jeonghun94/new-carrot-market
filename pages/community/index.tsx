@@ -105,7 +105,6 @@ const Community: NextPage<PostsResponse> = ({ posts }) => {
 };
 
 export async function getStaticProps() {
-  console.log("getStaticProps Community");
   const posts = await client.post.findMany({ include: { user: true } });
   return {
     props: {

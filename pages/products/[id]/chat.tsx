@@ -241,6 +241,8 @@ export const getServerSideProps = withSsrSession(async function ({
   req,
   query,
 }: NextPageContext) {
+  console.log("버그일어남");
+
   let chatting: ChatWithUserDay[] = [];
   const productId = Number(query.productId);
   const sellerId = Number(query.sellerId);

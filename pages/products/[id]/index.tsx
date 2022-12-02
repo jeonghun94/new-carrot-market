@@ -271,7 +271,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                           // router.push(`${router.asPath}/chat`);
                           router.push({
                             pathname: `${router.asPath}/chat`,
-                            query: { productId: product?.id },
+                            query: { productId: product?.id, sellerId: 1 },
                           });
                         }}
                         className={`py-2 px-4 text-white ${
