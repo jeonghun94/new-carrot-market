@@ -29,12 +29,11 @@ async function handler(
             id: product.id,
           },
         },
-        code: !code ? product.id + "/" + user?.id + "/" + product.userId : code,
+        code: !code ? user?.id + "/" + product.userId : code,
+        seller: user?.id === product.userId,
       },
     });
   }
-
-  console.log(codeP);
 
   const sellerId = await client?.product
     .findUnique({
@@ -56,8 +55,6 @@ async function handler(
       productId: productId ? productId : product.id,
     },
   });
-
-  console.log(chatCode), "chatCode" + userId;
 
   const chatDate = await client.chat
     .findMany({

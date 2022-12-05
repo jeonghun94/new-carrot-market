@@ -83,6 +83,7 @@ model Chat {
   code      String   
   read      Boolean  @default(false)
   exit      Boolean  @default(false)
+  seller    Boolean  @default(false)
   @@index([userId])
   @@index([productId])
 }

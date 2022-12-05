@@ -12,19 +12,6 @@ interface ProductWithUser extends Product {
   user: User;
 }
 
-interface ChatWithProductUser extends Chat {
-  user: {
-    name: string;
-    id: number;
-    avatar: string;
-  };
-  product: {
-    name: string;
-    id: number;
-    image: string;
-  };
-}
-
 interface ProductChat {
   code: string;
   message: string;
@@ -84,7 +71,6 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
                     <span className="ml-1 text-sm text-gray-400 font-normal">
                       {" "}
                       춘의동 ∙ {convertTime(productChat?.createdAt.toString())}
-                      {productChat.product.userId}
                     </span>
                   </p>
                   <p className="text-sm">{productChat?.lastChat}</p>
@@ -120,31 +106,39 @@ export const getServerSideProps = withSsrSession(async function ({
   req,
 }: NextPageContext) {
   const userId = req?.session.user?.id;
-  const chats: any[] = [];
   const productChats = [];
-  const products = await client.product.findMany({
-    where: {
-      userId,
-    },
+  const chats: any[] = [];
+
+  const allChats = await client.chat.findMany({
+    distinct: ["productId"],
     select: {
-      id: true,
+      productId: true,
+      seller: true,
+    },
+    where: {
+      code: {
+        contains: userId + "",
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 
-  const seller = false;
+  console.log(allChats, "allChats");
 
-  for (const product of products) {
-    const myCode = `${product.id}/${userId}/${userId}`;
-
+  for (const product of allChats) {
     const chatss = await client.chat.findMany({
-      distinct: ["productId", "code"],
-      where: seller
+      distinct: ["productId"],
+      where: product.seller
         ? {
-            userId,
+            product: {
+              userId,
+            },
             exit: false,
           }
         : {
-            productId: product.id,
+            userId,
             exit: false,
           },
       select: {
@@ -172,35 +166,13 @@ export const getServerSideProps = withSsrSession(async function ({
     });
 
     chatss.map((chat) => {
-      // seller
-      //   ? chats.push(chat)
-      //   : chat.code !== myCode
-      //   ? chats.push(chat)
-      //   : null;
-      if (chat.code !== myCode) {
-        chats.push(chat);
-      }
+      console.log(chat, "chat");
+      chats.push(chat);
     });
   }
-  console.log(chats);
 
   for (const chat of chats) {
-    // 새로운 메세지 갯수
-    const newMessages = await client.chat
-      .findMany({
-        select: {
-          id: true,
-        },
-        where: {
-          userId: chat.product.userId,
-          productId: chat.product.id,
-          exit: false,
-          read: false,
-        },
-      })
-      .then((res) => res.length);
-
-    // 마지막 채팅 구하기
+    const newMessages = 0;
     const lastChat = await client.chat
       .findFirst({
         distinct: ["productId"],
@@ -226,8 +198,6 @@ export const getServerSideProps = withSsrSession(async function ({
       lastChat,
     });
   }
-
-  console.log(productChats, "dsdsdsd");
 
   return {
     props: {
