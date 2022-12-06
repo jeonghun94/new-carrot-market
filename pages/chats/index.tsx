@@ -106,18 +106,29 @@ export const getServerSideProps = withSsrSession(async function ({
   req,
 }: NextPageContext) {
   const userId = req?.session.user?.id;
-  const productChats = [];
+
   const chats: any[] = [];
 
-  const allChats = await client.chat.findMany({
-    distinct: ["productId"],
+  const item = await client.product.findMany({
+    where: {
+      userId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  console.log(item);
+
+  const you = await client.chat.findMany({
+    distinct: ["productId", "userId", "code"],
     select: {
       productId: true,
-      seller: true,
+      userId: true,
     },
     where: {
-      code: {
-        contains: userId + "",
+      productId: {
+        in: item.map((i) => i.id),
       },
     },
     orderBy: {
@@ -125,23 +136,11 @@ export const getServerSideProps = withSsrSession(async function ({
     },
   });
 
-  console.log(allChats, "allChats");
-
-  for (const product of allChats) {
-    const chatss = await client.chat.findMany({
+  const me = await client.chat
+    .findMany({
       distinct: ["productId"],
-      where: product.seller
-        ? {
-            product: {
-              userId,
-            },
-            exit: false,
-          }
-        : {
-            userId,
-            exit: false,
-          },
       select: {
+        seller: true,
         code: true,
         message: true,
         createdAt: true,
@@ -155,53 +154,110 @@ export const getServerSideProps = withSsrSession(async function ({
         product: {
           select: {
             id: true,
-            userId: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                avatar: true,
+              },
+            },
             image: true,
           },
         },
+        productId: true,
+        userId: true,
+      },
+      where: {
+        userId,
       },
       orderBy: {
         createdAt: "desc",
       },
+    })
+    .then((res) => {
+      res.map((r) => {
+        console.log(r.product.user);
+      });
     });
 
-    chatss.map((chat) => {
-      console.log(chat, "chat");
-      chats.push(chat);
-    });
-  }
+  // console.log(you, "you");
+  console.log(me, "me");
 
-  for (const chat of chats) {
-    const newMessages = 0;
-    const lastChat = await client.chat
-      .findFirst({
-        distinct: ["productId"],
-        select: {
-          message: true,
-        },
-        where: {
-          productId: chat.product.id,
-          code: {
-            contains: chat.code,
+  const saleProudcts = await client.chat
+    .findMany({
+      distinct: ["productId"],
+      select: {
+        // seller: true,
+        // code: true,
+        // message: true,
+        // createdAt: true,
+        // user: {
+        //   select: {
+        //     id: true,
+        //     name: true,
+        //     avatar: true,
+        //   },
+        // },
+        // product: {
+        //   select: {
+        //     id: true,
+        //     user: {
+        //       select: {
+        //         id: true,
+        //         name: true,
+        //         avatar: true,
+        //       },
+        //     },
+        //     image: true,
+        //   },
+        // },
+        productId: true,
+        userId: true,
+      },
+      where: {
+        OR: [
+          {
+            product: {
+              userId,
+            },
           },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      })
-      .then((res) => res?.message);
-
-    // 채팅 내용 재설정
-    productChats.push({
-      ...chat,
-      newMessages,
-      lastChat,
+          {
+            userId,
+          },
+        ],
+        exit: false,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    })
+    .then((res) => {
+      // console.log(res, "res");
+      res.map((chat) => {
+        // console.log(chat, "chat");
+        // if (chat.seller) {
+        //   console.log(chat.product.user);
+        // } else {
+        //   console.log(chat.user);
+        // }
+        // chat.seller
+        //   ? chats.push({
+        //       ...chat,
+        //       user: chat.product.user,
+        //       newMessage: 1,
+        //       lastChat: chat.message,
+        //     })
+        //   : chats.push(chat);
+      });
+      return chats;
     });
-  }
+
+  console.log("##########################");
+  // console.log(saleProudcts, "mySaleProudcts");
 
   return {
     props: {
-      productChats: JSON.parse(JSON.stringify(productChats)),
+      productChats: JSON.parse(JSON.stringify(saleProudcts)),
     },
   };
 });
