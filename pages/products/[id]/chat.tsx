@@ -67,7 +67,7 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
 
   useEffect(() => {
     if (data?.ok) {
-      setCode(data?.chat?.code);
+      // setCode(data?.chat?.code);
       scrollToBottom();
     }
   }, [data]);
@@ -88,7 +88,7 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
               return (
                 <Message
                   key={m.id}
-                  message={m.message}
+                  // message={m.message}
                   avatarUrl={m?.user?.avatar}
                   reversed={m?.user?.id === user?.id}
                   sendTime={m.createdAt.toLocaleString("ko-KR")}
@@ -250,15 +250,15 @@ export const getServerSideProps = withSsrSession(async function ({
   const code = query.code;
   const userId = req?.session.user?.id;
 
-  await client.chat.updateMany({
-    where: {
-      productId: Number(productId),
-      userId: sellerId,
-    },
-    data: {
-      read: true,
-    },
-  });
+  // await client.chat.updateMany({
+  //   where: {
+  //     productId: Number(productId),
+  //     userId: sellerId,
+  //   },
+  //   data: {
+  //     read: true,
+  //   },
+  // });
 
   if (productId) {
     await fetch("http:localhost:3000/api/products/chat", {
