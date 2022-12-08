@@ -8,13 +8,13 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   if (req.method === "GET") {
-    const chat = await client.chat.findMany({
-      distinct: ["userId", "productId"],
-      select: {
-        productId: true,
-        userId: true,
-      },
-    });
+    // const chat = await client.chat.findMany({
+    //   distinct: ["userId", "productId"],
+    //   select: {
+    //     productId: true,
+    //     userId: true,
+    //   },
+    // });
 
     const products = await client.product
       .findMany({
@@ -36,7 +36,8 @@ async function handler(
         return data.map((product) => {
           return {
             ...product,
-            chats: chat.filter((item) => item.productId === product.id).length,
+            chats: 1,
+            // chats: chat.filter((item) => item.productId === product.id).length,
           };
         });
       });

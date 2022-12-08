@@ -94,7 +94,7 @@ model ChatMessage {
   updatedAt DateTime @updatedAt
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   chatId    Int
-  message   String   @db.MediumText
+  content   String   @db.MediumText
   read      Boolean  @default(false)
   @@index([chatId])
 }

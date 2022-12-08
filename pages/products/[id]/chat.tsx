@@ -28,7 +28,7 @@ interface ChatWithUser extends Chat {
 }
 
 interface ChatWithUserDay {
-  message: ChatWithUser[];
+  content: ChatWithUser[];
   day: string;
 }
 
@@ -39,7 +39,7 @@ interface ChatResponse {
 }
 
 interface ChatForm {
-  message: string;
+  content: string;
 }
 
 const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
@@ -54,13 +54,13 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
     setValue,
   } = useForm<ChatForm>();
 
-  const onValid = ({ message }: ChatForm) => {
+  const onValid = ({ content }: ChatForm) => {
     createChat({
-      message,
+      content,
       product,
       code,
     });
-    setValue("message", "");
+    setValue("content", "");
   };
 
   const scrollToBottom = () => window.scrollTo(0, document.body.scrollHeight);
@@ -84,7 +84,7 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
             {chat.day}
           </div>
           <div className="space-y-2">
-            {chat.message.map((m) => {
+            {chat.content.map((m) => {
               return (
                 <Message
                   key={m.id}
@@ -206,16 +206,16 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
                 type="text"
                 placeholder="메시지 보내기"
                 className="shadow-sm py-2 px-3 rounded-full w-full bg-gray-100 border-gray-300 outline-none"
-                {...register("message", {
+                {...register("content", {
                   required: {
                     value: true,
                     message: "메시지를 입력해주세요.",
                   },
                 })}
               />
-              {errors.message?.message && (
+              {errors.content?.message && (
                 <span className="text-xs text-red-500">
-                  {errors.message?.message}
+                  {errors.content?.message}
                 </span>
               )}
             </div>
@@ -300,7 +300,8 @@ export const getServerSideProps = withSsrSession(async function ({
   return {
     props: {
       product: JSON.parse(JSON.stringify(product)),
-      chatting: JSON.parse(JSON.stringify(chatting)),
+      // chatting: JSON.parse(JSON.stringify(chatting)),
+      chatting: [],
     },
   };
 });

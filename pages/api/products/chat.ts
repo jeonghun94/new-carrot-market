@@ -11,9 +11,76 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const {
-    body: { productId, userId, message, product, code, codeP },
+    body: { product, content },
     session: { user },
   } = req;
+
+  let chat;
+  const alreadyExists = await client.chat.findFirst({
+    where: {
+      sellerId: Number(product.user.id),
+      purchaserId: Number(user?.id),
+    },
+  });
+
+  if (!alreadyExists) {
+    chat = await client.chat.create({
+      data: {
+        sellerId: Number(product.user.id),
+        purchaserId: Number(user?.id),
+        productId: Number(product.id),
+      },
+    });
+  }
+
+  const chatContent = await client.chatMessage.create({
+    data: {
+      chatId: alreadyExists ? alreadyExists.id : Number(chat?.id),
+      content,
+    },
+  });
+
+  const chatting = await client.chat.findUnique({
+    select: {
+      seller: {
+        select: {
+          id: true,
+          name: true,
+          avatar: true,
+        },
+      },
+      purchaser: {
+        select: {
+          id: true,
+          name: true,
+          avatar: true,
+        },
+      },
+      product: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
+      chatMessages: {
+        select: {
+          content: true,
+          createdAt: true,
+        },
+      },
+      _count: {
+        select: {
+          chatMessages: true,
+        },
+      },
+    },
+    where: {
+      id: alreadyExists ? alreadyExists.id : Number(chat?.id),
+    },
+  });
+
+  console.log(chatting, "chatting");
 
   res.json({
     ok: true,
