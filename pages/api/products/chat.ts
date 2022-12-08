@@ -11,37 +11,41 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const {
-    body: { product, content },
+    body: { product, content, userId: loginId },
     session: { user },
   } = req;
 
-  let chat;
+  let newChat;
+  const userId = user ? Number(user.id) : loginId;
   const alreadyExists = await client.chat.findFirst({
     where: {
       sellerId: Number(product.user.id),
-      purchaserId: Number(user?.id),
+      purchaserId: userId,
     },
   });
 
   if (!alreadyExists) {
-    chat = await client.chat.create({
+    newChat = await client.chat.create({
       data: {
         sellerId: Number(product.user.id),
-        purchaserId: Number(user?.id),
-        productId: Number(product.id),
+        purchaserId: userId,
+        productId: product.id,
       },
     });
   }
 
-  const chatContent = await client.chatMessage.create({
-    data: {
-      chatId: alreadyExists ? alreadyExists.id : Number(chat?.id),
-      content,
-    },
-  });
+  if (content) {
+    await client.chatMessage.create({
+      data: {
+        chatId: alreadyExists ? alreadyExists.id : Number(newChat?.id),
+        content,
+      },
+    });
+  }
 
-  const chatting = await client.chat.findUnique({
+  const chat = await client.chat.findUnique({
     select: {
+      id: true,
       seller: {
         select: {
           id: true,
@@ -76,15 +80,13 @@ async function handler(
       },
     },
     where: {
-      id: alreadyExists ? alreadyExists.id : Number(chat?.id),
+      id: alreadyExists ? alreadyExists.id : Number(newChat?.id),
     },
   });
 
-  console.log(chatting, "chatting");
-
   res.json({
     ok: true,
-    chatting: [],
+    chat,
   });
 }
 

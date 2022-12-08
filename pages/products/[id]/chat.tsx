@@ -1,52 +1,49 @@
-import type { NextApiRequest, NextPage, NextPageContext } from "next";
-import Layout from "@components/layout";
-import client from "@libs/server/client";
-import { Chat, Product, User } from "@prisma/client";
-import { convertPrice } from "@libs/client/utils";
-import Image from "next/image";
-import { useForm } from "react-hook-form";
+import type { NextPage, NextPageContext } from "next";
+import { withSsrSession } from "@libs/server/withSession";
+import { ChatMessage, Product, User } from "@prisma/client";
 import useMutation from "@libs/client/useMutation";
-import { useEffect, useState } from "react";
+import { convertPrice } from "@libs/client/utils";
+import client from "@libs/server/client";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import useUser from "@libs/client/useUser";
 import Message from "@components/message";
+import Layout from "@components/layout";
+import Image from "next/image";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import { withSsrSession } from "@libs/server/withSession";
 dayjs.locale("ko");
 
 interface ProductWithUser extends Product {
   user: User;
 }
 
-interface ProductResponse {
-  product: ProductWithUser;
-  chatting: ChatWithUserDay[];
-}
-
-interface ChatWithUser extends Chat {
-  user: User;
-}
-
-interface ChatWithUserDay {
-  content: ChatWithUser[];
-  day: string;
-}
-
-interface ChatResponse {
-  ok: boolean;
-  chat: Chat;
-  chatting: ChatWithUserDay[];
-}
-
 interface ChatForm {
   content: string;
 }
 
-const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
+interface ChatResponse {
+  id: number;
+  seller: User;
+  purchaser: User;
+  product: Product;
+  chatMessages: ChatMessage[];
+}
+
+interface DataResponse {
+  ok: boolean;
+  chat: ChatResponse;
+}
+
+interface PageResponse {
+  product: ProductWithUser;
+  chat: ChatResponse;
+}
+
+const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
   const { user } = useUser();
-  const [code, setCode] = useState("");
   const [createChat, { loading, data }] =
-    useMutation<ChatResponse>(`/api/products/chat`);
+    useMutation<DataResponse>(`/api/products/chat`);
   const {
     register,
     handleSubmit,
@@ -58,7 +55,6 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
     createChat({
       content,
       product,
-      code,
     });
     setValue("content", "");
   };
@@ -67,7 +63,6 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
 
   useEffect(() => {
     if (data?.ok) {
-      // setCode(data?.chat?.code);
       scrollToBottom();
     }
   }, [data]);
@@ -76,25 +71,25 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
     scrollToBottom();
   }, []);
 
-  const paintChatting = (chatting: ChatWithUserDay[]) => {
-    return chatting.map((chat, index) => {
+  const paintChatting = (chat: ChatResponse) => {
+    return chat.chatMessages.map((c, i) => {
       return (
-        <div key={index}>
+        <div key={i}>
           <div className="mt-2 text-center text-sm text-gray-400">
-            {chat.day}
+            {/* {chat.day} */}
           </div>
           <div className="space-y-2">
-            {chat.content.map((m) => {
-              return (
-                <Message
-                  key={m.id}
-                  // message={m.message}
-                  avatarUrl={m?.user?.avatar}
-                  reversed={m?.user?.id === user?.id}
-                  sendTime={m.createdAt.toLocaleString("ko-KR")}
-                />
-              );
-            })}
+            <Message
+              key={i}
+              message={c.content}
+              avatarUrl={
+                chat.purchaser.id === user?.id
+                  ? chat.purchaser.avatar
+                  : chat.seller.avatar
+              }
+              reversed={chat.purchaser.id === user?.id}
+              sendTime={c.createdAt.toLocaleString("ko-KR")}
+            />
           </div>
         </div>
       );
@@ -121,7 +116,7 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
   return (
     <Layout canGoBack title={<CustomTitle />}>
       <div className="mt-1 ">
-        <div className={code || chatting.length > 0 ? "hidden" : "block"}>
+        <div className={data || chat ? "hidden" : "block"}>
           <div className="flex justify-center items-center fixed text-sm text-center text-gray-400 top-0 w-full min-h-screen  ">
             [거래꿀팁] 당근마켓 채팅이 가장 편하고 안전해요.🥕
             <br />
@@ -175,8 +170,7 @@ const ChatDetail: NextPage<ProductResponse> = ({ product, chatting }) => {
         </div>
 
         <div className="pt-4 px-4 space-y-1 pb-20">
-          {data ? null : chatting ? paintChatting(chatting) : null}
-          {paintChatting(data?.chatting || [])}
+          {paintChatting(data ? data?.chat : chat)}
           <form
             className="fixed flex justify-between items-center py-2 px-4 gap-4  bg-white pb-5 bottom-0 inset-x-0"
             onSubmit={handleSubmit(onValid)}
@@ -241,24 +235,18 @@ export const getServerSideProps = withSsrSession(async function ({
   req,
   query,
 }: NextPageContext) {
-  console.log("버그일어남");
-  console.log(query, "query");
-
-  let chatting: ChatWithUserDay[] = [];
+  let chat: any;
   const productId = Number(query.productId);
-  const sellerId = Number(query.sellerId);
-  const code = query.code;
   const userId = req?.session.user?.id;
 
-  // await client.chat.updateMany({
-  //   where: {
-  //     productId: Number(productId),
-  //     userId: sellerId,
-  //   },
-  //   data: {
-  //     read: true,
-  //   },
-  // });
+  const product = await client.product.findUnique({
+    include: {
+      user: true,
+    },
+    where: {
+      id: Number(productId),
+    },
+  });
 
   if (productId) {
     await fetch("http:localhost:3000/api/products/chat", {
@@ -267,41 +255,32 @@ export const getServerSideProps = withSsrSession(async function ({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        productId,
+        product,
         userId,
-        codeP: code,
       }),
     })
-      .then((response) => response.json())
+      .then((res) => res.json())
       .then((data) => {
-        chatting = data.chatting;
+        chat = data.chat;
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   }
 
-  const product = await client.product.findUnique({
+  await client.chatMessage.updateMany({
     where: {
-      id: Number(productId),
+      chatId: chat.id,
     },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          avatar: true,
-          temperature: true,
-        },
-      },
+    data: {
+      read: true,
     },
   });
 
   return {
     props: {
       product: JSON.parse(JSON.stringify(product)),
-      // chatting: JSON.parse(JSON.stringify(chatting)),
-      chatting: [],
+      chat: JSON.parse(JSON.stringify(chat)),
     },
   };
 });

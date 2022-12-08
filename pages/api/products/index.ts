@@ -8,40 +8,21 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   if (req.method === "GET") {
-    // const chat = await client.chat.findMany({
-    //   distinct: ["userId", "productId"],
-    //   select: {
-    //     productId: true,
-    //     userId: true,
-    //   },
-    // });
-
-    const products = await client.product
-      .findMany({
-        where: {
-          NOT: {
-            status: false,
+    const products = await client.product.findMany({
+      where: {
+        NOT: {
+          status: false,
+        },
+      },
+      include: {
+        _count: {
+          select: {
+            favs: true,
+            chats: true,
           },
         },
-        include: {
-          _count: {
-            select: {
-              favs: true,
-              chats: true,
-            },
-          },
-        },
-      })
-      .then((data) => {
-        return data.map((product) => {
-          return {
-            ...product,
-            chats: 1,
-            // chats: chat.filter((item) => item.productId === product.id).length,
-          };
-        });
-      });
-
+      },
+    });
     res.json({ ok: true, products });
   }
 
