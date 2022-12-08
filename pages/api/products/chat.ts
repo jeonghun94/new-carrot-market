@@ -21,6 +21,7 @@ async function handler(
     where: {
       sellerId: Number(product.user.id),
       purchaserId: userId,
+      productId: product.id,
     },
   });
 

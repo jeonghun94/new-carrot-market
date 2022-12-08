@@ -116,7 +116,9 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
   return (
     <Layout canGoBack title={<CustomTitle />}>
       <div className="mt-1 ">
-        <div className={data || chat ? "hidden" : "block"}>
+        <div
+          className={data || chat.chatMessages.length > 0 ? "hidden" : "block"}
+        >
           <div className="flex justify-center items-center fixed text-sm text-center text-gray-400 top-0 w-full min-h-screen  ">
             [거래꿀팁] 당근마켓 채팅이 가장 편하고 안전해요.🥕
             <br />

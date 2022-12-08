@@ -1,41 +1,32 @@
 import type { NextPage, NextPageContext } from "next";
 import { withSsrSession } from "@libs/server/withSession";
-import { Chat, Product, User } from "@prisma/client";
+import { Chat, ChatMessage, Product, User } from "@prisma/client";
 import { convertTime } from "@libs/client/utils";
 import { useRouter } from "next/router";
 import noImage from "public/no-image.png";
 import Layout from "@components/layout";
 import client from "@libs/server/client";
+import useUser from "@libs/client/useUser";
 import Image from "next/image";
 
-interface ProductWithUser extends Product {
-  user: User;
+interface ChatWithUserProduct extends Chat {
+  seller: User;
+  purchaser: User;
+  product: Product;
+  chatMessages: ChatMessage[];
 }
 
-interface ProductChat {
-  code: string;
-  message: string;
-  createdAt: string;
-  read: boolean;
-  user: {
-    name: string;
-    avatar: string;
-  };
-  product: ProductWithUser;
-  newMessages: number;
-  lastChat: string;
-}
-
-interface ProductsChatsResponse extends ProductChat {
-  productChats: ProductChat[];
+interface ProductsChatsResponse extends Chat {
+  productChats: ChatWithUserProduct[];
 }
 
 const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
+  const { user } = useUser();
   const router = useRouter();
-  const handleClick = (productId: number, sellerId: number, code: string) => {
+  const handleClick = (productId: number, sellerId: number) => {
     router.push({
       pathname: `/products/${productId}/chat`,
-      query: { productId, sellerId, code },
+      query: { productId, sellerId },
     });
   };
   return (
@@ -45,11 +36,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
           <div
             key={i}
             onClick={() =>
-              handleClick(
-                productChat?.product.id,
-                productChat?.product.userId,
-                productChat?.code
-              )
+              handleClick(productChat?.product.id, productChat?.product.userId)
             }
             className="py-3 px-5 border-b flex items-center space-x-3 cursor-pointer first:mt-2 "
           >
@@ -59,30 +46,41 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
                   width={48}
                   height={48}
                   src={
-                    productChat.user.avatar
-                      ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${productChat.user.avatar}/avatar`
+                    productChat.sellerId === user?.id
+                      ? productChat.purchaser.avatar
+                        ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${productChat.purchaser.avatar}/avatar`
+                        : noImage
+                      : productChat.seller.avatar
+                      ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${productChat.seller.avatar}/avatar`
                       : noImage
                   }
                   className="w-12 h-12 rounded-full bg-slate-300"
                 />
                 <div className="flex flex-col justify-center items-start ">
                   <p className="font-semibold">
-                    {productChat?.user.name}
+                    {productChat.sellerId === user?.id
+                      ? productChat.purchaser.name
+                      : productChat.seller.name}
                     <span className="ml-1 text-sm text-gray-400 font-normal">
                       {" "}
-                      춘의동 ∙ {convertTime(productChat?.createdAt.toString())}
+                      춘의동 ∙{" "}
+                      {convertTime(
+                        productChat.chatMessages[0].createdAt.toString()
+                      )}
                     </span>
                   </p>
-                  <p className="text-sm">{productChat?.lastChat}</p>
+                  <p className="text-sm">
+                    {productChat.chatMessages[0].content}
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-center">
-                {productChat?.newMessages > 0 ? (
+                {/* {productChat?.newMessages > 0 ? (
                   <div className=" w-8 h-8 flex justify-center mr-3 items-center bg-orange-500 text-sm text-white-400 text-white rounded-full">
                     {productChat?.newMessages}
                   </div>
-                ) : null}
+                ) : null} */}
                 <Image
                   width={52}
                   height={52}
@@ -106,11 +104,56 @@ export const getServerSideProps = withSsrSession(async function ({
   req,
 }: NextPageContext) {
   const userId = req?.session.user?.id;
-  console.log(userId);
+  console.log(userId, "채팅 목록 보러 왔어용");
+
+  const chats = await client.chat.findMany({
+    where: {
+      OR: [
+        {
+          purchaserId: userId,
+        },
+        {
+          sellerId: userId,
+        },
+      ],
+    },
+    include: {
+      product: {
+        include: {
+          user: true,
+        },
+      },
+      seller: {
+        select: {
+          name: true,
+          avatar: true,
+        },
+      },
+      purchaser: {
+        select: {
+          name: true,
+          avatar: true,
+        },
+      },
+      chatMessages: {
+        // where: {
+        //   read: false,
+        // },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  console.log(chats, "채팅 목록");
 
   return {
     props: {
-      productChats: JSON.parse(JSON.stringify([])),
+      productChats: JSON.parse(JSON.stringify(chats)),
     },
   };
 });
