@@ -23,10 +23,10 @@ interface ProductsChatsResponse extends Chat {
 const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
   const { user } = useUser();
   const router = useRouter();
-  const handleClick = (productId: number, sellerId: number) => {
+  const handleClick = (productId: number) => {
     router.push({
       pathname: `/products/${productId}/chat`,
-      query: { productId, sellerId },
+      query: { productId },
     });
   };
   return (
@@ -35,9 +35,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
         productChats.map((productChat, i) => (
           <div
             key={i}
-            onClick={() =>
-              handleClick(productChat?.product.id, productChat?.product.userId)
-            }
+            onClick={() => handleClick(productChat?.product.id)}
             className="py-3 px-5 border-b flex items-center space-x-3 cursor-pointer first:mt-2 "
           >
             <div className="w-full flex justify-between space-x-7">
@@ -65,12 +63,12 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
                       {" "}
                       춘의동 ∙{" "}
                       {convertTime(
-                        productChat.chatMessages[0].createdAt.toString()
+                        productChat.chatMessages[0]?.createdAt.toString()
                       )}
                     </span>
                   </p>
                   <p className="text-sm">
-                    {productChat.chatMessages[0].content}
+                    {productChat.chatMessages[0]?.content}
                   </p>
                 </div>
               </div>
@@ -104,8 +102,6 @@ export const getServerSideProps = withSsrSession(async function ({
   req,
 }: NextPageContext) {
   const userId = req?.session.user?.id;
-  console.log(userId, "채팅 목록 보러 왔어용");
-
   const chats = await client.chat.findMany({
     where: {
       OR: [
@@ -136,9 +132,6 @@ export const getServerSideProps = withSsrSession(async function ({
         },
       },
       chatMessages: {
-        // where: {
-        //   read: false,
-        // },
         orderBy: {
           createdAt: "desc",
         },
@@ -149,7 +142,6 @@ export const getServerSideProps = withSsrSession(async function ({
       createdAt: "desc",
     },
   });
-  console.log(chats, "채팅 목록");
 
   return {
     props: {

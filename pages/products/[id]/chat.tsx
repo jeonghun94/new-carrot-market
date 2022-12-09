@@ -10,9 +10,6 @@ import useUser from "@libs/client/useUser";
 import Message from "@components/message";
 import Layout from "@components/layout";
 import Image from "next/image";
-import dayjs from "dayjs";
-import "dayjs/locale/ko";
-dayjs.locale("ko");
 
 interface ProductWithUser extends Product {
   user: User;
@@ -22,12 +19,17 @@ interface ChatForm {
   content: string;
 }
 
+interface ChatMessgaeWithDay {
+  day: string;
+  content: ChatMessage[];
+}
+
 interface ChatResponse {
   id: number;
   seller: User;
   purchaser: User;
   product: Product;
-  chatMessages: ChatMessage[];
+  chatMessages: ChatMessgaeWithDay[];
 }
 
 interface DataResponse {
@@ -42,6 +44,9 @@ interface PageResponse {
 
 const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
   const { user } = useUser();
+  const isMe = Boolean(user?.id === chat.purchaser.id);
+  const scrollToBottom = () => window.scrollTo(0, document.body.scrollHeight);
+
   const [createChat, { loading, data }] =
     useMutation<DataResponse>(`/api/products/chat`);
   const {
@@ -59,8 +64,6 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
     setValue("content", "");
   };
 
-  const scrollToBottom = () => window.scrollTo(0, document.body.scrollHeight);
-
   useEffect(() => {
     if (data?.ok) {
       scrollToBottom();
@@ -75,21 +78,17 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
     return chat.chatMessages.map((c, i) => {
       return (
         <div key={i}>
-          <div className="mt-2 text-center text-sm text-gray-400">
-            {/* {chat.day} */}
-          </div>
+          <div className="mt-2 text-center text-sm text-gray-400">{c.day}</div>
           <div className="space-y-2">
-            <Message
-              key={i}
-              message={c.content}
-              avatarUrl={
-                chat.purchaser.id === user?.id
-                  ? chat.purchaser.avatar
-                  : chat.seller.avatar
-              }
-              reversed={chat.purchaser.id === user?.id}
-              sendTime={c.createdAt.toLocaleString("ko-KR")}
-            />
+            {c.content.map((ct, i) => (
+              <Message
+                key={i}
+                message={ct.content}
+                avatarUrl={isMe ? chat.seller.avatar : chat.purchaser.avatar}
+                reversed={ct.userId === user?.id}
+                sendTime={ct.createdAt.toLocaleString("ko-KR")}
+              />
+            ))}
           </div>
         </div>
       );
@@ -97,17 +96,21 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
   };
 
   const CustomTitle = () => {
-    const temperature = product?.user?.temperature || 0;
-    const bg = temperature > 40 ? "bg-orange-100" : "bg-green-100";
+    const temperature = isMe
+      ? chat.seller.temperature || 0
+      : chat.purchaser.temperature || 0;
     const text = temperature > 40 ? "text-orange-500" : "text-green-500";
+    const bg = temperature > 40 ? "bg-orange-100" : "bg-green-100";
 
     return (
       <div className="flex items-center space-x-1">
-        <span className="">{product?.user?.name}</span>
+        <span className="">
+          {isMe ? chat.seller.name : chat.purchaser.name}
+        </span>
         <span
           className={`flex items-center text-[0.5rem] font-bold rounded-md px-1 h-[15px] ${bg} ${text}`}
         >
-          {product?.user?.temperature}℃
+          {isMe ? chat.seller.temperature : chat.purchaser.temperature}℃
         </span>
       </div>
     );
@@ -246,7 +249,7 @@ export const getServerSideProps = withSsrSession(async function ({
       user: true,
     },
     where: {
-      id: Number(productId),
+      id: productId,
     },
   });
 

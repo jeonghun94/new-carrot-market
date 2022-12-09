@@ -17,20 +17,38 @@ async function handler(
 
   let newChat;
   const userId = user ? Number(user.id) : loginId;
+
+  console.log(product, content, loginId);
+  console.log(userId);
+
   const alreadyExists = await client.chat.findFirst({
     where: {
-      sellerId: Number(product.user.id),
-      purchaserId: userId,
       productId: product.id,
+      OR: [
+        {
+          sellerId: product.user.id,
+        },
+        {
+          purchaserId: userId,
+        },
+        {
+          sellerId: userId,
+        },
+        {
+          purchaserId: product.user.id,
+        },
+      ],
     },
   });
+
+  console.log(alreadyExists, "alreadyExists");
 
   if (!alreadyExists) {
     newChat = await client.chat.create({
       data: {
-        sellerId: Number(product.user.id),
-        purchaserId: userId,
         productId: product.id,
+        sellerId: product.user.id,
+        purchaserId: userId,
       },
     });
   }
@@ -38,6 +56,7 @@ async function handler(
   if (content) {
     await client.chatMessage.create({
       data: {
+        userId,
         chatId: alreadyExists ? alreadyExists.id : Number(newChat?.id),
         content,
       },
@@ -52,6 +71,7 @@ async function handler(
           id: true,
           name: true,
           avatar: true,
+          temperature: true,
         },
       },
       purchaser: {
@@ -59,6 +79,7 @@ async function handler(
           id: true,
           name: true,
           avatar: true,
+          temperature: true,
         },
       },
       product: {
@@ -72,6 +93,10 @@ async function handler(
         select: {
           content: true,
           createdAt: true,
+          userId: true,
+        },
+        orderBy: {
+          createdAt: "asc",
         },
       },
       _count: {
@@ -85,9 +110,27 @@ async function handler(
     },
   });
 
+  const chatMessages = Array.from(
+    new Set(
+      chat?.chatMessages.map((chatMessage) =>
+        dayjs(chatMessage.createdAt).format("YYYY년MM월DD일")
+      )
+    )
+  ).map((day) => {
+    return {
+      day,
+      content: chat?.chatMessages?.filter((chat) => {
+        return dayjs(chat.createdAt).format("YYYY년MM월DD일") === day;
+      }),
+    };
+  });
+
   res.json({
     ok: true,
-    chat,
+    chat: {
+      ...chat,
+      chatMessages,
+    },
   });
 }
 

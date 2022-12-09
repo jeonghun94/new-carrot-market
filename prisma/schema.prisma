@@ -36,6 +36,7 @@ model User {
   messages        Message[]
   purchasers      Chat[]      @relation(name: "purchasers")
   sellers         Chat[]      @relation(name: "sellers")
+  chatMessages    ChatMessage[]
   
 }
 
@@ -94,6 +95,8 @@ model ChatMessage {
   updatedAt DateTime @updatedAt
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   chatId    Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
   content   String   @db.MediumText
   read      Boolean  @default(false)
   @@index([chatId])
