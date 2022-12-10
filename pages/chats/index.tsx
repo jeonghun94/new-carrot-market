@@ -13,6 +13,7 @@ interface ChatWithUserProduct extends Chat {
   seller: User;
   purchaser: User;
   product: Product;
+  newMessages: number;
   chatMessages: ChatMessage[];
 }
 
@@ -74,11 +75,11 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
               </div>
 
               <div className="flex items-center">
-                {/* {productChat?.newMessages > 0 ? (
+                {productChat?.newMessages > 0 ? (
                   <div className=" w-8 h-8 flex justify-center mr-3 items-center bg-orange-500 text-sm text-white-400 text-white rounded-full">
                     {productChat?.newMessages}
                   </div>
-                ) : null} */}
+                ) : null}
                 <Image
                   width={52}
                   height={52}
@@ -102,7 +103,8 @@ export const getServerSideProps = withSsrSession(async function ({
   req,
 }: NextPageContext) {
   const userId = req?.session.user?.id;
-  const chats = await client.chat.findMany({
+
+  const chats: any = await client.chat.findMany({
     where: {
       OR: [
         {
@@ -138,9 +140,27 @@ export const getServerSideProps = withSsrSession(async function ({
         take: 1,
       },
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+  });
+
+  for (let chat of chats) {
+    const newMessages = await client.chatMessage.count({
+      where: {
+        chatId: chat.id,
+        read: false,
+        userId: {
+          not: userId,
+        },
+      },
+    });
+
+    chat.newMessages = newMessages;
+  }
+
+  chats.sort((a: any, b: any) => {
+    return (
+      new Date(b.chatMessages[0]?.createdAt).getTime() -
+      new Date(a.chatMessages[0]?.createdAt).getTime()
+    );
   });
 
   return {

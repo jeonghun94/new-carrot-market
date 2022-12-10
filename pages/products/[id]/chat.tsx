@@ -276,6 +276,9 @@ export const getServerSideProps = withSsrSession(async function ({
   await client.chatMessage.updateMany({
     where: {
       chatId: chat.id,
+      userId: {
+        not: userId,
+      },
     },
     data: {
       read: true,
