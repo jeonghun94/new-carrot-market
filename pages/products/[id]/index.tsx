@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Products from "@components/products";
 import { withSsrSession } from "@libs/server/withSession";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore, { Navigation, Pagination } from "swiper";
 import "swiper/css";
@@ -61,6 +61,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
     });
   });
 
+  const [chatAlert, setChatAlert] = useState(false);
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
   const [views] = useMutation(`/api/products/${router.query.id}/views`);
 
@@ -68,6 +69,13 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
     if (!data) return;
     mutate((prev) => prev && { ...prev, isLiked: !prev.isLiked }, false);
     toggleFav({});
+  };
+
+  const onChatClick = (chat: number) => {
+    chat <= 0 ? setChatAlert(true) : null;
+    setTimeout(() => {
+      setChatAlert(false);
+    }, 2000);
   };
 
   useEffect(() => {
@@ -258,8 +266,19 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
 
                   <div>
                     {product?.user?.id === user?.id ? (
-                      <button className="py-2 px-4 rounded-md text-white bg-orange-500">
-                        채팅 목록 보기{" "}
+                      <button
+                        onClick={() => {
+                          // onChatClick(mySaleProductsChats);
+                          mySaleProductsChats <= 0
+                            ? setChatAlert(true)
+                            : router.push("/chats");
+                          setTimeout(() => {
+                            setChatAlert(false);
+                          }, 2000);
+                        }}
+                        className="py-2 px-4 rounded-md text-white bg-orange-500"
+                      >
+                        대화 중인 채팅방
                         {mySaleProductsChats > 0
                           ? `(${mySaleProductsChats})`
                           : null}
@@ -268,22 +287,31 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                       <button
                         disabled={!product.status ? true : false}
                         onClick={() => {
-                          // router.push(`${router.asPath}/chat`);
                           router.push({
                             pathname: `${router.asPath}/chat`,
-                            query: { productId: product?.id, sellerId: 1 },
+                            query: {
+                              productId: product?.id,
+                              purchaserId: user?.id,
+                            },
                           });
                         }}
                         className={`py-2 px-4 text-white ${
                           product.status ? "bg-orange-500" : "bg-gray-400"
                         }  rounded-md disabled:text-gray-300`}
                       >
-                        {isChat ? "채팅하기" : "채팅방으로 이동"}
+                        {!isChat ? "채팅하기" : "채팅방으로 이동"}
                       </button>
                     )}
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+          <div
+            className={`flex justify-center  ${chatAlert ? "block" : "hidden"}`}
+          >
+            <div className="fixed flex justify-center items-center bottom-24 w-3/4 h-12 px-5 rounded-md bg-gray-100  ">
+              채팅한 이웃이 없어요.
             </div>
           </div>
         </div>
@@ -298,8 +326,7 @@ export const getServerSideProps = withSsrSession(async function ({
 }: NextPageContext) {
   const product = await client.product.findUnique({
     where: {
-      // @ts-ignore
-      id: +query.id,
+      id: Number(query.id),
     },
     include: {
       user: {
@@ -357,21 +384,20 @@ export const getServerSideProps = withSsrSession(async function ({
     },
   });
 
-  const mySaleProductsChats = await client.chat
-    .findMany({
-      where: {
-        productId: product?.id,
-      },
-    })
-    .then((res) => res.length);
-
-  console.log(mySaleProductsChats, "mySaleProductsChats");
-
-  const d = await client.chat.findFirst({
+  const mySaleProductsChats = await client.chat.count({
     where: {
       productId: product?.id,
     },
   });
+
+  const isChat = Boolean(
+    await client.chat.findFirst({
+      where: {
+        productId: product?.id,
+        purchaserId: req?.session.user?.id,
+      },
+    })
+  );
 
   return {
     props: {
@@ -380,7 +406,7 @@ export const getServerSideProps = withSsrSession(async function ({
       mySaleProducts: JSON.parse(JSON.stringify(mySaleProducts)),
       mySaleProductsChats,
       isLiked: false,
-      isChat: false,
+      isChat,
     },
   };
 });

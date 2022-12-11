@@ -26,16 +26,22 @@ export default function Message({
       )}
     >
       {!reversed ? (
-        <Image
-          width={33}
-          height={33}
-          src={
-            avatarUrl
-              ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${avatarUrl}/avatar`
-              : noImage
-          }
-          className="w-6 h-6 rounded-full bg-slate-300"
-        />
+        avatarUrl ? (
+          <Image
+            width={33}
+            height={33}
+            src={
+              avatarUrl
+                ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${avatarUrl}/avatar`
+                : noImage
+            }
+            className="w-6 h-6 rounded-full bg-slate-300"
+          />
+        ) : (
+          <div className="w-9 h-9 flex justify-center items-center rounded-full bg-gray-300 text-2xl">
+            🙎🏻‍♂️
+          </div>
+        )
       ) : null}
 
       <div
