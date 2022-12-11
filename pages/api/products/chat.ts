@@ -20,23 +20,27 @@ async function handler(
 
   const alreadyExists = await client.chat.findFirst({
     where: {
-      productId: product.id,
       OR: [
+        // {
+        //   sellerId: product.user.id,
+        // },
+        // {
+        //   purchaserId: product.user.id,
+        // },
         {
-          sellerId: product.user.id,
-        },
-        {
-          purchaserId: userId,
-        },
-        {
+          productId: product.id,
           sellerId: userId,
         },
         {
-          purchaserId: product.user.id,
+          productId: product.id,
+          purchaserId: userId,
         },
       ],
     },
   });
+
+  console.log(product.id, product.user.id, userId);
+  console.log(alreadyExists);
 
   if (!alreadyExists) {
     newChat = await client.chat.create({
@@ -48,7 +52,7 @@ async function handler(
     });
   }
 
-  if (content) {
+  if (alreadyExists && content) {
     await client.chatMessage.create({
       data: {
         userId,

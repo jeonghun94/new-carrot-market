@@ -75,8 +75,9 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
   }, []);
 
   const paintChatting = (chat: ChatResponse) => {
+    console.log(chat);
     return chat.chatMessages.map((c, i) => {
-      return (
+      return chat.chatMessages.length > 0 ? (
         <div key={i}>
           <div className="mt-2 text-center text-sm text-gray-400">{c.day}</div>
           <div className="space-y-2">
@@ -91,7 +92,7 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
             ))}
           </div>
         </div>
-      );
+      ) : null;
     });
   };
 
@@ -275,7 +276,7 @@ export const getServerSideProps = withSsrSession(async function ({
 
   await client.chatMessage.updateMany({
     where: {
-      chatId: chat.id,
+      chatId: chat?.id,
       userId: {
         not: userId,
       },
