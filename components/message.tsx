@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { cls } from "../libs/client/utils";
+import noImage from "public/no-image.png";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 dayjs.locale("ko");
@@ -24,20 +25,18 @@ export default function Message({
         reversed ? "flex-row-reverse space-x-reverse" : "space-x-2"
       )}
     >
-      {avatarUrl ? (
-        reversed ? (
-          ""
-        ) : (
-          <Image
-            width={33}
-            height={33}
-            src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${avatarUrl}/avatar`}
-            className="w-6 h-6 rounded-full bg-slate-300"
-          />
-        )
-      ) : (
-        <div className="w-8 h-8 rounded-full bg-slate-400" />
-      )}
+      {!reversed ? (
+        <Image
+          width={33}
+          height={33}
+          src={
+            avatarUrl
+              ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${avatarUrl}/avatar`
+              : noImage
+          }
+          className="w-6 h-6 rounded-full bg-slate-300"
+        />
+      ) : null}
 
       <div
         className={`flex ${

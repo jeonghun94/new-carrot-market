@@ -60,6 +60,7 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
     createChat({
       content,
       product,
+      purchaserId: user?.id,
     });
     setValue("content", "");
   };
@@ -75,7 +76,6 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
   }, []);
 
   const paintChatting = (chat: ChatResponse) => {
-    console.log(chat);
     return chat.chatMessages.map((c, i) => {
       return chat.chatMessages.length > 0 ? (
         <div key={i}>
@@ -85,7 +85,15 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
               <Message
                 key={i}
                 message={ct.content}
-                avatarUrl={isMe ? chat.seller.avatar : chat.purchaser.avatar}
+                avatarUrl={
+                  isMe
+                    ? chat.seller.avatar
+                      ? chat.seller.avatar
+                      : null
+                    : chat.purchaser.avatar
+                    ? chat.purchaser.avatar
+                    : null
+                }
                 reversed={ct.userId === user?.id}
                 sendTime={ct.createdAt.toLocaleString("ko-KR")}
               />
@@ -243,6 +251,9 @@ export const getServerSideProps = withSsrSession(async function ({
 }: NextPageContext) {
   let chat: any;
   const productId = Number(query.productId);
+  const purchaserId = Number(query.purchaserId);
+  console.log("productId", productId);
+  console.log("purchaserId", purchaserId);
   const userId = req?.session.user?.id;
 
   const product = await client.product.findUnique({
@@ -263,6 +274,7 @@ export const getServerSideProps = withSsrSession(async function ({
       body: JSON.stringify({
         product,
         userId,
+        purchaserId,
       }),
     })
       .then((res) => res.json())

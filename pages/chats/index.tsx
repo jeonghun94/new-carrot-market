@@ -24,10 +24,10 @@ interface ProductsChatsResponse extends Chat {
 const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
   const { user } = useUser();
   const router = useRouter();
-  const handleClick = (productId: number) => {
+  const handleClick = (productId: number, purchaserId: number) => {
     router.push({
       pathname: `/products/${productId}/chat`,
-      query: { productId },
+      query: { productId, purchaserId },
     });
   };
   return (
@@ -37,7 +37,9 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
           productChat.chatMessages.length > 0 ? (
             <div
               key={i}
-              onClick={() => handleClick(productChat?.product.id)}
+              onClick={() =>
+                handleClick(productChat?.product.id, productChat?.purchaserId)
+              }
               className="py-3 px-5 border-b flex items-center space-x-3 cursor-pointer first:mt-2 "
             >
               <div className="w-full flex justify-between space-x-7">
@@ -124,12 +126,14 @@ export const getServerSideProps = withSsrSession(async function ({
       },
       seller: {
         select: {
+          id: true,
           name: true,
           avatar: true,
         },
       },
       purchaser: {
         select: {
+          id: true,
           name: true,
           avatar: true,
         },

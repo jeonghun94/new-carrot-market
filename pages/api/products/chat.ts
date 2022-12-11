@@ -11,7 +11,7 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   const {
-    body: { product, content, userId: loginId },
+    body: { product, content, userId: loginId, purchaserId },
     session: { user },
   } = req;
 
@@ -20,26 +20,13 @@ async function handler(
 
   const alreadyExists = await client.chat.findFirst({
     where: {
-      OR: [
-        // {
-        //   sellerId: product.user.id,
-        // },
-        // {
-        //   purchaserId: product.user.id,
-        // },
-        {
-          productId: product.id,
-          sellerId: userId,
-        },
-        {
-          productId: product.id,
-          purchaserId: userId,
-        },
-      ],
+      productId: product.id,
+      sellerId: product.user.id,
+      purchaserId,
     },
   });
 
-  console.log(product.id, product.user.id, userId);
+  console.log(product.id, userId, purchaserId);
   console.log(alreadyExists);
 
   if (!alreadyExists) {
