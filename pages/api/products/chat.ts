@@ -17,7 +17,6 @@ async function handler(
 
   let newChat;
   const userId = user ? Number(user.id) : loginId;
-
   const alreadyExists = await client.chat.findFirst({
     where: {
       productId: product.id,
@@ -25,9 +24,6 @@ async function handler(
       purchaserId,
     },
   });
-
-  console.log(product.id, userId, purchaserId);
-  console.log(alreadyExists);
 
   if (!alreadyExists) {
     newChat = await client.chat.create({
@@ -83,11 +79,6 @@ async function handler(
         },
         orderBy: {
           createdAt: "asc",
-        },
-      },
-      _count: {
-        select: {
-          chatMessages: true,
         },
       },
     },

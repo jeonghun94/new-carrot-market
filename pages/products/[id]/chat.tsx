@@ -40,9 +40,10 @@ interface DataResponse {
 interface PageResponse {
   product: ProductWithUser;
   chat: ChatResponse;
+  purchaserId: number;
 }
 
-const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
+const ChatDetail: NextPage<PageResponse> = ({ product, chat, purchaserId }) => {
   const { user } = useUser();
   const isMe = Boolean(user?.id === chat.purchaser.id);
   const scrollToBottom = () => window.scrollTo(0, document.body.scrollHeight);
@@ -60,7 +61,7 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat }) => {
     createChat({
       content,
       product,
-      purchaserId: user?.id,
+      purchaserId,
     });
     setValue("content", "");
   };
@@ -250,11 +251,11 @@ export const getServerSideProps = withSsrSession(async function ({
   query,
 }: NextPageContext) {
   let chat: any;
-  const productId = Number(query.productId);
   const purchaserId = Number(query.purchaserId);
-  console.log("productId", productId);
-  console.log("purchaserId", purchaserId);
+  const productId = Number(query.productId);
   const userId = req?.session.user?.id;
+
+  console.log("purchaserId", purchaserId);
 
   const product = await client.product.findUnique({
     include: {
@@ -302,6 +303,7 @@ export const getServerSideProps = withSsrSession(async function ({
     props: {
       product: JSON.parse(JSON.stringify(product)),
       chat: JSON.parse(JSON.stringify(chat)),
+      purchaserId,
     },
   };
 });

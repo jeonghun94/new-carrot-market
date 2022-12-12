@@ -1,14 +1,14 @@
 import type { NextPage, NextPageContext } from "next";
-import Link from "next/link";
-import Layout from "@components/layout";
-import useUser from "@libs/client/useUser";
-import useSWR, { SWRConfig } from "swr";
-import { Review, User } from "@prisma/client";
-import { cls } from "@libs/client/utils";
 import { withSsrSession } from "@libs/server/withSession";
+import { Review, User } from "@prisma/client";
+import useSWR, { SWRConfig } from "swr";
+import useUser from "@libs/client/useUser";
+import { cls } from "@libs/client/utils";
 import client from "@libs/server/client";
+import Layout from "@components/layout";
 import logo from "public/carrot-logo.png";
 import Image from "next/image";
+import Link from "next/link";
 
 interface ReviewWithUser extends Review {
   createdBy: User;
@@ -33,7 +33,7 @@ const Profile: NextPage = () => {
                 className="w-16 h-16 bg-slate-500 rounded-full"
               />
             ) : (
-              <div className="w-12 h-12 flex justify-center items-center rounded-full bg-gray-300 text-3xl">
+              <div className="w-16 h-16 flex justify-center items-center rounded-full bg-gray-300 text-5xl">
                 🙎🏻‍♂️
               </div>
             )}

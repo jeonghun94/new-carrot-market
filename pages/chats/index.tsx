@@ -31,7 +31,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
     });
   };
   return (
-    <Layout hasTabBar title="채팅">
+    <Layout hasTabBar title={`채팅 - ${user?.name}`}>
       {productChats.length > 0 ? (
         productChats.map((productChat, i) =>
           productChat.chatMessages.length > 0 ? (
