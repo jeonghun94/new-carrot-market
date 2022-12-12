@@ -72,7 +72,9 @@ export default function Products({
                   height={270}
                   src={
                     product.image
-                      ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${product.image}/public `
+                      ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${
+                          product.image.split(",")[0]
+                        }/public `
                       : noImage
                   }
                   className="rounded-md"

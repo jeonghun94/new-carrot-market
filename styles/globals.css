@@ -35,3 +35,11 @@ progress::-webkit-progress-value {
   /* background: -webkit-linear-gradient(to right, #93f9b9, #1d976c); */
   /* background: linear-gradient(to right, #93f9b9, #1d976c); */
 }
+select {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url(../public/select-arrow.png);
+  background-position: 100%;
+  background-repeat: no-repeat;
+  padding: 0.5rem;
+}

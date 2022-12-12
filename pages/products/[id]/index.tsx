@@ -3,7 +3,6 @@ import { cls, convertPrice, convertTime } from "@libs/client/utils";
 import useMutation from "@libs/client/useMutation";
 import { Category, Product, User } from "@prisma/client";
 import useSWR, { useSWRConfig } from "swr";
-import useUser from "@libs/client/useUser";
 import client from "@libs/server/client";
 import Layout from "@components/layout";
 import { useRouter } from "next/router";
@@ -18,6 +17,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
+import useUser from "@libs/client/useUser";
 
 SwiperCore.use([Navigation, Pagination]);
 
@@ -39,6 +39,10 @@ interface ItemDetailResponse {
   isChat: boolean;
 }
 
+interface ImageResponse {
+  url: string;
+}
+
 const ItemDetail: NextPage<ItemDetailResponse> = ({
   product,
   relatedProducts,
@@ -47,13 +51,13 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   isLiked,
   isChat,
 }) => {
-  const { user } = useUser();
   const router = useRouter();
   const { data, mutate } = useSWR<ItemDetailResponse>(
     router.query.id ? `/api/products/${router.query.id}` : null
   );
+  const { user } = useUser();
 
-  const images: any = [];
+  const images: ImageResponse[] = [];
   const productImg = product?.image?.split(",");
   productImg.map((img) => {
     images.push({
@@ -71,11 +75,17 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
     toggleFav({});
   };
 
-  const onChatClick = (chat: number) => {
-    chat <= 0 ? setChatAlert(true) : null;
-    setTimeout(() => {
-      setChatAlert(false);
-    }, 2000);
+  // const onChatClick = (chat: number) => {
+  //   chat <= 0 ? setChatAlert(true) : null;
+  //   setTimeout(() => {
+  //     setChatAlert(false);
+  //   }, 2000);
+  // };
+  const isSeller = product?.user?.id === user?.id;
+
+  const handleSelect = (e: any) => {
+    const page = e.target.value;
+    router.push(`${router.asPath}/${page}`);
   };
 
   useEffect(() => {
@@ -176,20 +186,35 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
               </div>
             </div>
             <div className="mt-5">
+              {isSeller ? (
+                <select
+                  id="countries"
+                  onChange={handleSelect}
+                  className="block w-full px-3 py-2.5 mb-3 border border-gray-300 text-gray-900 text-md rounded-md focus:ring-orange-500 focus:border-orange-500"
+                >
+                  <option value="sell">판매중</option>
+                  <option value="reservation">예약중</option>
+                  <option value="sold">거래완료</option>
+                </select>
+              ) : null}
               <h1 className="text-2xl font-bold text-gray-900">
                 {product?.name}
               </h1>
-              <span className="text-xs mt-3 text-gray-400">
-                {product?.category.name}ㆍ끌올{" "}
-                {convertTime(product?.createdAt.toString())}
-              </span>
+              <p>
+                <span className="text-xs mt-3 text-gray-400">
+                  {product?.category.name}ㆍ끌올{" "}
+                  {convertTime(product?.createdAt.toString())}
+                </span>
+              </p>
               <p className="mt-3 text-black">{product?.description}</p>
-              <span className="text-xs text-gray-400">
-                {product?._count?.favs > 0
-                  ? `관심 ${product._count.favs} ∙ `
-                  : null}
-                조회 {product?.views}
-              </span>
+              <p>
+                <span className="text-xs text-gray-400">
+                  {product?._count?.favs > 0
+                    ? `관심 ${product._count.favs} ∙ `
+                    : null}
+                  조회 {product?.views}
+                </span>
+              </p>
             </div>
           </div>
           <Products
@@ -308,9 +333,11 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
             </div>
           </div>
           <div
-            className={`flex justify-center  ${chatAlert ? "block" : "hidden"}`}
+            className={`flex justify-center  ${
+              chatAlert ? "block" : "hidden"
+            } transition-opacity ease-in-out`}
           >
-            <div className="fixed flex justify-center items-center bottom-24 w-3/4 h-12 px-5 rounded-md bg-gray-100  ">
+            <div className="fixed flex justify-center items-center bottom-24 w-3/4 h-12 px-5 rounded-md bg-gray-50 transition-transform">
               채팅한 이웃이 없어요.
             </div>
           </div>
