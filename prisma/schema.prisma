@@ -37,7 +37,6 @@ model User {
   purchasers      Chat[]      @relation(name: "purchasers")
   sellers         Chat[]      @relation(name: "sellers")
   chatMessages    ChatMessage[]
-  
 }
 
 model Token {
@@ -70,8 +69,15 @@ model Product {
   views       Int       @default(0)
   share       Boolean   @default(false)
   nego        Boolean   @default(false)
-  status      Boolean   @default(true)
+  state     ProductState  @default(Sale)
   @@index([userId])
+}
+
+enum ProductState {
+  Sale 
+  Reservation
+  Completed
+  Hide
 }
 
 model Chat {

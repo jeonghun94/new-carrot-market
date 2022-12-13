@@ -310,7 +310,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                       </button>
                     ) : (
                       <button
-                        disabled={!product.status ? true : false}
+                        disabled={product.state !== "Sale" ? true : false}
                         onClick={() => {
                           router.push({
                             pathname: `${router.asPath}/chat`,
@@ -321,7 +321,9 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                           });
                         }}
                         className={`py-2 px-4 text-white ${
-                          product.status ? "bg-orange-500" : "bg-gray-400"
+                          product.state === "Sale"
+                            ? "bg-orange-500"
+                            : "bg-gray-400"
                         }  rounded-md disabled:text-gray-300`}
                       >
                         {!isChat ? "채팅하기" : "채팅방으로 이동"}
@@ -401,7 +403,7 @@ export const getServerSideProps = withSsrSession(async function ({
 
   const mySaleProducts = await client.product.findMany({
     where: {
-      status: true,
+      state: "Sale",
       user: {
         id: product?.user?.id,
       },

@@ -11,7 +11,7 @@ async function handler(
     const products = await client.product.findMany({
       where: {
         NOT: {
-          status: false,
+          state: "Completed",
         },
       },
       include: {
