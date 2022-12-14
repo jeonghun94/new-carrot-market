@@ -11,7 +11,7 @@ async function handler(
     const products = await client.product.findMany({
       where: {
         NOT: {
-          state: "Completed",
+          state: "Completed" || "Hide",
         },
       },
       include: {
@@ -21,6 +21,9 @@ async function handler(
             chats: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
     res.json({ ok: true, products });

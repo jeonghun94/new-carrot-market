@@ -24,17 +24,20 @@ const Home: NextPage = () => {
   return (
     <Layout title="홈" hasTabBar seoTitle="Home">
       <div className="flex flex-col space-y-5 divide-y">
-        {data?.products?.map((product) => (
-          <Item
-            id={product.id}
-            key={product.id}
-            title={product.name}
-            price={product.price}
-            hearts={product._count.favs}
-            image={product.image}
-            createdAt={convertTime(product.createdAt.toString())}
-            chats={product._count.chats}
-          />
+        {data?.products?.map((product, index) => (
+          <div key={index}>
+            <Item
+              id={product.id}
+              key={product.id}
+              title={product.name}
+              price={product.price}
+              hearts={product._count.favs}
+              image={product.image}
+              state={product.state}
+              createdAt={convertTime(product.createdAt.toString())}
+              chats={product._count.chats}
+            />
+          </div>
         ))}
         <FloatingButton href="/products/upload">
           <svg

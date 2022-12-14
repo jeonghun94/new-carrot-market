@@ -11,6 +11,7 @@ interface ItemProps {
   image?: string;
   createdAt: string;
   chats: number;
+  state: string;
 }
 
 export default function Item({
@@ -21,6 +22,7 @@ export default function Item({
   id,
   image,
   createdAt,
+  state,
 }: ItemProps) {
   return (
     <Link href={`/products/${id}`}>
@@ -43,9 +45,22 @@ export default function Item({
           <div className="pt-2 flex flex-col">
             <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
             <h5 className="text-sm text-gray-400">{createdAt}</h5>
-            <span className="font-bold mt-1 text-gray-900">
-              {price.toLocaleString("ko-KR")}원
-            </span>
+            <div
+              className={`${
+                state !== "Sale"
+                  ? "flex justify-center items-center py-1 space-x-1"
+                  : ""
+              } text-bold`}
+            >
+              {state === "Reservation" ? (
+                <span className="px-2 py-1 bg-green-500 text-xs text-white rounded-md">
+                  예약중
+                </span>
+              ) : null}
+              <span className="  text-gray-900">
+                {price.toLocaleString("ko-KR")}원
+              </span>
+            </div>
           </div>
         </div>
         <div className="flex space-x-2 items-end justify-end">

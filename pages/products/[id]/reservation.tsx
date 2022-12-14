@@ -8,6 +8,7 @@ import { withSsrSession } from "@libs/server/withSession";
 import useUser from "@libs/client/useUser";
 import Image from "next/image";
 import { convertTime } from "@libs/client/utils";
+import { useState } from "react";
 
 interface ChatResponse extends Chat {
   purchaser: User;
@@ -22,6 +23,22 @@ interface PageResponse {
 const Reservation: NextPage<PageResponse> = ({ product, productChat }) => {
   const router = useRouter();
   const { user } = useUser();
+  const [purchaserId, setPurchaserId] = useState<number>(
+    productChat[0].purchaser.id
+  );
+
+  const onRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPurchaserId(Number(e.target.value));
+  };
+
+  const onButtonClick = () => {
+    purchaserId === 0
+      ? alert("예약자를 선택해주세요")
+      : router.push({
+          pathname: `/api/products/${product.id}/state`,
+          query: { productId: product.id, state: "Reservation" },
+        });
+  };
 
   const hasChat = productChat.length > 0;
 
@@ -54,6 +71,7 @@ const Reservation: NextPage<PageResponse> = ({ product, productChat }) => {
           ) : (
             productChat.map((chat, index) => (
               <label
+                key={index}
                 className="flex justify-start items-center w-full p-3 border-b border-gray-200"
                 htmlFor={`radio${index}`}
               >
@@ -63,6 +81,7 @@ const Reservation: NextPage<PageResponse> = ({ product, productChat }) => {
                   name="radioButton"
                   value={chat.purchaser.id}
                   defaultChecked={index === 0 ? true : false}
+                  onChange={onRadioChange}
                   className="w-6 h-6 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 mr-2"
                 />
                 {chat.purchaser.avatar ? (
@@ -100,6 +119,7 @@ const Reservation: NextPage<PageResponse> = ({ product, productChat }) => {
         <div className="border-t border-gray-200 h-0.5/4 p-4 pb-8">
           <button
             disabled={!hasChat ? true : false}
+            onClick={onButtonClick}
             className={`w-full py-3 rounded-md bg-${
               hasChat ? "orange-500 text-white" : "gray-100 text-gray-400"
             }  text-lg cursor-${!hasChat ? "not-allowed" : "pointer"} `}

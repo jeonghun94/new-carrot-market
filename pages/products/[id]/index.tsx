@@ -1,9 +1,10 @@
 import type { NextPage, NextPageContext } from "next";
 import { cls, convertPrice, convertTime } from "@libs/client/utils";
 import useMutation from "@libs/client/useMutation";
-import { Category, Product, User } from "@prisma/client";
+import { Category, Chat, ChatMessage, Product, User } from "@prisma/client";
 import useSWR, { useSWRConfig } from "swr";
 import client from "@libs/server/client";
+import useUser from "@libs/client/useUser";
 import Layout from "@components/layout";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -17,7 +18,6 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
-import useUser from "@libs/client/useUser";
 
 SwiperCore.use([Navigation, Pagination]);
 
@@ -28,10 +28,15 @@ interface ProductWithUser extends Product {
     favs: number;
   };
 }
+interface ChatResponse extends Chat {
+  purchaser: User;
+  chatMessages: ChatMessage[];
+}
 
 interface ItemDetailResponse {
   ok: boolean;
   product: ProductWithUser;
+  productChats: ChatResponse[];
   relatedProducts: Product[];
   mySaleProducts: Product[];
   mySaleProductsChats: number;
@@ -45,10 +50,10 @@ interface ImageResponse {
 
 const ItemDetail: NextPage<ItemDetailResponse> = ({
   product,
+  productChats,
   relatedProducts,
   mySaleProducts,
   mySaleProductsChats,
-  isLiked,
   isChat,
 }) => {
   const router = useRouter();
@@ -56,6 +61,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
     router.query.id ? `/api/products/${router.query.id}` : null
   );
   const { user } = useUser();
+  const isSeller = product?.user?.id === user?.id;
 
   const images: ImageResponse[] = [];
   const productImg = product?.image?.split(",");
@@ -66,8 +72,10 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   });
 
   const [chatAlert, setChatAlert] = useState(false);
+  const [state, setState] = useState("Sale");
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
   const [views] = useMutation(`/api/products/${router.query.id}/views`);
+  const [stateUpdate] = useMutation(`/api/products/${router.query.id}/state`);
 
   const onFavClick = () => {
     if (!data) return;
@@ -75,31 +83,39 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
     toggleFav({});
   };
 
-  // const onChatClick = (chat: number) => {
-  //   chat <= 0 ? setChatAlert(true) : null;
-  //   setTimeout(() => {
-  //     setChatAlert(false);
-  //   }, 2000);
-  // };
-  const isSeller = product?.user?.id === user?.id;
-
   const handleSelect = (e: any) => {
-    const page = e.target.value;
-    router.push(`${router.asPath}/${page}`);
+    const state = e.target.value;
+    setState(state);
+    stateUpdate({ state });
+    // e.target.value = state;
+    e.target.selected = true;
   };
 
   useEffect(() => {
     views({});
   }, [router]);
 
-  if (router.isFallback) {
-    return (
-      <Layout title="Loaidng for youuuuuuu">
-        <h1 className="flex justify-center items-center">Wait a Seconds</h1>
-      </Layout>
-    );
-  }
-  return (
+  // ##########
+
+  const [purchaserId, setPurchaserId] = useState<number>(
+    productChats[0].purchaser.id
+  );
+
+  const onRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPurchaserId(Number(e.target.value));
+  };
+
+  const onButtonClick = () => {
+    purchaserId === 0
+      ? alert("예약자를 선택해주세요")
+      : stateUpdate({ state: "Reservation" });
+
+    setState("Sale");
+  };
+
+  const hasChat = productChats.length > 0;
+
+  return state === "Sale" ? (
     <div className="mb-24">
       <Layout canGoBack seoTitle={`${product.name}`}>
         <Swiper
@@ -107,9 +123,6 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
           slidesPerView={1}
           pagination={{ clickable: true }}
           scrollbar={{ draggable: true }}
-          // navigation={true}
-          // onSlideChange={() => console.log("slide change")}
-          // onSwiper={(swiper) => console.log(swiper)}
         >
           {productImg?.map((img, index) => (
             <SwiperSlide key={index}>
@@ -190,11 +203,12 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                 <select
                   id="countries"
                   onChange={handleSelect}
+                  defaultValue={product.state}
                   className="block w-full px-3 py-2.5 mb-3 border border-gray-300 text-gray-900 text-md rounded-md focus:ring-orange-500 focus:border-orange-500"
                 >
-                  <option value="sell">판매중</option>
-                  <option value="reservation">예약중</option>
-                  <option value="sold">거래완료</option>
+                  <option value="Sale">판매중</option>
+                  <option value="Reservation">예약중</option>
+                  <option value="Completed">거래완료</option>
                 </select>
               ) : null}
               <h1 className="text-2xl font-bold text-gray-900">
@@ -346,6 +360,93 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
         </div>
       </Layout>
     </div>
+  ) : (
+    <Layout canGoBack seoTitle={`${product.name}`} title="예약자 선택">
+      <div className="h-screen -mb-10">
+        <div className="flex justify-start items-center h-0.5/4 p-4 space-x-3 bg-gray-100 mt-2">
+          <Image
+            className="rounded-md"
+            src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${
+              product.image.split(",")[0]
+            }/public`}
+            width={56}
+            height={56}
+          />
+          <div className="flex flex-col justify-between items-start gap-2">
+            <p className="text-sm text-gray-400">거래할 상품</p>
+            <p className="text-md justify-items-end">{product.name}</p>
+          </div>
+        </div>
+        <div
+          className={`flex  flex-col ${
+            !hasChat ? "items-center justify-center" : null
+          } h-3/4`}
+        >
+          {!hasChat ? (
+            <div className="flex flex-col justify-center items-center gap-2 text-gray-400">
+              <p>이 게시글에서 대화한 이웃이 없어요.</p>
+            </div>
+          ) : (
+            productChats.map((chat, index) => (
+              <label
+                key={index}
+                className="flex justify-start items-center w-full p-3 border-b border-gray-200"
+                htmlFor={`radio${index}`}
+              >
+                <input
+                  id={`radio${index}`}
+                  type="radio"
+                  name="radioButton"
+                  value={chat.purchaser.id}
+                  defaultChecked={index === 0 ? true : false}
+                  onChange={onRadioChange}
+                  className="w-6 h-6 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 mr-2"
+                />
+                {chat.purchaser.avatar ? (
+                  <Image
+                    width={48}
+                    height={48}
+                    className="rounded-full"
+                    src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${chat.purchaser.avatar}/avatar`}
+                  />
+                ) : (
+                  <div className="w-12 h-12  flex justify-center items-center rounded-full bg-gray-300 text-4xl">
+                    🙎🏻‍♂️
+                  </div>
+                )}
+                <div className="flex flex-col space-y-1">
+                  <p className="ml-2 text-md font-bold ">
+                    {chat.purchaser.name}
+                  </p>
+                  <p className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                    마지막 대화{" "}
+                    {convertTime(chat.chatMessages[0].createdAt.toString())}
+                  </p>
+                </div>
+              </label>
+            ))
+          )}
+          <p
+            className={`flex justify-center text-gray-400 underline ${
+              hasChat ? "mt-10" : null
+            }`}
+          >
+            최근 채팅 목록에서 예약자 찾기
+          </p>
+        </div>
+        <div className="border-t border-gray-200 h-0.5/4 p-4 pb-8">
+          <button
+            disabled={!hasChat ? true : false}
+            onClick={onButtonClick}
+            className={`w-full py-3 rounded-md bg-${
+              hasChat ? "orange-500 text-white" : "gray-100 text-gray-400"
+            }  text-lg cursor-${!hasChat ? "not-allowed" : "pointer"} `}
+          >
+            예약자 선택
+          </button>
+        </div>
+      </div>
+    </Layout>
   );
 };
 
@@ -357,6 +458,7 @@ export const getServerSideProps = withSsrSession(async function ({
     where: {
       id: Number(query.id),
     },
+
     include: {
       user: {
         select: {
@@ -428,13 +530,38 @@ export const getServerSideProps = withSsrSession(async function ({
     })
   );
 
+  const productChat = await client.chat.findMany({
+    where: {
+      productId: product?.id,
+      exit: false,
+    },
+    select: {
+      purchaser: {
+        select: {
+          id: true,
+          name: true,
+          avatar: true,
+        },
+      },
+      chatMessages: {
+        select: {
+          createdAt: true,
+        },
+        take: 1,
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
+  });
+
   return {
     props: {
       product: JSON.parse(JSON.stringify(product)),
+      productChats: JSON.parse(JSON.stringify(productChat)),
       relatedProducts: JSON.parse(JSON.stringify(relatedProducts)),
       mySaleProducts: JSON.parse(JSON.stringify(mySaleProducts)),
       mySaleProductsChats,
-      isLiked: false,
       isChat,
     },
   };
