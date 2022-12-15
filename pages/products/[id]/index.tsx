@@ -1,17 +1,18 @@
 import type { NextPage, NextPageContext } from "next";
-import { cls, convertPrice, convertTime } from "@libs/client/utils";
-import useMutation from "@libs/client/useMutation";
 import { Category, Chat, ChatMessage, Product, User } from "@prisma/client";
+import { cls, convertPrice, convertTime } from "@libs/client/utils";
+import { withSsrSession } from "@libs/server/withSession";
+import useMutation from "@libs/client/useMutation";
+import { useEffect, useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
-import client from "@libs/server/client";
 import useUser from "@libs/client/useUser";
+import Products from "@components/products";
+import client from "@libs/server/client";
 import Layout from "@components/layout";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
-import Products from "@components/products";
-import { withSsrSession } from "@libs/server/withSession";
-import { useEffect, useState } from "react";
+
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore, { Navigation, Pagination } from "swiper";
 import "swiper/css";
@@ -62,6 +63,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   );
   const { user } = useUser();
   const isSeller = product?.user?.id === user?.id;
+  const hasChat = productChats.length > 0;
 
   const images: ImageResponse[] = [];
   const productImg = product?.image?.split(",");
@@ -71,8 +73,10 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
     });
   });
 
-  const [chatAlert, setChatAlert] = useState(false);
   const [state, setState] = useState("Sale");
+  const [popup, setPopup] = useState(false);
+  const [stateChange, setStateChange] = useState(false);
+  const [chatAlert, setChatAlert] = useState(false);
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
   const [views] = useMutation(`/api/products/${router.query.id}/views`);
   const [stateUpdate] = useMutation(`/api/products/${router.query.id}/state`);
@@ -83,39 +87,25 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
     toggleFav({});
   };
 
-  const handleSelect = (e: any) => {
-    const state = e.target.value;
-    setState(state);
+  const onBtnClick = () => {
     stateUpdate({ state });
-    // e.target.value = state;
-    e.target.selected = true;
+    setPopup(!popup);
+  };
+
+  const onSelectChange = (e: any) => {
+    setStateChange(true);
+    if (e.target.value !== "Sale") {
+      setPopup(!popup);
+    }
+    stateUpdate({ state: e.target.value });
+    setState(e.target.value);
   };
 
   useEffect(() => {
     views({});
   }, [router]);
 
-  // ##########
-
-  const [purchaserId, setPurchaserId] = useState<number>(
-    productChats[0].purchaser.id
-  );
-
-  const onRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPurchaserId(Number(e.target.value));
-  };
-
-  const onButtonClick = () => {
-    purchaserId === 0
-      ? alert("예약자를 선택해주세요")
-      : stateUpdate({ state: "Reservation" });
-
-    setState("Sale");
-  };
-
-  const hasChat = productChats.length > 0;
-
-  return state === "Sale" ? (
+  return !popup ? (
     <div className="mb-24">
       <Layout canGoBack seoTitle={`${product.name}`}>
         <Swiper
@@ -201,9 +191,8 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
             <div className="mt-5">
               {isSeller ? (
                 <select
-                  id="countries"
-                  onChange={handleSelect}
-                  defaultValue={product.state}
+                  onChange={onSelectChange}
+                  defaultValue={!stateChange ? product.state : state}
                   className="block w-full px-3 py-2.5 mb-3 border border-gray-300 text-gray-900 text-md rounded-md focus:ring-orange-500 focus:border-orange-500"
                 >
                   <option value="Sale">판매중</option>
@@ -232,119 +221,112 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
             </div>
           </div>
           <Products
-            products={mySaleProducts}
-            isMe={true}
-            name={product?.user.name}
             sellerId={product?.user.id}
+            products={mySaleProducts}
+            name={product?.user.name}
+            isMe={true}
           />
-          <Products products={relatedProducts} isMe={false} name={user?.name} />
+          <Products products={relatedProducts} name={user?.name} isMe={false} />
         </div>
         <div className="w-full h-20 fixed bottom-0 bg-white">
-          <div>
-            <div>
-              <div className="flex items-center justify-between px-4 py-3 border-t border-gray-300">
-                <div className="w-full flex items-center justify-between">
-                  <div className="flex gap-4">
-                    <button
-                      onClick={onFavClick}
-                      className={cls(
-                        "p-3 rounded-md flex items-center  border-r",
-                        data?.isLiked
-                          ? "text-orange-500  hover:text-orange-600"
-                          : "text-gray-400  hover:text-gray-500"
-                      )}
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-300">
+            <div className="w-full flex items-center justify-between">
+              <div className="flex gap-4">
+                <button
+                  onClick={onFavClick}
+                  className={cls(
+                    "p-3 rounded-md flex items-center  border-r",
+                    data?.isLiked
+                      ? "text-orange-500  hover:text-orange-600"
+                      : "text-gray-400  hover:text-gray-500"
+                  )}
+                >
+                  {data?.isLiked ? (
+                    <svg
+                      className="w-6 h-6"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      {data?.isLiked ? (
-                        <svg
-                          className="w-6 h-6"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                            clipRule="evenodd"
-                          ></path>
-                        </svg>
-                      ) : (
-                        <svg
-                          className="h-6 w-6 "
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                          />
-                        </svg>
-                      )}
-                    </button>
-                    <div className="flex justify-center items-center flex-col">
-                      <p className="text-md font-semibold text-black">
-                        {convertPrice(product?.price)}
-                      </p>
-                      {product?.nego ? (
-                        <Link href={`/users/profiles/${product?.user?.id}`}>
-                          <a className="text-xs font-bold text-orange-500 underline">
-                            가격 제안하기
-                          </a>
-                        </Link>
-                      ) : (
-                        <p className="text-xs text-gray-400 self-start">
-                          가격 제안 불가
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    {product?.user?.id === user?.id ? (
-                      <button
-                        onClick={() => {
-                          // onChatClick(mySaleProductsChats);
-                          mySaleProductsChats <= 0
-                            ? setChatAlert(true)
-                            : router.push("/chats");
-                          setTimeout(() => {
-                            setChatAlert(false);
-                          }, 2000);
-                        }}
-                        className="py-2 px-4 rounded-md text-white bg-orange-500"
-                      >
-                        대화 중인 채팅방
-                        {mySaleProductsChats > 0
-                          ? `(${mySaleProductsChats})`
-                          : null}
-                      </button>
-                    ) : (
-                      <button
-                        disabled={product.state !== "Sale" ? true : false}
-                        onClick={() => {
-                          router.push({
-                            pathname: `${router.asPath}/chat`,
-                            query: {
-                              productId: product?.id,
-                              purchaserId: user?.id,
-                            },
-                          });
-                        }}
-                        className={`py-2 px-4 text-white ${
-                          product.state === "Sale"
-                            ? "bg-orange-500"
-                            : "bg-gray-400"
-                        }  rounded-md disabled:text-gray-300`}
-                      >
-                        {!isChat ? "채팅하기" : "채팅방으로 이동"}
-                      </button>
-                    )}
-                  </div>
+                      <path
+                        fillRule="evenodd"
+                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                  ) : (
+                    <svg
+                      className="h-6 w-6 "
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      />
+                    </svg>
+                  )}
+                </button>
+                <div className="flex justify-center items-center flex-col">
+                  <p className="text-md font-semibold text-black">
+                    {convertPrice(product?.price)}
+                  </p>
+                  {product?.nego ? (
+                    <Link href={`/users/profiles/${product?.user?.id}`}>
+                      <a className="text-xs font-bold text-orange-500 underline">
+                        가격 제안하기
+                      </a>
+                    </Link>
+                  ) : (
+                    <p className="text-xs text-gray-400 self-start">
+                      가격 제안 불가
+                    </p>
+                  )}
                 </div>
+              </div>
+
+              <div>
+                {product?.user?.id === user?.id ? (
+                  <button
+                    onClick={() => {
+                      mySaleProductsChats <= 0
+                        ? setChatAlert(true)
+                        : router.push("/chats");
+                      setTimeout(() => {
+                        setChatAlert(false);
+                      }, 2000);
+                    }}
+                    className="py-2 px-4 rounded-md text-white bg-orange-500"
+                  >
+                    대화 중인 채팅방
+                    {mySaleProductsChats > 0
+                      ? `(${mySaleProductsChats})`
+                      : null}
+                  </button>
+                ) : (
+                  <button
+                    disabled={product.state !== "Sale" ? true : false}
+                    onClick={() => {
+                      router.push({
+                        pathname: `${router.asPath}/chat`,
+                        query: {
+                          productId: product?.id,
+                          purchaserId: user?.id,
+                        },
+                      });
+                    }}
+                    className={`py-2 px-4 text-white ${
+                      product.state === "Sale" ? "bg-orange-500" : "bg-gray-400"
+                    }  rounded-md disabled:text-gray-300`}
+                  >
+                    {!isChat ? "채팅하기" : "채팅방으로 이동"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -399,7 +381,6 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                   name="radioButton"
                   value={chat.purchaser.id}
                   defaultChecked={index === 0 ? true : false}
-                  onChange={onRadioChange}
                   className="w-6 h-6 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 mr-2"
                 />
                 {chat.purchaser.avatar ? (
@@ -437,7 +418,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
         <div className="border-t border-gray-200 h-0.5/4 p-4 pb-8">
           <button
             disabled={!hasChat ? true : false}
-            onClick={onButtonClick}
+            onClick={onBtnClick}
             className={`w-full py-3 rounded-md bg-${
               hasChat ? "orange-500 text-white" : "gray-100 text-gray-400"
             }  text-lg cursor-${!hasChat ? "not-allowed" : "pointer"} `}
