@@ -6,6 +6,7 @@ import useSWR from "swr";
 import { Post, User } from "@prisma/client";
 import useCoords from "@libs/client/useCoords";
 import client from "@libs/server/client";
+import { convertTime } from "@libs/client/utils";
 
 interface PostWithUser extends Post {
   user: User;
@@ -42,7 +43,7 @@ const Community: NextPage<PostsResponse> = ({ posts }) => {
               </div>
               <div className="mt-5 px-4 flex items-center justify-between w-full text-gray-500 font-medium text-xs">
                 <span>{post.user.name}</span>
-                <span>{post.createdAt.toString()}</span>
+                <span>{convertTime(post.createdAt.toString())}</span>
               </div>
               <div className="flex px-4 space-x-5 mt-3 text-gray-700 py-2.5 border-t   w-full">
                 <span className="flex space-x-2 items-center text-sm">

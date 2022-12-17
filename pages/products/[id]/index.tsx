@@ -310,7 +310,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                   </button>
                 ) : (
                   <button
-                    disabled={product.state !== "Sale" ? true : false}
+                    disabled={product.state === "Completed" ? true : false}
                     onClick={() => {
                       router.push({
                         pathname: `${router.asPath}/chat`,
@@ -321,10 +321,16 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                       });
                     }}
                     className={`py-2 px-4 text-white ${
-                      product.state === "Sale" ? "bg-orange-500" : "bg-gray-400"
+                      product.state === "Completed"
+                        ? "bg-gray-500 cursor-not-allowed"
+                        : "bg-orange-400 cursor-pointer"
                     }  rounded-md disabled:text-gray-300`}
                   >
-                    {!isChat ? "채팅하기" : "채팅방으로 이동"}
+                    {!isChat
+                      ? "채팅하기"
+                      : product.state === "Completed"
+                      ? "거래 완료"
+                      : "채팅방으로 이동"}
                   </button>
                 )}
               </div>
