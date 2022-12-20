@@ -17,7 +17,6 @@ interface PostWithUser extends Post {
 }
 
 interface PostsResponse {
-  // ok: boolean;
   posts: PostWithUser[];
 }
 
@@ -30,10 +29,10 @@ const Community: NextPage<PostsResponse> = ({ posts }) => {
   // );
   return (
     <Layout hasTabBar title="동네생활">
-      <div className="space-y-4 divide-y-[2px]">
+      <div className="space-y-5 divide-y-[3px] ">
         {posts?.map((post) => (
           <Link key={post.id} href={`/community/${post.id}`}>
-            <a className="flex cursor-pointer flex-col pt-4 items-start">
+            <a className="flex flex-col items-start pt-4 cursor-pointer">
               <span className="flex ml-4 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                 동네질문
               </span>
@@ -61,7 +60,10 @@ const Community: NextPage<PostsResponse> = ({ posts }) => {
                       d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     ></path>
                   </svg>
-                  <span>궁금해요 {post._count?.wondering}</span>
+                  <span>
+                    궁금해요{" "}
+                    {post._count.wondering > 0 ? post._count.wondering : null}
+                  </span>
                 </span>
                 <span className="flex space-x-2 items-center text-sm">
                   <svg
@@ -78,7 +80,11 @@ const Community: NextPage<PostsResponse> = ({ posts }) => {
                       d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                     ></path>
                   </svg>
-                  <span>답변 {post._count?.answers}</span>
+                  <span>
+                    {post._count.answers > 0
+                      ? `댓글 ${post._count.answers}`
+                      : "답변하기"}
+                  </span>
                 </span>
               </div>
             </a>
@@ -95,9 +101,9 @@ const Community: NextPage<PostsResponse> = ({ posts }) => {
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth="2"
+              strokeWidth={2}
               d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-            ></path>
+            />
           </svg>
         </FloatingButton>
       </div>
@@ -106,7 +112,29 @@ const Community: NextPage<PostsResponse> = ({ posts }) => {
 };
 
 export async function getStaticProps() {
-  const posts = await client.post.findMany({ include: { user: true } });
+  const posts = await client.post.findMany({
+    include: {
+      user: {
+        select: {
+          name: true,
+        },
+      },
+
+      wondering: {
+        select: {
+          id: true,
+        },
+      },
+      _count: {
+        select: {
+          wondering: true,
+          answers: true,
+        },
+      },
+    },
+  });
+  console.log(posts);
+
   return {
     props: {
       posts: JSON.parse(JSON.stringify(posts)),

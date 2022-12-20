@@ -53,8 +53,6 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
     share,
     categoryId,
   }: UploadProductForm) => {
-    // 등록 하기 전에 이미지를 먼저 업로드 해야함
-    console.log(name, price, description, nego, share, categoryId, "dsdsds");
     if (loading) return;
     if (photo && photo.length > 0) {
       const photoIds = [];
