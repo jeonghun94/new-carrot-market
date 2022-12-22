@@ -13,29 +13,29 @@ datasource db {
 }
 
 model User {
-  id              Int         @id @default(autoincrement())
-  phone           String?     @unique
-  email           String?     @unique
+  id              Int           @id @default(autoincrement())
+  phone           String?       @unique
+  email           String?       @unique
   name            String
   avatar          String?
   temperature     Float?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   tokens          Token[]
   products        Product[]
   posts           Post[]
   answers         Answer[]
   wonderings      Wondering[]
-  writtenReviews  Review[]    @relation(name: "writtenReviews")
-  receivedReviews Review[]    @relation(name: "receivedReviews")
+  writtenReviews  Review[]      @relation(name: "writtenReviews")
+  receivedReviews Review[]      @relation(name: "receivedReviews")
   fav             Fav[]
   sales           Sale[]
   purchases       Purchase[]
   record          Record[]
   streams         Stream[]
   messages        Message[]
-  purchasers      Chat[]      @relation(name: "purchasers")
-  sellers         Chat[]      @relation(name: "sellers")
+  purchasers      Chat[]        @relation(name: "purchasers")
+  sellers         Chat[]        @relation(name: "sellers")
   chatMessages    ChatMessage[]
 }
 
@@ -46,53 +46,59 @@ model Token {
   userId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@index([userId])
 }
 
 model Product {
-  id          Int        @id @default(autoincrement())
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int
-  category    Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId  Int        @default(1)
+  category    Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  Int          @default(1)
   image       String
   name        String
   price       Int
-  description String     @db.MediumText
+  description String       @db.MediumText
   favs        Fav[]
   sales       Sale[]
   purchases   Purchase[]
   records     Record[]
   chats       Chat[]
-  views       Int       @default(0)
-  share       Boolean   @default(false)
-  nego        Boolean   @default(false)
-  state     ProductState  @default(Sale)
+  views       Int          @default(0)
+  share       Boolean      @default(false)
+  nego        Boolean      @default(false)
+  state       ProductState @default(Sale)
+
   @@index([userId])
+  @@index([categoryId])
 }
 
 enum ProductState {
-  Sale 
+  Sale
   Reservation
   Completed
   Hide
 }
 
 model Chat {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  seller    User     @relation(name: "sellers", fields: [sellerId], references: [id], onDelete: Cascade)
-  sellerId  Int
-  purchaser   User   @relation(name: "purchasers", fields: [purchaserId], references: [id], onDelete: Cascade)
-  purchaserId Int
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId Int
-  exit      Boolean  @default(false)
+  id           Int           @id @default(autoincrement())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  seller       User          @relation(name: "sellers", fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId     Int
+  purchaser    User          @relation(name: "purchasers", fields: [purchaserId], references: [id], onDelete: Cascade)
+  purchaserId  Int
+  product      Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId    Int
+  exit         Boolean       @default(false)
   chatMessages ChatMessage[]
-  @@index([sellerId, purchaserId, productId])
+
+  @@index([sellerId])
+  @@index([productId])
+  @@index([purchaserId])
 }
 
 model ChatMessage {
@@ -101,25 +107,39 @@ model ChatMessage {
   updatedAt DateTime @updatedAt
   chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   chatId    Int
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
   content   String   @db.MediumText
   read      Boolean  @default(false)
+
   @@index([chatId])
+  @@index([userId])
 }
 
 model Post {
-  id        Int         @id @default(autoincrement())
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  question  String      @db.MediumText
-  latitude  Float?
-  longitude Float?
-  answers   Answer[]
-  wondering Wondering[]
+  id             Int          @id @default(autoincrement())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         Int
+  question       String       @db.MediumText
+  latitude       Float?
+  longitude      Float?
+  answers        Answer[]
+  wondering      Wondering[]
+  postCategory   PostCategory @relation(fields: [postCategoryId], references: [id], onDelete: Cascade)
+  postCategoryId Int
+
   @@index([userId])
+  @@index([postCategoryId])
+}
+
+model PostCategory {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  posts     Post[]
 }
 
 model Answer {
@@ -131,6 +151,7 @@ model Answer {
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    Int
   answer    String   @db.MediumText
+
   @@index([userId])
   @@index([postId])
 }
@@ -143,6 +164,7 @@ model Wondering {
   userId    Int
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    Int
+
   @@index([userId])
   @@index([postId])
 }
@@ -157,6 +179,7 @@ model Review {
   createdFor   User     @relation(name: "receivedReviews", fields: [createdForId], references: [id], onDelete: Cascade)
   createdForId Int
   score        Int      @default(1)
+
   @@index([createdById])
   @@index([createdForId])
 }
@@ -169,6 +192,7 @@ model Sale {
   productId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@index([userId])
   @@index([productId])
 }
@@ -181,6 +205,7 @@ model Purchase {
   productId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@index([userId])
   @@index([productId])
 }
@@ -193,6 +218,7 @@ model Fav {
   productId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@index([userId])
   @@index([productId])
 }
@@ -206,6 +232,7 @@ model Record {
   createdAt DateTime @default(now())
   kind      String
   updatedAt DateTime @updatedAt
+
   @@index([userId])
   @@index([productId])
 }
@@ -217,18 +244,19 @@ enum Kind {
 }
 
 model Stream {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  name        String
-  description String    @db.MediumText
-  price       Int
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int
-  messages    Message[]
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  name          String
+  description   String    @db.MediumText
+  price         Int
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+  messages      Message[]
   cloudflareId  String?
   cloudflareUrl String?
   cloudflareKey String?
+
   @@index([userId])
 }
 
@@ -241,14 +269,15 @@ model Message {
   message   String   @db.MediumText
   stream    Stream   @relation(fields: [streamId], references: [id], onDelete: Cascade)
   streamId  Int
+
   @@index([userId])
   @@index([streamId])
 }
 
-model Category{
-  id        Int      @id @default(autoincrement())
+model Category {
+  id        Int       @id @default(autoincrement())
   name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   products  Product[]
 }
