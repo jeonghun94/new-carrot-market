@@ -125,10 +125,11 @@ model Post {
   question       String       @db.MediumText
   latitude       Float?
   longitude      Float?
+  image          String?
   answers        Answer[]
   wondering      Wondering[]
   postCategory   PostCategory @relation(fields: [postCategoryId], references: [id], onDelete: Cascade)
-  postCategoryId Int
+  postCategoryId Int          @default(1)
 
   @@index([userId])
   @@index([postCategoryId])

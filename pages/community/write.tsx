@@ -1,14 +1,16 @@
-import type { NextPage } from "next";
+import type { NextPage, NextPageContext } from "next";
 import useMutation from "@libs/client/useMutation";
 import Layout from "@components/layout";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { Post } from "@prisma/client";
+import { Post, PostCategory } from "@prisma/client";
 import { useRouter } from "next/router";
 import useCoords from "@libs/client/useCoords";
+import Image from "next/image";
 
 interface WriteForm {
   content: string;
+  photo: FileList;
 }
 
 interface WriteResponse {
@@ -16,23 +18,15 @@ interface WriteResponse {
   post: Post;
 }
 
-const categories = [
-  { id: 1, name: "동네질문" },
-  { id: 2, name: "동네사건사고" },
-  { id: 3, name: "겨울간식" },
-  { id: 4, name: "동네소식" },
-  { id: 5, name: "동네맛집" },
-  { id: 6, name: "취미생활" },
-  { id: 7, name: "일상" },
-  { id: 8, name: "분실/실종센터" },
-  { id: 9, name: "해주세요" },
-  { id: 10, name: "동네사진전" },
-];
+interface PageResponse extends PostCategory {
+  categories: PostCategory[];
+}
 
-const Write: NextPage = () => {
+const Write: NextPage<PageResponse> = ({ categories }) => {
   const { latitude, longitude } = useCoords();
   const router = useRouter();
-  const { register, handleSubmit, getValues, watch } = useForm<WriteForm>();
+  const { register, handleSubmit, watch } = useForm<WriteForm>();
+
   const [post, { loading, data }] = useMutation<WriteResponse>("/api/posts");
   const onValid = (data: WriteForm) => {
     if (loading) return;
@@ -44,6 +38,10 @@ const Write: NextPage = () => {
   });
 
   const content = watch("content");
+
+  const photo = watch("photo");
+  const [photos, setPhotos] = useState(0);
+  const [photoPreview, setPhotoPreview] = useState("");
 
   useEffect(() => {
     console.log(content);
@@ -59,13 +57,30 @@ const Write: NextPage = () => {
     fadeInOut();
   };
 
+  const removePhoto = (idx: number) => {
+    const newPhotoPreview = photoPreview.split(",");
+    newPhotoPreview.splice(idx, 1);
+    setPhotos(photos - 1);
+    setPhotoPreview(newPhotoPreview.toString());
+  };
+
   useEffect(() => {
     if (data && data.ok) {
       router.push(`/community/${data.post.id}`);
     }
   }, [data, router]);
 
-  useEffect(() => {}, [category]);
+  useEffect(() => {
+    const files = [];
+    if (photo && photo.length > 0) {
+      for (let i = 0; i < photo.length; i++) {
+        files.push(URL.createObjectURL(photo[i]));
+      }
+      setPhotos(photo.length);
+      setPhotoPreview(files.toString());
+    }
+  }, [photo]);
+
   return (
     <>
       <Layout noActionBar>
@@ -121,7 +136,11 @@ const Write: NextPage = () => {
             </svg>
           </div>
           {notice && (
-            <div className=" m-4 p-5 rounded-md bg-orange-50 text-sm">
+            <div
+              className={`mx-4 my-6 ${
+                photoPreview ? `-mb-1` : null
+              }  p-5 rounded-md bg-orange-50 text-sm`}
+            >
               <div className="flex justify-between items-center">
                 <p className=" font-semibold">글 작성하기 전에 알려드려요.</p>
                 <svg
@@ -147,6 +166,45 @@ const Write: NextPage = () => {
             </div>
           )}
           <div className="px-5 py-2">
+            {photoPreview ? (
+              <div className="flex my-5 items-center ml-3 gap-3">
+                {photoPreview.split(",").map((photo, idx) => (
+                  <div className="w-20 h-20 mr-3 relative" key={idx}>
+                    <Image
+                      src={photo}
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-lg"
+                    />
+                    {idx === 0 && (
+                      <div className="absolute w-full h-6 bottom-0 flex justify-center items-center text-sm bg-black text-white rounded-bl-md rounded-br-md">
+                        대표 사진
+                      </div>
+                    )}
+                    <div
+                      className="absolute w-6 h-6 flex justify-center items-center text-xs rounded-full -top-2 -right-3 border-gray-300 cursor-pointer bg-gray-700 
+                    "
+                      onClick={() => removePhoto(idx)}
+                    >
+                      <svg
+                        className="w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        ></path>
+                      </svg>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
             <textarea
               {...register("content", {
                 required: "제목을 입력해주세요.",
@@ -261,8 +319,48 @@ const Write: NextPage = () => {
           </div>
         ) : null}
       </div>
+      <div className="fixed bottom-0 w-full p-5 border-t">
+        <label className="text-gray-600 cursor-pointer">
+          <div className="flex justify-start items-center gap-1">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <p>{photos}/10</p>
+          </div>
+          <input
+            {...register("photo")}
+            multiple
+            accept="image/*"
+            className="hidden"
+            type="file"
+          />
+        </label>
+      </div>
     </>
   );
+};
+
+export const getServerSideProps = async (context: NextPageContext) => {
+  const categories = await client?.postCategory.findMany();
+
+  console.log(categories);
+
+  return {
+    props: {
+      categories: JSON.parse(JSON.stringify(categories)),
+    },
+  };
 };
 
 export default Write;
