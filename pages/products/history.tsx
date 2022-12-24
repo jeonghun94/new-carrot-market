@@ -26,8 +26,10 @@ const History: NextPage<SellerProduct> = ({ products }) => {
     router.push(`/products/${id}`);
   };
 
-  const saleProducts = products.filter((product) => product.status === true);
-  const soldProducts = products.filter((product) => product.status === false);
+  const saleProducts = products.filter((product) => product.state === "Sale");
+  const soldProducts = products.filter(
+    (product) => product.state === "Completed"
+  );
 
   const foucsTab = (tab: number, index: number) => {
     const foucs =
@@ -87,7 +89,7 @@ const History: NextPage<SellerProduct> = ({ products }) => {
           <p>{product.name}</p>
           <p className="text-xs my-1 text-gray-400">조회 {product.views}</p>
           <div className="flex">
-            {!product.status ? (
+            {!product.state ? (
               <div className="bg-gray-300 rounded-sm self-center text-sm px-2 mr-1">
                 거래완료
               </div>
