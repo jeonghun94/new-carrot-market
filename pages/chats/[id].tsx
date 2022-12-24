@@ -99,7 +99,7 @@ const ChatDetail: NextPage<ChatResponse> = ({ chats, product }) => {
             <div key={index} className="mt-2 text-center text-sm text-gray-400">
               {chat.day}
             </div>
-            {chat.message.map((m) => (
+            {/* {chat.message.map((m) => (
               <Message
                 key={m.id}
                 message={m.message}
@@ -107,7 +107,7 @@ const ChatDetail: NextPage<ChatResponse> = ({ chats, product }) => {
                 reversed={m?.user?.id === user?.id}
                 sendTime={m.createdAt.toLocaleString("ko-KR")}
               />
-            ))}
+            ))} */}
           </>
         ))}
         <form className="fixed  flex justify-between items-center  py-2 pb-4 px-4 gap-4  bg-white  bottom-0 inset-x-0">
@@ -173,14 +173,14 @@ export const getServerSideProps = async (req: NextApiRequest) => {
     },
     where: {
       productId: Number(productId),
-      OR: [
-        {
-          userId: Number(userId),
-        },
-        {
-          userId: sellerId?.userId,
-        },
-      ],
+      // OR: [
+      //   {
+      //     userId: Number(userId),
+      //   },
+      //   {
+      //     userId: sellerId?.userId,
+      //   },
+      // ],
     },
   });
 
@@ -191,20 +191,20 @@ export const getServerSideProps = async (req: NextApiRequest) => {
   let result = chatDays?.filter((v, i) => chatDays.indexOf(v) === i);
 
   const chats = await client?.chat.findMany({
-    include: {
-      user: {
-        select: {
-          avatar: true,
-          id: true,
-        },
-      },
-    },
-    where: {
-      productId: Number(productId),
-      userId: {
-        in: [Number(userId), Number(sellerId?.userId)],
-      },
-    },
+    // include: {
+    //   user: {
+    //     select: {
+    //       avatar: true,
+    //       id: true,
+    //     },
+    //   },
+    // },
+    // where: {
+    //   productId: Number(productId),
+    //   userId: {
+    //     in: [Number(userId), Number(sellerId?.userId)],
+    //   },
+    // },
   });
 
   const d = result?.map((day) => {
