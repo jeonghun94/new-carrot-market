@@ -105,13 +105,13 @@ const Stream1: NextPage = () => {
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Live Chat</h2>
           <div className="py-10 pb-16 h-[50vh] overflow-y-scroll  px-4 space-y-4">
-            {data?.stream.messages.map((message) => (
+            {/* {data?.stream.messages.map((message) => (
               <Message
                 key={message.id}
                 message={message.message}
                 reversed={message.user.id === user?.id}
               />
-            ))}
+            ))} */}
           </div>
           <div className="fixed py-2 bg-white  bottom-0 inset-x-0">
             <form
