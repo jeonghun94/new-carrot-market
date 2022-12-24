@@ -28,9 +28,11 @@ const Profile: NextPage = () => {
         <div className="w-full flex justify-between items-center py-4 space-x-3">
           <div className="flex gap-3">
             {user?.avatar ? (
-              <img
+              <Image
                 src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${user?.avatar}/avatar`}
                 className="w-16 h-16 bg-slate-500 rounded-full"
+                width={60}
+                height={60}
               />
             ) : (
               <div className="w-16 h-16 flex justify-center items-center rounded-full bg-gray-300 text-5xl">

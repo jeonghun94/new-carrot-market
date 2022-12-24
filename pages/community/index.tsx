@@ -54,13 +54,13 @@ const Community: NextPage<PostsResponse> = ({
   return (
     <Layout hasTabBar title="동네생활">
       <div
-        className={`w-full flex justify-start items-center px-3 pt-5 pb-3.5 gap-3 border-b overflow-auto overflow-x-visible md:justify-between lg:justify-center`}
+        className={`w-full flex justify-start items-center px-3 pt-5 pb-3.5 gap-3 border-b overflow-auto overflow-x-visible md:justify-between lg:justify-center `}
       >
         {categories?.map((category) => (
           <div
             key={category.id}
             onClick={() => setCategory(category)}
-            className="flex min-w-fit items-center justify-center px-3 py-2 border rounded-2xl bg-white text-gray-600 font-semibold text-xs cursor-pointer"
+            className="flex min-w-fit items-center justify-center px-3 py-2 border rounded-2xl bg-white text-gray-600 font-semibold text-xs cursor-pointer z-10"
           >
             {category.name}
           </div>
@@ -157,7 +157,7 @@ const Community: NextPage<PostsResponse> = ({
             </Link>
           ))
         ) : (
-          <div className="flex items-center justify-center w-full min-h-screen">
+          <div className="fixed top-0 flex items-center justify-center w-full min-h-screen z-0">
             등록된 글이 없습니다.
           </div>
         )}

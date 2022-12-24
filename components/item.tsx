@@ -4,25 +4,25 @@ import Link from "next/link";
 import noImage from "public/no-image.png";
 
 interface ItemProps {
-  title: string;
   id: number;
+  title: string;
   price: number;
   hearts: number;
   image?: string;
+  state: string;
   createdAt: string;
   chats: number;
-  state: string;
 }
 
 export default function Item({
+  id,
   title,
   price,
   hearts,
-  chats,
-  id,
   image,
-  createdAt,
   state,
+  createdAt,
+  chats,
 }: ItemProps) {
   return (
     <Link href={`/products/${id}`}>

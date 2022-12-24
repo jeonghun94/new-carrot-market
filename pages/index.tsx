@@ -27,8 +27,8 @@ const Home: NextPage = () => {
         {data?.products?.map((product, index) => (
           <div key={index}>
             <Item
-              id={product.id}
               key={product.id}
+              id={product.id}
               title={product.name}
               price={product.price}
               hearts={product._count.favs}
