@@ -9,14 +9,20 @@ async function handler(
 ) {
   if (req.method === "POST") {
     const {
-      body: { question, latitude, longitude },
+      body: { content, latitude, longitude, image, postCategoryId },
       session: { user },
     } = req;
     const post = await client.post.create({
       data: {
-        question,
+        content,
         latitude,
         longitude,
+        image,
+        postCategory: {
+          connect: {
+            id: postCategoryId,
+          },
+        },
         user: {
           connect: {
             id: user?.id,
@@ -32,17 +38,31 @@ async function handler(
   }
   if (req.method === "GET") {
     const {
-      query: { latitude, longitude },
+      query: { latitude, longitude, categoryId },
     } = req;
     // const parsedLatitude = parseFloat(latitude.toString());
     // const parsedLongitue = parseFloat(longitude.toString());
+
     const posts = await client.post.findMany({
+      where: {
+        postCategory: {
+          id: Number(categoryId),
+        },
+      },
       include: {
         user: {
           select: {
-            id: true,
             name: true,
-            avatar: true,
+          },
+        },
+        postCategory: {
+          select: {
+            name: true,
+          },
+        },
+        wondering: {
+          select: {
+            id: true,
           },
         },
         _count: {
@@ -51,6 +71,9 @@ async function handler(
             answers: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
       // where: {
       //   latitude: {

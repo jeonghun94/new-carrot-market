@@ -23,14 +23,42 @@ interface PageResponse extends PostCategory {
 }
 
 const Write: NextPage<PageResponse> = ({ categories }) => {
-  const { latitude, longitude } = useCoords();
   const router = useRouter();
+  const { latitude, longitude } = useCoords();
   const { register, handleSubmit, watch } = useForm<WriteForm>();
-
   const [post, { loading, data }] = useMutation<WriteResponse>("/api/posts");
-  const onValid = (data: WriteForm) => {
+  const onValid = async (data: WriteForm) => {
     if (loading) return;
-    post({ ...data, latitude, longitude });
+    const photoIds = [];
+    if (photo.length > 0) {
+      for (let i = 0; i < photo.length; i++) {
+        const form = new FormData();
+        const { uploadURL } = await (await fetch(`/api/files`)).json();
+        form.append("file", photo[i], "community");
+        const {
+          result: { id },
+        } = await (
+          await fetch(uploadURL, { method: "POST", body: form })
+        ).json();
+        photoIds.push(id);
+      }
+    }
+
+    console.log({
+      ...data,
+      latitude,
+      longitude,
+      image: photoIds,
+      postCategoryId: category.id,
+    });
+
+    post({
+      ...data,
+      latitude,
+      longitude,
+      postCategoryId: category.id,
+      image: photoIds.join(","),
+    });
   };
   const [category, setCategory] = useState({
     id: 0,
@@ -42,10 +70,6 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
   const photo = watch("photo");
   const [photos, setPhotos] = useState(0);
   const [photoPreview, setPhotoPreview] = useState("");
-
-  useEffect(() => {
-    console.log(content);
-  }, [content]);
 
   const [notice, setNotice] = useState(true);
   const [fade, setFade] = useState(false);
@@ -106,7 +130,7 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
             <button
               disabled={loading || category.id === 0 || !content}
               className={
-                category.id === 0 || !content
+                loading || category.id === 0 || !content
                   ? `text-gray-300 cursor-not-allowed`
                   : `text-orange-500 cursor-pointer`
               }
@@ -209,7 +233,7 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
               {...register("content", {
                 required: "제목을 입력해주세요.",
                 maxLength: {
-                  value: 50,
+                  value: 500,
                   message: "제목은 50자 이내로 입력해주세요.",
                 },
               })}
@@ -353,8 +377,6 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
 
 export const getServerSideProps = async (context: NextPageContext) => {
   const categories = await client?.postCategory.findMany();
-
-  console.log(categories);
 
   return {
     props: {
