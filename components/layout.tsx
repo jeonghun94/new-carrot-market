@@ -41,7 +41,7 @@ export default function Layout({
         <div
           className={`w-full h-14 max-w-full px-6 flex  ${
             setting ? "justify-between" : "justify-center"
-          } items-center fixed top-0 text-lg font-medium text-gray-800  bg-white border-b z-10`}
+          } items-center fixed top-0 text-lg font-medium text-gray-800  bg-white border-b z-30`}
         >
           {canGoBack ? (
             <button onClick={onClick} className="absolute left-4">

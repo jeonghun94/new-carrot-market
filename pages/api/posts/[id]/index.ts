@@ -42,6 +42,7 @@ async function handler(
         select: {
           answers: true,
           wondering: true,
+          hearts: true,
         },
       },
     },
@@ -57,10 +58,24 @@ async function handler(
       },
     })
   );
+
+  const isHeart = Boolean(
+    await client.heart.findFirst({
+      where: {
+        postId: Number(id),
+        userId: user?.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+  );
+
   res.json({
     ok: true,
     post,
     isWondering,
+    isHeart,
   });
 }
 
