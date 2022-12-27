@@ -27,6 +27,9 @@ async function handler(
       },
       answer,
     },
+    include: {
+      user: true,
+    },
   });
   console.log(newAnswer);
   res.json({

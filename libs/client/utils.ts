@@ -30,3 +30,6 @@ export const convertTime = (value: string) => {
 export const convertPrice = (price: number) => {
   return `${price.toLocaleString("ko-KR")}원`;
 };
+
+export const scrollToBottom = () =>
+  window.scrollTo(0, document.body.scrollHeight);

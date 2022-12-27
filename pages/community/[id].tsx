@@ -1,16 +1,15 @@
 import type { NextPage, NextPageContext } from "next";
 import Layout from "@components/layout";
-import TextArea from "@components/textarea";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import { Answer, Post, PostCategory, User } from "@prisma/client";
 import useMutation from "@libs/client/useMutation";
-import { cls, convertTime } from "@libs/client/utils";
+import { cls, convertTime, scrollToBottom } from "@libs/client/utils";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-
 import client from "@libs/server/client";
+import useUser from "@libs/client/useUser";
 
 interface AnswerWithUser extends Answer {
   user: User;
@@ -18,13 +17,13 @@ interface AnswerWithUser extends Answer {
 
 interface PostWithUser extends Post {
   user: User;
-  _count: {
-    answers: number;
-    wondering: number;
-    hearts: number;
-  };
   postCategory: PostCategory;
   answers: AnswerWithUser[];
+  _count: {
+    wondering: number;
+    answers: number;
+    hearts: number;
+  };
 }
 
 interface CommunityPostResponse {
@@ -40,7 +39,7 @@ interface AnswerForm {
 
 interface AnswerResponse {
   ok: boolean;
-  response: Answer;
+  answer: AnswerWithUser;
 }
 
 interface CommunityWithCategory extends PostWithUser {
@@ -49,7 +48,14 @@ interface CommunityWithCategory extends PostWithUser {
 
 const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
   const router = useRouter();
-  const { register, handleSubmit, reset } = useForm<AnswerForm>();
+  const { user } = useUser();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<AnswerForm>();
   const { data, mutate } = useSWR<CommunityPostResponse>(
     router.query.id ? `/api/posts/${router.query.id}` : null
   );
@@ -63,6 +69,10 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
 
   const [sendAnswer, { data: answerData, loading: answerLoading }] =
     useMutation<AnswerResponse>(`/api/posts/${router.query.id}/answers`);
+
+  const [answers, setAnswers] = useState(post.answers);
+  const [orderBy, setOrderBy] = useState("asc");
+
   const onWonderClick = () => {
     if (!data) return;
     mutate(
@@ -109,16 +119,38 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
     }
   };
 
-  const onValid = (form: AnswerForm) => {
+  const onValid = (data: AnswerForm) => {
     if (answerLoading) return;
-    sendAnswer(form);
+    sendAnswer(data);
   };
+
+  const orderbyAnswer = async () => {
+    await fetch(`/api/posts/${router.query.id}/answers/orderby`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ orderBy }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setAnswers(data.answers);
+      });
+  };
+
+  useEffect(() => {
+    orderbyAnswer();
+  }, [orderBy]);
+
   useEffect(() => {
     if (answerData && answerData.ok) {
       reset();
       mutate();
+      setAnswers([...answers, answerData.answer]);
+      scrollToBottom();
     }
   }, [answerData, reset, mutate]);
+
   return (
     <Layout canGoBack>
       <span className="inline-flex  ml-4 items-center px-2.5 py-1 mt-5 mb-2 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -164,12 +196,12 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
 
           <span className="text-sm text-gray-500">{`조회 수 ${post.views}`}</span>
         </div>
-        <div className="flex justify-between px-3  mt-3 text-gray-700 py-2.5 border-t border-b w-full">
+        <div className="flex justify-between px-7 mt-3 text-gray-700 py-2.5 border-t border-b w-full">
           <button
             onClick={onWonderClick}
             className={cls(
               "flex space-x-2 items-center text-sm",
-              data?.isWondering ? "text-teal-600" : ""
+              data?.isWondering ? "text-orange-600" : ""
             )}
           >
             <svg
@@ -218,7 +250,7 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
               onClick={onHeartClick}
               className={cls(
                 "flex space-x-2 items-center text-sm",
-                data?.isHeart ? "text-red-600" : ""
+                data?.isHeart ? "text-orange-600" : ""
               )}
             >
               <svg
@@ -242,10 +274,78 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
             </button>
           </span>
         </div>
-        <div className="border-b-4">
-          {post.answers.length > 0 ? (
-            post.answers.map((answer) => (
-              <div key={answer.id} className="flex items-start space-x-3"></div>
+        <div className="mb-20 ">
+          {answers.length > 0 ? (
+            <div className="pl-4 py-2 space-x-3 text-xs flex">
+              {[
+                {
+                  id: 1,
+                  name: "등록순",
+                  value: "asc",
+                },
+                {
+                  id: 2,
+                  name: "최신순",
+                  value: "desc",
+                },
+              ].map((order) => (
+                <button
+                  key={order.id}
+                  className={cls(
+                    "flex items-center outline-none",
+                    orderBy === order.value ? "text-black" : "text-gray-300"
+                  )}
+                  onClick={() => setOrderBy(order.value)}
+                >
+                  <span
+                    className={cls(
+                      "mr-1 text-xl bordr",
+                      orderBy === order.value
+                        ? "text-orange-500"
+                        : "text-gray-500"
+                    )}
+                  >
+                    ·
+                  </span>
+                  <span className={"text-xs"}>{order.name}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+          {answers.length > 0 ? (
+            answers.map((answer, index) => (
+              <div key={index} className="w-full p-3 space-x-3 border">
+                <div className="flex gap-3 items-start">
+                  <div className="w-1/12">
+                    {answer.user?.avatar ? (
+                      <Image
+                        src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${answer.user?.avatar}/avatar`}
+                        className="w-16 h-16 rounded-full "
+                        width={40}
+                        height={40}
+                      />
+                    ) : (
+                      <div className="w-8 h-8 flex justify-center items-center rounded-full bg-gray-300 text-2xl">
+                        🙎🏻‍♂️
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col w-11/12">
+                    <p className="text-sm flex items-center">
+                      {answer.user?.name}
+                      {user?.id === answer.userId ? (
+                        <span className="ml-1 px-1  border-[1.5px] rounded-sm text-xs text-gray-500">
+                          작성자
+                        </span>
+                      ) : null}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      신월동 · {convertTime(answer.createdAt.toString())}
+                    </p>
+                    <div>{answer.answer}</div>
+                  </div>
+                </div>
+              </div>
             ))
           ) : (
             <p className=" w-full mb-10 p-20  text-md text-gray-500 text-center">
@@ -280,6 +380,16 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
               className="w-full rounded-2xl p-3 border outline-none placeholder:text-md"
               type="text"
               placeholder="댓글을 입력해주세요."
+              {...register("answer", {
+                required: {
+                  value: true,
+                  message: "댓글 입력은 필수입니다.",
+                },
+                maxLength: {
+                  value: 100,
+                  message: "댓글은 100자 이내로 입력해주세요.",
+                },
+              })}
             />
             <button className="p-3 bg-orange-500  text-white rounded-full text-sm hover:bg-orange-600">
               {answerLoading ? (
@@ -302,6 +412,11 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
               )}
             </button>
           </div>
+          {errors.answer?.message && (
+            <p className="text-red-500 text-sm text-center pt-3">
+              {errors.answer?.message}
+            </p>
+          )}
         </form>
       </div>
     </Layout>
@@ -321,7 +436,14 @@ export const getServerSideProps = async (context: NextPageContext) => {
       user: true,
       postCategory: true,
       wondering: true,
-      answers: true,
+      answers: {
+        include: {
+          user: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
       _count: {
         select: {
           hearts: true,
@@ -332,7 +454,16 @@ export const getServerSideProps = async (context: NextPageContext) => {
     },
   });
 
-  console.log(post);
+  if (post) {
+    await client.post.update({
+      where: {
+        id: post.id,
+      },
+      data: {
+        views: post.views + 1,
+      },
+    });
+  }
 
   return {
     props: {
