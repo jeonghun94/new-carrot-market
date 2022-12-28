@@ -110,7 +110,7 @@ const Community: NextPage<PostsResponse> = ({
                   <span>{post.user.name}</span>
                   <span>{convertTime(post.createdAt.toString())}</span>
                 </div>
-                <div className="flex px-4 space-x-5 mt-3 text-gray-700 py-2.5 border-t   w-full">
+                <div className="flex px-4 space-x-5 mt-3 text-gray-700 py-2.5 border-t w-full">
                   <span className="flex space-x-2 items-center text-sm">
                     <svg
                       className="w-4 h-4"

@@ -255,8 +255,6 @@ export const getServerSideProps = withSsrSession(async function ({
   const productId = Number(query.productId);
   const userId = req?.session.user?.id;
 
-  console.log("purchaserId", purchaserId);
-
   const product = await client.product.findUnique({
     include: {
       user: true,
