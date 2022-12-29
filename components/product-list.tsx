@@ -1,5 +1,7 @@
+import { convertTime } from "@libs/client/utils";
 import { ProductWithCount } from "pages";
 import useSWR from "swr";
+import EmptyLayout from "./empty-layout";
 import Item from "./item";
 
 interface ProductListProps {
@@ -16,9 +18,29 @@ interface ProductListResponse {
 }
 
 export default function ProductList({ kind }: ProductListProps) {
+  const commentTitle = (kind: string) => {
+    const titles = [
+      {
+        kind: "purchases",
+        title: "구매",
+      },
+      {
+        kind: "sales",
+        title: "판매",
+      },
+      {
+        kind: "favs",
+        title: "관심",
+      },
+    ];
+
+    return titles.find((item) => item.kind === kind)?.title;
+  };
+
   const { data } = useSWR<ProductListResponse>(`/api/users/me/${kind}`);
-  return data ? (
-    <>
+
+  return data && data[kind].length > 0 ? (
+    <div className="mt-2 space-y-5 divide-y">
       {data[kind]?.map((record) => (
         <Item
           key={record.id}
@@ -28,10 +50,12 @@ export default function ProductList({ kind }: ProductListProps) {
           hearts={record.product._count.favs}
           image={record.product?.image}
           state={record.product.state}
-          createdAt={record.product.createdAt.toString()}
+          createdAt={convertTime(record.product.createdAt.toString())}
           chats={record.product._count.chats}
         />
       ))}
-    </>
-  ) : null;
+    </div>
+  ) : (
+    <EmptyLayout comment={`${commentTitle(kind)} 목록이 없습니다.`} />
+  );
 }

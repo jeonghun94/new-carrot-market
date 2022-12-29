@@ -3,11 +3,10 @@ import { withSsrSession } from "@libs/server/withSession";
 import { Answer, Post, PostCategory } from "@prisma/client";
 import { convertTime } from "@libs/client/utils";
 import { useRouter } from "next/router";
-import client from "@libs/server/client";
-import Layout from "@components/layout";
 import { useState } from "react";
-import Link from "next/link";
+import client from "@libs/server/client";
 import EmptyLayout from "@components/empty-layout";
+import Layout from "@components/layout";
 
 interface PostWithCategory extends Post {
   postCategory: PostCategory;

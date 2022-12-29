@@ -27,7 +27,7 @@ export default function Item({
   return (
     <Link href={`/products/${id}`}>
       <a className="flex px-4 pt-5 cursor-pointer justify-between">
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 ">
           <Image
             width={120}
             height={114}
@@ -42,8 +42,8 @@ export default function Item({
               `w-12 h-12 rounded-md ${image ? " bg-slate-300" : ""}`
             )}
           />
-          <div className="pt-2 flex flex-col">
-            <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+          <div className="flex flex-col gap-1 pt-1">
+            <h3 className="text-sm font-semibold text-gray-900">{title} </h3>
             <h5 className="text-sm text-gray-400">{createdAt}</h5>
             <div
               className={`${
@@ -63,6 +63,7 @@ export default function Item({
             </div>
           </div>
         </div>
+
         <div className="flex space-x-2 items-end justify-end">
           {hearts > 0 ? (
             <div className="flex space-x-0.5 items-center text-sm  text-gray-600">
