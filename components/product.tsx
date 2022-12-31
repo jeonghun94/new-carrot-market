@@ -2,7 +2,7 @@ import useMutation from "@libs/client/useMutation";
 import { convertPrice, convertTime } from "@libs/client/utils";
 import Link from "next/link";
 import { ProductWithCount } from "pages/profile/sold";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductImage from "./product-image";
 
 interface ProductProps {
@@ -41,19 +41,11 @@ export default function Product({
     `/api/products/${id}/state`
   );
 
-  const handleState = async (state: string) => {
-    await fetch(`/api/products/${id}/state`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ state }),
-    }).then((res) => {
-      res.json().then((data) => {
-        setItems(data.products);
-      });
-    });
-  };
+  useEffect(() => {
+    if (data && data.ok) {
+      setItems(data.products);
+    }
+  }, [data]);
 
   const switchState = (state: string) => {
     switch (state) {
@@ -62,7 +54,7 @@ export default function Product({
           <>
             <button
               className="px-10 py-2.5"
-              onClick={() => handleState("Hide")}
+              onClick={() => stateUpdate({ state: "Hide" })}
             >
               숨기기 해제
             </button>
@@ -73,13 +65,13 @@ export default function Product({
           <>
             <button
               className="px-10 py-2.5"
-              onClick={() => handleState("Sale")}
+              onClick={() => stateUpdate({ state: "Sale" })}
             >
               판매중
             </button>
             <button
               className="px-10 py-2.5"
-              onClick={() => handleState("Completed")}
+              onClick={() => stateUpdate({ state: "Completed" })}
             >
               거래완료
             </button>
@@ -97,13 +89,13 @@ export default function Product({
             <button className="px-10 py-2.5">끌어올리기</button>
             <button
               className="px-10 py-2.5"
-              onClick={() => handleState("Reservation")}
+              onClick={() => stateUpdate({ state: "Reservation" })}
             >
               예약중
             </button>
             <button
               className="px-10 py-2.5"
-              onClick={() => handleState("Completed")}
+              onClick={() => stateUpdate({ state: "Completed" })}
             >
               거래완료
             </button>

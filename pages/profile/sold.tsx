@@ -2,15 +2,15 @@ import type { NextPage, NextPageContext } from "next";
 import { withSsrSession } from "@libs/server/withSession";
 import { Product, User } from "@prisma/client";
 import client from "@libs/server/client";
+import { useState } from "react";
 
 import UserAvartar from "@components/user-avatar";
 import TabMenus from "@components/tab-menus";
 import Layout from "@components/layout";
-import ProductItems from "@components/product";
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import EmptyLayout from "@components/empty-layout";
-import products from "pages/api/products";
+import ProductItems from "@components/product";
+import Link from "next/link";
+import useMutation from "@libs/client/useMutation";
 
 export interface ProductWithCount extends Product {
   _count: {
@@ -46,7 +46,7 @@ const Sold: NextPage<PageResponse> = ({ profile, products }) => {
     },
   ];
 
-  const data = [
+  const values = [
     {
       products: items.filter(
         (product) => product.state === "Sale" || product.state === "Reservation"
@@ -89,7 +89,7 @@ const Sold: NextPage<PageResponse> = ({ profile, products }) => {
         setTabNumber={setTabNumber}
       />
 
-      {data.map((data, index) => {
+      {values.map((data, index) => {
         return (
           <div key={index}>
             {tabNumber === index && data.products.length > 0
