@@ -20,13 +20,19 @@ async function handler(
     { id: 10, name: "동네사진전" },
   ];
 
-  for (const category of categories) {
-    await client.postCategory.create({
-      data: {
-        name: category.name,
-      },
-    });
-  }
+  // for (const category of categories) {
+  //   await client.postCategory.create({
+  //     data: {
+  //       name: category.name,
+  //     },
+  //   });
+  // }
+
+  await client.product.updateMany({
+    data: {
+      state: "Sale",
+    },
+  });
 
   res.json({
     ok: true,

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import withHandler, { ResponseType } from "@libs/server/withHandler";
-import client from "@libs/server/client";
 import { withApiSession } from "@libs/server/withSession";
+import client from "@libs/server/client";
 
 async function handler(
   req: NextApiRequest,
@@ -10,6 +10,7 @@ async function handler(
   const {
     query: { id },
     body: { state },
+    session: { user },
   } = req;
 
   const productId = Number(id);
@@ -26,12 +27,32 @@ async function handler(
         id: productId,
       },
       data: {
-        state,
+        state: state === "Hide" ? "Sale" : state,
       },
     });
   }
+  const products = await client.product.findMany({
+    where: {
+      userId: user?.id,
+    },
 
-  res.send({ ok: true });
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      image: true,
+      createdAt: true,
+      state: true,
+      _count: {
+        select: {
+          favs: true,
+          chats: true,
+        },
+      },
+    },
+  });
+
+  res.send({ ok: true, products });
 }
 
 export default withApiSession(withHandler({ methods: ["POST"], handler }));
