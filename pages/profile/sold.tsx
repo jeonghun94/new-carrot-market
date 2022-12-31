@@ -36,42 +36,32 @@ const Sold: NextPage<PageResponse> = ({ profile, products }) => {
 
   const menus = [
     {
-      id: 1,
       name: `판매중 ${saleProducts.length > 0 ? saleProducts.length : ""}`,
     },
     {
-      id: 2,
       name: `거래완료 ${soldProducts.length > 0 ? soldProducts.length : ""}`,
     },
     {
-      id: 3,
       name: `숨김 ${hideProducts.length > 0 ? hideProducts.length : ""}`,
     },
   ];
 
-  const datas = [
+  const data = [
     {
-      id: 0,
       products: items.filter(
         (product) => product.state === "Sale" || product.state === "Reservation"
       ),
-      comment: "판매중 게시글이 없어요.",
+      comment: "판매중인",
     },
     {
-      id: 1,
       products: items.filter((product) => product.state === "Completed"),
-      comment: "거래완료 게시글이 없어요.",
+      comment: "거래완료",
     },
     {
-      id: 2,
       products: items.filter((product) => product.state === "Hide"),
-      comment: "숨기기한 게시글이 없어요.",
+      comment: "숨기기한",
     },
   ];
-
-  useEffect(() => {
-    console.log(items);
-  }, [items]);
 
   return (
     <Layout canGoBack>
@@ -99,95 +89,34 @@ const Sold: NextPage<PageResponse> = ({ profile, products }) => {
         setTabNumber={setTabNumber}
       />
 
-      {/* {datas.map((data, index) => {
-        tabNumber === index && data.products.length > 0
-          ? data.products.map((product, index) => (
-              <ProductItems
-                key={index}
-                id={product.id}
-                image={product.image}
-                name={product.name}
-                createdAt={product.createdAt.toString()}
-                price={product.price}
-                isSoldTab
-                chats={product._count.chats}
-                favs={product._count.favs}
-                state={product.state}
-              />
-            ))
-          : tabNumber === index && (
-              <EmptyLayout comment={data.comment} color="bg-gray-100" />
-            );
-      })} */}
-
-      {tabNumber === 0 && saleProducts.length > 0
-        ? saleProducts.map((product, index) => (
-            <ProductItems
-              key={index}
-              id={product.id}
-              image={product.image}
-              name={product.name}
-              createdAt={product.createdAt.toString()}
-              price={product.price}
-              isSoldTab
-              chats={product._count.chats}
-              favs={product._count.favs}
-              state={product.state}
-              setItems={setItems}
-            />
-          ))
-        : tabNumber === 0 && (
-            <EmptyLayout
-              comment="판매중 게시글이 없어요."
-              color="bg-gray-100"
-            />
-          )}
-
-      {tabNumber === 1 && soldProducts.length > 0
-        ? soldProducts.map((product, index) => (
-            <ProductItems
-              key={index}
-              id={product.id}
-              image={product.image}
-              name={product.name}
-              createdAt={product.createdAt.toString()}
-              price={product.price}
-              isSoldTab
-              chats={product._count.chats}
-              favs={product._count.favs}
-              state={product.state}
-              setItems={setItems}
-            />
-          ))
-        : tabNumber === 1 && (
-            <EmptyLayout
-              comment="거래완료 게시글이 없어요."
-              color="bg-gray-100"
-            />
-          )}
-
-      {tabNumber === 2 && hideProducts.length > 0
-        ? hideProducts.map((product, index) => (
-            <ProductItems
-              key={index}
-              id={product.id}
-              image={product.image}
-              name={product.name}
-              createdAt={product.createdAt.toString()}
-              price={product.price}
-              isSoldTab
-              chats={product._count.chats}
-              favs={product._count.favs}
-              state={product.state}
-              setItems={setItems}
-            />
-          ))
-        : tabNumber === 2 && (
-            <EmptyLayout
-              comment="숨기기한 게시글이 없어요."
-              color="bg-gray-100"
-            />
-          )}
+      {data.map((data, index) => {
+        return (
+          <div key={index}>
+            {tabNumber === index && data.products.length > 0
+              ? data.products.map((product, index) => (
+                  <ProductItems
+                    key={index}
+                    id={product.id}
+                    image={product.image}
+                    name={product.name}
+                    createdAt={product.createdAt.toString()}
+                    price={product.price}
+                    isSoldTab
+                    chats={product._count.chats}
+                    favs={product._count.favs}
+                    state={product.state}
+                    setItems={setItems}
+                  />
+                ))
+              : tabNumber === index && (
+                  <EmptyLayout
+                    comment={`${data.comment} 게시글이 없어요.`}
+                    color="bg-gray-100"
+                  />
+                )}
+          </div>
+        );
+      })}
     </Layout>
   );
 };
