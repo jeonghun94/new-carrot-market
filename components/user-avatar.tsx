@@ -13,7 +13,7 @@ export default function UserAvartar({
 }: AvatarProps) {
   return (
     <>
-      {avatar ? (
+      {avatar !== "null" ? (
         <Image
           src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${avatar}/avatar`}
           className="w-16 h-16 bg-slate-500 rounded-full"
@@ -21,10 +21,12 @@ export default function UserAvartar({
           height={imageSize}
         />
       ) : (
-        <div
-          className={`w-${defaultImageSize} h-${defaultImageSize} flex justify-center items-center rounded-full bg-gray-300 text-3xl`}
-        >
-          🙎🏻‍♂️
+        <div>
+          <div
+            className={`w-${defaultImageSize} h-${defaultImageSize} flex justify-center items-center rounded-full bg-gray-300 text-3xl`}
+          >
+            🙎🏻‍♂️
+          </div>
         </div>
       )}
     </>

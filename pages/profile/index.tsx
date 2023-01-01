@@ -43,9 +43,11 @@ const Profile: NextPage = () => {
               <h3 className="font-semibold text-lg">{user?.name}</h3>
             </div>
           </div>
-          <button className="px-1.5 py-2 text-xs rounded-md bg-gray-100">
-            프로필 보기
-          </button>
+          <Link href={`/profile/${user?.id}`}>
+            <a className="px-1.5 py-2 text-xs rounded-md bg-gray-100">
+              프로필 보기
+            </a>
+          </Link>
         </div>
 
         <div className=" flex flex-col justify-between items-center gap-3 w-full mb-3 p-3 border-[1.5px]  rounded-md">
