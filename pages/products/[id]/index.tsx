@@ -147,7 +147,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                   <p className="text-sm font-semibold text-gray-700">
                     {product?.user?.name}
                   </p>
-                  <Link href={`/users/profiles/${product?.user?.id}`}>
+                  <Link href={`/profile/${product?.user?.id}`}>
                     <a className="text-xs font-medium text-gray-500">
                       프로필 보기
                     </a>

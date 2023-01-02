@@ -44,14 +44,6 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
       }
     }
 
-    console.log({
-      ...data,
-      latitude,
-      longitude,
-      image: photoIds,
-      postCategoryId: category.id,
-    });
-
     post({
       ...data,
       latitude,

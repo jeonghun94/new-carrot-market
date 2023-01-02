@@ -22,6 +22,9 @@ async function handler(
   await client.token.deleteMany({
     where: {
       userId: foundToken.userId,
+      NOT: {
+        payload: token,
+      },
     },
   });
   res.json({ ok: true, token: foundToken.payload });

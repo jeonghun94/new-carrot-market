@@ -11,7 +11,7 @@ export const convertTime = (value: string) => {
   );
   if (betweenTime < 1) return "방금 전";
   if (betweenTime < 60) {
-    return `${betweenTime}분전`;
+    return `${betweenTime}분 전`;
   }
 
   const betweenTimeHour = Math.floor(betweenTime / 60);

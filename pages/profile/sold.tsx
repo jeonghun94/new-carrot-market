@@ -10,7 +10,6 @@ import Layout from "@components/layout";
 import EmptyLayout from "@components/empty-layout";
 import ProductItems from "@components/product";
 import Link from "next/link";
-import useMutation from "@libs/client/useMutation";
 
 export interface ProductWithCount extends Product {
   _count: {
@@ -20,11 +19,12 @@ export interface ProductWithCount extends Product {
 }
 
 interface PageResponse {
+  isMe: boolean;
   profile: User;
   products: ProductWithCount[];
 }
 
-const Sold: NextPage<PageResponse> = ({ profile, products }) => {
+const Sold: NextPage<PageResponse> = ({ isMe, profile, products }) => {
   const [tabNumber, setTabNumber] = useState(0);
   const [items, setItems] = useState(products);
 
@@ -66,13 +66,19 @@ const Sold: NextPage<PageResponse> = ({ profile, products }) => {
   return (
     <Layout canGoBack>
       <div className="flex justify-between items-center mt-2 p-3 h-24">
-        <div className="flex flex-col items-start justify-between gap-2">
-          <p className="font-semibold text-xl">나의 판매내역</p>
-          <Link href={"/products/upload"}>
-            <a className="px-3 py-1 bg-gray-100 rounded-sm text-sm font-semibold">
-              글쓰기
-            </a>
-          </Link>
+        <div className="flex flex-col items-start justify-between gap-2 font-semibold text-xl">
+          {isMe ? (
+            <>
+              <p>나의 판매내역</p>
+              <Link href={"/products/upload"}>
+                <a className="px-3 py-1 bg-gray-100 rounded-sm text-sm font-semibold">
+                  글쓰기
+                </a>
+              </Link>
+            </>
+          ) : (
+            <p>{profile.name}님의 판매상품</p>
+          )}
         </div>
         <div className="flex items-center">
           <UserAvartar
@@ -125,8 +131,9 @@ export default Sold;
 
 export const getServerSideProps = withSsrSession(async function ({
   req,
+  query,
 }: NextPageContext) {
-  const userId = req?.session?.user?.id;
+  const userId = query.id ? Number(query.id) : req?.session?.user?.id;
 
   const profile = await client.user.findUnique({
     where: { id: userId },
@@ -155,6 +162,7 @@ export const getServerSideProps = withSsrSession(async function ({
 
   return {
     props: {
+      isMe: query.id ? false : true,
       profile: JSON.parse(JSON.stringify(profile)),
       products: JSON.parse(JSON.stringify(products)),
     },
