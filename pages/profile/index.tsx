@@ -5,10 +5,10 @@ import useSWR, { SWRConfig } from "swr";
 import useUser from "@libs/client/useUser";
 import { cls } from "@libs/client/utils";
 import client from "@libs/server/client";
-import Layout from "@components/layout";
 import logo from "public/carrot-logo.png";
 import Image from "next/image";
 import Link from "next/link";
+import NewLayout from "@components/newLayout";
 
 interface ReviewWithUser extends Review {
   createdBy: User;
@@ -23,7 +23,7 @@ const Profile: NextPage = () => {
   const { user } = useUser();
   const { data } = useSWR<ReviewsResponse>("/api/reviews");
   return (
-    <Layout setting title="나의 당근" hasTabBar>
+    <NewLayout actionBar subTitle="나의 당근" settingBtn>
       <div className="mt-2 px-4">
         <div className="w-full flex justify-between items-center py-4 space-x-3">
           <div className="flex items-center gap-3">
@@ -284,7 +284,7 @@ const Profile: NextPage = () => {
           </div>
         ))}
       </div>
-    </Layout>
+    </NewLayout>
   );
 };
 

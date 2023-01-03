@@ -1,12 +1,11 @@
 import type { NextPage } from "next";
-import Button from "@components/button";
 import Input from "@components/input";
-import Layout from "@components/layout";
 import useUser from "@libs/client/useUser";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import useMutation from "@libs/client/useMutation";
 import Image from "next/image";
+import NewLayout from "@components/newLayout";
 
 interface EditProfileForm {
   email?: string;
@@ -87,60 +86,72 @@ const EditProfile: NextPage = () => {
       setAvatarPreview(URL.createObjectURL(file));
     }
   }, [avatar]);
+
+  const B = () => {
+    return (
+      <>
+        <button className="text-gray-500">
+          {loading ? "Loading..." : "완료"}
+        </button>
+      </>
+    );
+  };
   return (
-    <Layout canGoBack title="프로필 수정">
-      <form onSubmit={handleSubmit(onValid)} className="py-10 px-4 space-y-4">
-        <div className="flex justify-center items-center">
-          {avatarPreview ? (
-            <Image
-              src={avatarPreview}
-              className="relative rounded-full"
-              width={100}
-              height={100}
-            />
-          ) : (
-            <div className="w-14 h-14 rounded-full bg-slate-500" />
-          )}
-          <label
-            htmlFor="picture"
-            className="relative -bottom-7 bg-white right-5 cursor-pointer p-1 border border-gray-300 rounded-full shadow-sm text-xs  text-gray-700"
-          >
-            <svg
-              className="w-5 h-5 text-gray-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z"
-                clipRule="evenodd"
+    <form onSubmit={handleSubmit(onValid)}>
+      <NewLayout actionBar backBtn title="프로필 수정" actionBtn={B()}>
+        <div className="py-10 px-4 space-y-4">
+          <div className="flex justify-center items-center">
+            {avatarPreview ? (
+              <Image
+                src={avatarPreview}
+                className="relative rounded-full"
+                width={100}
+                height={100}
               />
-            </svg>
-            <input
-              {...register("avatar")}
-              id="picture"
-              type="file"
-              className="hidden"
-              accept="image/*"
-            />
-          </label>
+            ) : (
+              <div className="w-14 h-14 rounded-full bg-slate-500" />
+            )}
+            <label
+              htmlFor="picture"
+              className="relative  -bottom-7 right-7 bg-white cursor-pointer p-1 border border-gray-300 rounded-full shadow-sm text-xs  text-gray-700"
+            >
+              <svg
+                className="w-5 h-5 text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <input
+                {...register("avatar")}
+                id="picture"
+                type="file"
+                className="hidden"
+                accept="image/*"
+              />
+            </label>
+          </div>
+          <Input
+            register={register("name")}
+            required={false}
+            label="닉네임"
+            name="name"
+            type="text"
+          />
+          {errors.formErrors ? (
+            <span className="my-2 text-orange-500 font-medium text-center block">
+              {errors.formErrors.message}
+            </span>
+          ) : null}
+          {/* <Button text={loading ? "Loading..." : "완료"} /> */}
         </div>
-        <Input
-          register={register("name")}
-          required={false}
-          label="닉네임"
-          name="name"
-          type="text"
-        />
-        {errors.formErrors ? (
-          <span className="my-2 text-orange-500 font-medium text-center block">
-            {errors.formErrors.message}
-          </span>
-        ) : null}
-        <Button text={loading ? "Loading..." : "완료"} />
-      </form>
-    </Layout>
+      </NewLayout>
+    </form>
   );
 };
 

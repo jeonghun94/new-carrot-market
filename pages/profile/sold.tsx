@@ -6,10 +6,10 @@ import { useState } from "react";
 
 import UserAvartar from "@components/user-avatar";
 import TabMenus from "@components/tab-menus";
-import Layout from "@components/layout";
 import EmptyLayout from "@components/empty-layout";
 import ProductItems from "@components/product";
 import Link from "next/link";
+import NewLayout from "@components/newLayout";
 
 export interface ProductWithCount extends Product {
   _count: {
@@ -64,7 +64,7 @@ const Sold: NextPage<PageResponse> = ({ isMe, profile, products }) => {
   ];
 
   return (
-    <Layout canGoBack>
+    <NewLayout actionBar backBtn>
       <div className="flex justify-between items-center mt-2 p-3 h-24">
         <div className="flex flex-col items-start justify-between gap-2 font-semibold text-xl">
           {isMe ? (
@@ -123,7 +123,7 @@ const Sold: NextPage<PageResponse> = ({ isMe, profile, products }) => {
           </div>
         );
       })}
-    </Layout>
+    </NewLayout>
   );
 };
 

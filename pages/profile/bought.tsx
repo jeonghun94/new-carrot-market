@@ -1,12 +1,12 @@
 import type { NextPage } from "next";
-import Layout from "@components/layout";
 import ProductList from "@components/product-list";
+import NewLayout from "@components/newLayout";
 
 const Bought: NextPage = () => {
   return (
-    <Layout title="구매내역" canGoBack>
+    <NewLayout actionBar backBtn title="구매내역">
       <ProductList kind="purchases" />
-    </Layout>
+    </NewLayout>
   );
 };
 

@@ -7,6 +7,7 @@ import { useState } from "react";
 import client from "@libs/server/client";
 import EmptyLayout from "@components/empty-layout";
 import Layout from "@components/layout";
+import NewLayout from "@components/newLayout";
 
 interface PostWithCategory extends Post {
   postCategory: PostCategory;
@@ -59,7 +60,7 @@ const History: NextPage<PageResponse> = ({ posts, answers }) => {
   };
 
   return (
-    <Layout canGoBack title="내 글 목록">
+    <NewLayout actionBar backBtn title="내 글 목록">
       <div className="flex flex-wrap ">
         <div className="w-full ">
           <ul
@@ -151,7 +152,7 @@ const History: NextPage<PageResponse> = ({ posts, answers }) => {
           )}
         </div>
       </div>
-    </Layout>
+    </NewLayout>
   );
 };
 

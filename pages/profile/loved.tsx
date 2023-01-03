@@ -1,12 +1,12 @@
 import type { NextPage } from "next";
-import Layout from "@components/layout";
 import ProductList from "@components/product-list";
+import NewLayout from "@components/newLayout";
 
 const Loved: NextPage = () => {
   return (
-    <Layout title="관심목록" canGoBack>
+    <NewLayout actionBar backBtn title="관심목록">
       <ProductList kind="favs" />
-    </Layout>
+    </NewLayout>
   );
 };
 

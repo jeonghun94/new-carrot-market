@@ -2,11 +2,11 @@ import type { NextPage, NextPageContext } from "next";
 import { withSsrSession } from "@libs/server/withSession";
 import { Review, Token, User } from "@prisma/client";
 import client from "@libs/server/client";
-import Layout from "@components/layout";
 import UserAvartar from "@components/user-avatar";
 import Link from "next/link";
 import { convertTime } from "@libs/client/utils";
 import { useRouter } from "next/router";
+import NewLayout from "@components/newLayout";
 
 interface UserWithIsMe extends User {
   isMe: boolean;
@@ -28,7 +28,7 @@ const UserProfile: NextPage<PageResponse> = ({ profile }) => {
   const router = useRouter();
 
   return (
-    <Layout canGoBack title="프로필">
+    <NewLayout actionBar backBtn title="프로필">
       <div className="mt-2">
         <div className="space-y-3 p-3">
           <div className="flex items-center gap-3">
@@ -239,7 +239,7 @@ const UserProfile: NextPage<PageResponse> = ({ profile }) => {
           </div>
         </div>
       </div>
-    </Layout>
+    </NewLayout>
   );
 };
 
