@@ -13,7 +13,7 @@ const IndexPage: NextPage = () => {
       </div>
       <div className="p-2">
         <p className="p-2 text-sm text-center">
-          현재 내 동네로 설정되어 있는 동네에서만 동네인증을 할 수 있어요. 현재
+          현재 내 동네로 설정되어 있는 동네서만 동네인증을 할 수 있어요. 현재
           위치를 확인해 주세요.
         </p>
         <button className="w-full mt-2 p-2 text-center text-sm font-semibold rounded-md border">
