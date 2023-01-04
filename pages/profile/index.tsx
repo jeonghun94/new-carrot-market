@@ -3,7 +3,6 @@ import { withSsrSession } from "@libs/server/withSession";
 import { Review, User } from "@prisma/client";
 import useSWR, { SWRConfig } from "swr";
 import useUser from "@libs/client/useUser";
-import { cls } from "@libs/client/utils";
 import client from "@libs/server/client";
 import logo from "public/carrot-logo.png";
 import Image from "next/image";
@@ -23,7 +22,7 @@ const Profile: NextPage = () => {
   const { user } = useUser();
   const { data } = useSWR<ReviewsResponse>("/api/reviews");
   return (
-    <NewLayout actionBar subTitle="나의 당근" settingBtn>
+    <NewLayout actionBar backBtn subTitle="나의 당근" settingBtn>
       <div className="mt-2 px-4">
         <div className="w-full flex justify-between items-center py-4 space-x-3">
           <div className="flex items-center gap-3">
@@ -203,7 +202,7 @@ const Profile: NextPage = () => {
           </div>
         </div>
 
-        <div className="mb-3 pb-3 border-b">
+        <div className="mb-3 pb-3">
           <div className="py-1 text-md font-semibold">기타</div>
           <div className="py-3 flex items-center gap-3 cursor-pointer">
             <svg
@@ -226,9 +225,11 @@ const Profile: NextPage = () => {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               ></path>
             </svg>
-            <div className="font-normal">내 동네 설정</div>
+            <Link href={"/profile/map"}>
+              <div className="font-normal">내 동네 설정</div>
+            </Link>
           </div>
-          <Link href={"/profile/loved"}>
+          {/* <Link href={"/profile/loved"}>
             <div className="py-3 flex items-center gap-3 cursor-pointer">
               <svg
                 className="w-6 h-6"
@@ -246,7 +247,7 @@ const Profile: NextPage = () => {
               </svg>
               <div className="font-normal">동네 인증하기</div>
             </div>
-          </Link>
+          </Link> */}
         </div>
       </div>
     </NewLayout>
