@@ -17,6 +17,8 @@ interface ProductProps {
   isLoved?: boolean;
   state?: string;
   setItems: (value: ProductWithCount[]) => void;
+  border?: boolean;
+  etcBtn?: boolean;
 }
 
 interface PageResponse {
@@ -36,6 +38,8 @@ export default function Product({
   isLoved,
   state,
   setItems,
+  border,
+  etcBtn,
 }: ProductProps) {
   const [stateUpdate, { data, loading }] = useMutation<PageResponse>(
     `/api/products/${id}/state`
@@ -108,7 +112,7 @@ export default function Product({
     <>
       <Link href={`/products/${id}`}>
         <a>
-          <div className="flex gap-1 p-3">
+          <div className={`flex gap-1 p-3 ${border ? "border-b" : ""}`}>
             <div className="flex justify-start items-center w-1/5">
               <ProductImage url={image} width={200} height={200} />
             </div>
@@ -116,20 +120,22 @@ export default function Product({
               <div className="flex justify-between">
                 <p>{name}</p>
                 <div className="flex items-center">
-                  <svg
-                    className="w-4 h-4 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                    />
-                  </svg>
+                  {etcBtn && (
+                    <svg
+                      className="w-4 h-4 text-gray-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                      />
+                    </svg>
+                  )}
                   {isLoved && (
                     <svg
                       className="w-4 h-4 text-orange-500"

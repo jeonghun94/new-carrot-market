@@ -30,6 +30,7 @@ async function handler(
       createdAt: "desc",
     },
   });
+  console.log(favs);
   res.json({
     ok: true,
     favs,

@@ -1,8 +1,7 @@
-import { convertTime } from "@libs/client/utils";
 import { ProductWithCount } from "pages";
 import useSWR from "swr";
 import EmptyLayout from "./empty-layout";
-import Item from "./item";
+import Product from "./product";
 
 interface ProductListProps {
   kind: "favs" | "sales" | "purchases";
@@ -42,16 +41,18 @@ export default function ProductList({ kind }: ProductListProps) {
   return data && data[kind].length > 0 ? (
     <div className="mt-2 space-y-5 divide-y">
       {data[kind]?.map((record) => (
-        <Item
+        <Product
           key={record.id}
           id={record.product.id}
-          title={record.product.name}
+          image={record.product.image}
+          name={record.product.name}
           price={record.product.price}
-          hearts={record.product._count.favs}
-          image={record.product?.image}
-          state={record.product.state}
-          createdAt={convertTime(record.product.createdAt.toString())}
+          createdAt={record.product.createdAt.toString()}
+          favs={record.product._count.favs}
           chats={record.product._count.chats}
+          state={record.product.state}
+          setItems={() => console.log("setItems")}
+          border
         />
       ))}
     </div>

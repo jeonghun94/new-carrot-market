@@ -28,11 +28,72 @@ const Sold: NextPage<PageResponse> = ({ isMe, profile, products }) => {
   const [tabNumber, setTabNumber] = useState(0);
   const [items, setItems] = useState(products);
 
+  console.log(isMe);
+
   const saleProducts = items.filter(
     (product) => product.state === "Sale" || product.state === "Reservation"
   );
   const soldProducts = items.filter((product) => product.state === "Completed");
   const hideProducts = items.filter((product) => product.state === "Hide");
+
+  const data = {
+    myMenu: [
+      {
+        name: `판매중 ${saleProducts.length > 0 ? saleProducts.length : ""}`,
+      },
+      {
+        name: `거래완료 ${soldProducts.length > 0 ? soldProducts.length : ""}`,
+      },
+      {
+        name: `숨김 ${hideProducts.length > 0 ? hideProducts.length : ""}`,
+      },
+    ],
+    myValue: [
+      {
+        products: items.filter(
+          (product) =>
+            product.state === "Sale" || product.state === "Reservation"
+        ),
+        comment: "판매중인",
+      },
+      {
+        products: items.filter((product) => product.state === "Completed"),
+        comment: "거래완료",
+      },
+      {
+        products: items.filter((product) => product.state === "Hide"),
+        comment: "숨기기한",
+      },
+    ],
+
+    guestMenu: [
+      {
+        name: `전체 ${products.length > 0 ? products.length : ""}`,
+      },
+      {
+        name: `거래중 ${saleProducts.length > 0 ? saleProducts.length : ""}`,
+      },
+      {
+        name: `거래완료 ${soldProducts.length > 0 ? soldProducts.length : ""}`,
+      },
+    ],
+    guestValue: [
+      {
+        products: items,
+      },
+      {
+        products: items.filter(
+          (product) =>
+            product.state === "Sale" || product.state === "Reservation"
+        ),
+        comment: "판매중인",
+      },
+      {
+        products: items.filter((product) => product.state === "Completed"),
+        comment: "거래완료",
+      },
+    ],
+  };
 
   const menus = [
     {
@@ -90,39 +151,69 @@ const Sold: NextPage<PageResponse> = ({ isMe, profile, products }) => {
       </div>
 
       <TabMenus
-        menus={menus}
+        menus={isMe ? data.myMenu : data.guestMenu}
         tabNumber={tabNumber}
         setTabNumber={setTabNumber}
       />
 
-      {values.map((data, index) => {
-        return (
-          <div key={index}>
-            {tabNumber === index && data.products.length > 0
-              ? data.products.map((product, index) => (
-                  <ProductItems
-                    key={index}
-                    id={product.id}
-                    image={product.image}
-                    name={product.name}
-                    createdAt={product.createdAt.toString()}
-                    price={product.price}
-                    isSoldTab
-                    chats={product._count.chats}
-                    favs={product._count.favs}
-                    state={product.state}
-                    setItems={setItems}
-                  />
-                ))
-              : tabNumber === index && (
-                  <EmptyLayout
-                    comment={`${data.comment} 게시글이 없어요.`}
-                    color="bg-gray-100"
-                  />
-                )}
-          </div>
-        );
-      })}
+      {isMe
+        ? data.myValue.map((data, index) => {
+            return (
+              <div key={index}>
+                {tabNumber === index && data.products.length > 0
+                  ? data.products.map((product, index) => (
+                      <ProductItems
+                        key={index}
+                        id={product.id}
+                        image={product.image}
+                        name={product.name}
+                        createdAt={product.createdAt.toString()}
+                        price={product.price}
+                        isSoldTab
+                        chats={product._count.chats}
+                        favs={product._count.favs}
+                        state={product.state}
+                        setItems={setItems}
+                        etcBtn
+                      />
+                    ))
+                  : tabNumber === index && (
+                      <EmptyLayout
+                        comment={`${data.comment} 게시글이 없어요.`}
+                        color="bg-gray-100"
+                      />
+                    )}
+              </div>
+            );
+          })
+        : data.guestValue.map((data, index) => {
+            return (
+              <div key={index}>
+                {tabNumber === index && data.products.length > 0
+                  ? data.products.map((product, index) => (
+                      <ProductItems
+                        key={index}
+                        id={product.id}
+                        image={product.image}
+                        name={product.name}
+                        createdAt={product.createdAt.toString()}
+                        price={product.price}
+                        chats={product._count.chats}
+                        favs={product._count.favs}
+                        state={product.state}
+                        setItems={setItems}
+                        border
+                      />
+                    ))
+                  : tabNumber === index && (
+                      <EmptyLayout
+                        comment={`${data.comment} 게시글이 없어요.`}
+                        color="bg-gray-100"
+                      />
+                    )}
+              </div>
+            );
+          })}
     </NewLayout>
   );
 };
