@@ -11,6 +11,7 @@
   "dependencies": {
     "@prisma/client": "^4.2.1",
     "@sendgrid/mail": "^7.7.0",
+    "@types/navermaps": "^3.6.1",
     "autoprefixer": "^10.4.8",
     "dayjs": "^1.11.5",
     "gray-matter": "^4.0.3",
