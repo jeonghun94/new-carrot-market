@@ -7,8 +7,12 @@ interface ProfileResponse {
   ok: boolean;
   profile: User;
 }
+interface UseUserProps {
+  user: User;
+  isLoading: boolean;
+}
 
-export default function useUser() {
+export default function useUser(): UseUserProps {
   const { data, error } = useSWR<ProfileResponse>("/api/users/me");
   const router = useRouter();
   useEffect(() => {
@@ -16,5 +20,8 @@ export default function useUser() {
       router.push("/login");
     }
   }, [data, router]);
-  return { user: data?.profile, isLoading: !data && !error };
+
+  const user = Object(data?.profile);
+
+  return { user, isLoading: !data && !error };
 }

@@ -19,6 +19,9 @@ model User {
   name            String
   avatar          String?
   temperature     Float?
+  latitude        Float?
+  longitude       Float?
+  address         String?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   tokens          Token[]

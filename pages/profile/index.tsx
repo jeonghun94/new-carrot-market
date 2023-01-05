@@ -226,7 +226,7 @@ const Profile: NextPage = () => {
               ></path>
             </svg>
             <Link href={"/profile/map"}>
-              <div className="font-normal">내 동네 설정</div>
+              <div className="font-normal">내 동네 인증</div>
             </Link>
           </div>
           {/* <Link href={"/profile/loved"}>
