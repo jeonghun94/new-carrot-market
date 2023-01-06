@@ -7,7 +7,7 @@ import useMutation from "@libs/client/useMutation";
 import { useRouter } from "next/router";
 
 const IndexPage: NextPage = () => {
-  const [location, { data, loading }] = useMutation("/api/users/me/location");
+  const [location, { data }] = useMutation("/api/users/me/location");
   const router = useRouter();
 
   const {
@@ -18,34 +18,32 @@ const IndexPage: NextPage = () => {
     },
   } = useUser();
 
+  // useEffect(() => {
+  //   if (userLongitude !== undefined) {
+  //     fetch(
+  //       `https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${userLongitude}&y=${userLatitude}}`,
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           Authorization: "KakaoAK ac6a4a66be3e449810b96547a19fbefa",
+  //           "Content-type": "application/json",
+  //         },
+  //       }
+  //     )
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         console.log(data, "data");
+  //         const regionAddress = data?.documents[0]?.address.region_3depth_name;
+  //         console.log(regionAddress, "regionAddress");
+  //       });
+  //   }
+  // }, []);
+
   const { myLocation } = useMap({
     userLatitude: Number(userLatitude),
     userLongitude: Number(userLongitude),
     userAddress: userAddress + "",
   });
-
-  useEffect(() => {
-    if (typeof myLocation !== "string") {
-      const position = new naver.maps.LatLng(
-        myLocation.latitude,
-        myLocation.longitude
-      );
-
-      const map = new naver.maps.Map("map", {
-        center: position,
-        zoom: 18,
-      });
-
-      const marker = new naver.maps.Marker({
-        position: position,
-        map: map,
-      });
-
-      // naver.maps.Event.addListener(map, "click", function (e) {
-      //   marker.setPosition(e.coord);
-      // });
-    }
-  }, [myLocation]);
 
   const handleOnClick = () => {
     if (confirm("현재 위치를 동네로 설정하시겠습니까?")) {

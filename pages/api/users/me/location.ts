@@ -23,9 +23,6 @@ async function handler(
     },
   });
 
-  console.log(user?.id, "user");
-  console.log(myLocation, "myLocation");
-
   res.json({
     ok: true,
   });
