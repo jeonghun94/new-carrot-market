@@ -58,7 +58,7 @@ export default function MenuBar() {
           <span>동네생활</span>
         </a>
       </Link>
-      <Link href="/streams">
+      {/* <Link href="/streams">
         <a
           className={cls(
             "flex flex-col items-center space-y-2 ",
@@ -83,7 +83,7 @@ export default function MenuBar() {
           </svg>
           <span>라이브</span>
         </a>
-      </Link>
+      </Link> */}
       <Link href="/chats">
         <a
           className={cls(
