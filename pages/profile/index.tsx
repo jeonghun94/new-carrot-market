@@ -271,6 +271,14 @@ const Page: NextPage<{ profile: User }> = ({ profile }) => {
 export const getServerSideProps = withSsrSession(async function ({
   req,
 }: NextPageContext) {
+  if (!req?.session.user) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
   const profile = await client.user.findUnique({
     where: { id: req?.session.user?.id },
   });
