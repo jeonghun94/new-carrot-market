@@ -1,10 +1,12 @@
 import type { NextPage } from "next";
-import FloatingButton from "@components/floating-button";
+import FloatingButton from "@components/buttons/floating-button";
 import Item from "@components/item";
-import Layout from "@components/layout";
 import useSWR from "swr";
 import { Product } from "@prisma/client";
 import { convertTime } from "@libs/client/utils";
+import NewLayout from "@components/newLayout";
+import ProductItems from "@components/product";
+import { useState } from "react";
 
 export interface ProductWithCount extends Product {
   _count: {
@@ -20,22 +22,23 @@ interface ProductResponse {
 
 const Home: NextPage = () => {
   const { data } = useSWR<ProductResponse>("/api/products");
-
+  const [items, setItems] = useState(data?.products);
   return (
-    <Layout title="홈" hasTabBar seoTitle="Home">
-      <div className="flex flex-col space-y-5 divide-y">
+    <NewLayout actionBar title="홈" menuBar seoTitle="Home">
+      <div className="flex flex-col  divide-y">
         {data?.products?.map((product, index) => (
           <div key={index}>
-            <Item
+            <ProductItems
               key={product.id}
               id={product.id}
-              title={product.name}
-              price={product.price}
-              hearts={product._count.favs}
               image={product.image}
-              state={product.state}
-              createdAt={convertTime(product.createdAt.toString())}
+              name={product.name}
+              createdAt={product.createdAt.toString()}
+              price={product.price}
               chats={product._count.chats}
+              favs={product._count.favs}
+              state={product.state}
+              setItems={setItems}
             />
           </div>
         ))}
@@ -57,7 +60,7 @@ const Home: NextPage = () => {
           </svg>
         </FloatingButton>
       </div>
-    </Layout>
+    </NewLayout>
   );
 };
 

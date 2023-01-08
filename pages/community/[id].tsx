@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import client from "@libs/server/client";
 import useUser from "@libs/client/useUser";
+import NewLayout from "@components/newLayout";
 
 interface AnswerWithUser extends Answer {
   user: User;
@@ -152,7 +153,7 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
   }, [answerData, reset, mutate]);
 
   return (
-    <Layout canGoBack>
+    <NewLayout actionBar backBtn homeBtn>
       <span className="inline-flex  ml-4 items-center px-2.5 py-1 mt-5 mb-2 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
         {post.postCategory.name}
       </span>
@@ -419,7 +420,7 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
           )}
         </form>
       </div>
-    </Layout>
+    </NewLayout>
   );
 };
 

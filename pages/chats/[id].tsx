@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import Image from "next/image";
 import { convertPrice } from "@libs/client/utils";
+import NewLayout from "@components/newLayout";
 dayjs.locale("ko");
 
 interface ChatWithUser extends Chat {
@@ -49,7 +50,7 @@ const ChatDetail: NextPage<ChatResponse> = ({ chats, product }) => {
   };
 
   return (
-    <Layout canGoBack title={<CustomTitle />}>
+    <NewLayout actionBar backBtn title={<CustomTitle />}>
       <div className="w-full border-b p-4 space-y-3">
         <div className="flex gap-3 w-full ">
           <Image
@@ -149,7 +150,7 @@ const ChatDetail: NextPage<ChatResponse> = ({ chats, product }) => {
           </div>
         </form>
       </div>
-    </Layout>
+    </NewLayout>
   );
 };
 

@@ -7,6 +7,7 @@ import { Post, PostCategory } from "@prisma/client";
 import { useRouter } from "next/router";
 import useCoords from "@libs/client/useCoords";
 import Image from "next/image";
+import NewLayout from "@components/newLayout";
 
 interface WriteForm {
   content: string;
@@ -97,40 +98,32 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
     }
   }, [photo]);
 
+  const actionBtn = () => {
+    return (
+      <>
+        <button
+          disabled={loading || category.id === 0 || !content}
+          className={
+            loading || category.id === 0 || !content
+              ? `text-gray-300 cursor-not-allowed`
+              : `text-orange-500 cursor-pointer`
+          }
+        >
+          {loading ? "Loading..." : "완료"}
+        </button>
+      </>
+    );
+  };
+
   return (
     <>
-      <Layout noActionBar>
-        <form onSubmit={handleSubmit(onValid)}>
-          <div className=" w-full h-14 flex justify-between items-center fixed top-0  text-lg font-medium text-gray-800  bg-white border-b px-5">
-            <button onClick={() => router.back()}>
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </button>
-            <span className="font-semibold">동네생활 글쓰기</span>
-            <button
-              disabled={loading || category.id === 0 || !content}
-              className={
-                loading || category.id === 0 || !content
-                  ? `text-gray-300 cursor-not-allowed`
-                  : `text-orange-500 cursor-pointer`
-              }
-            >
-              {loading ? "Loading..." : "완료"}
-            </button>
-          </div>
-
+      <form onSubmit={handleSubmit(onValid)}>
+        <NewLayout
+          actionBar
+          backBtn
+          title="동네생활 글쓰기"
+          actionBtn={actionBtn()}
+        >
           <div
             className="flex justify-between items-center w-full p-5 mt-2 border-b"
             onClick={fadeInOut}
@@ -234,8 +227,8 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
               rows={15}
             />
           </div>
-        </form>
-      </Layout>
+        </NewLayout>
+      </form>
       <div>
         {fade ? (
           <div

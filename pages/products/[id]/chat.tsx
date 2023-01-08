@@ -10,6 +10,7 @@ import useUser from "@libs/client/useUser";
 import Message from "@components/message";
 import Layout from "@components/layout";
 import Image from "next/image";
+import NewLayout from "@components/newLayout";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -127,7 +128,7 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat, purchaserId }) => {
   };
 
   return (
-    <Layout canGoBack title={<CustomTitle />}>
+    <NewLayout backBtn title={<CustomTitle />}>
       <div className="mt-1 ">
         <div
           className={data || chat.chatMessages.length > 0 ? "hidden" : "block"}
@@ -242,7 +243,7 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat, purchaserId }) => {
           </form>
         </div>
       </div>
-    </Layout>
+    </NewLayout>
   );
 };
 

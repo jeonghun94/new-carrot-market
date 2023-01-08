@@ -28,8 +28,6 @@ const Sold: NextPage<PageResponse> = ({ isMe, profile, products }) => {
   const [tabNumber, setTabNumber] = useState(0);
   const [items, setItems] = useState(products);
 
-  console.log(isMe);
-
   const saleProducts = items.filter(
     (product) => product.state === "Sale" || product.state === "Reservation"
   );
@@ -94,35 +92,6 @@ const Sold: NextPage<PageResponse> = ({ isMe, profile, products }) => {
       },
     ],
   };
-
-  const menus = [
-    {
-      name: `판매중 ${saleProducts.length > 0 ? saleProducts.length : ""}`,
-    },
-    {
-      name: `거래완료 ${soldProducts.length > 0 ? soldProducts.length : ""}`,
-    },
-    {
-      name: `숨김 ${hideProducts.length > 0 ? hideProducts.length : ""}`,
-    },
-  ];
-
-  const values = [
-    {
-      products: items.filter(
-        (product) => product.state === "Sale" || product.state === "Reservation"
-      ),
-      comment: "판매중인",
-    },
-    {
-      products: items.filter((product) => product.state === "Completed"),
-      comment: "거래완료",
-    },
-    {
-      products: items.filter((product) => product.state === "Hide"),
-      comment: "숨기기한",
-    },
-  ];
 
   return (
     <NewLayout actionBar backBtn>

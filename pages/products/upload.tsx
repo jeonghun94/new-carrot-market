@@ -7,6 +7,7 @@ import { Product } from "@prisma/client";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import client from "@libs/server/client";
+import NewLayout from "@components/newLayout";
 
 interface UploadProductForm {
   name: string;
@@ -117,69 +118,68 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
     }
   }, [photo]);
 
-  return (
-    <div>
-      <Layout noActionBar>
-        <form onSubmit={handleSubmit(onValid)}>
-          <div className=" w-full h-14 flex justify-between items-center fixed top-0 text-lg font-medium text-gray-800  bg-white border-b px-5">
-            <button onClick={() => router.back()}>
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </button>
-            <span className="font-semibold">중고거래 글쓰기</span>
-            <button className="text-orange-500">
-              {loading ? "Loading..." : "완료"}
-            </button>
-          </div>
+  const content = watch("description");
 
+  const actionBtn = () => {
+    return (
+      <>
+        <button
+          disabled={loading || category.id === 0 || !content}
+          className={
+            loading || category.id === 0 || !content
+              ? `text-gray-300 cursor-not-allowed`
+              : `text-orange-500 cursor-pointer`
+          }
+        >
+          {loading ? "Loading..." : "완료"}
+        </button>
+      </>
+    );
+  };
+
+  return (
+    <>
+      <form onSubmit={handleSubmit(onValid)}>
+        <NewLayout
+          actionBar
+          backBtn
+          title="중고거래 글쓰기"
+          actionBtn={actionBtn()}
+        >
           <div className="p-4">
             <div className="w-full mb-5 flex overflow-y-hidden">
-              <div>
-                <label className=" w-28 h-28 mt-2 cursor-pointer text-gray-600 flex items-center justify-center border border-gray-300 rounded-md">
-                  <div className="flex flex-col justify-center items-center gap-1">
-                    <svg
-                      className="w-8 h-8"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                      ></path>
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                      ></path>
-                    </svg>
-                    <p>{photos}/10</p>
-                  </div>
-                  <input
-                    {...register("photo")}
-                    multiple
-                    accept="image/*"
-                    className="hidden"
-                    type="file"
-                  />
-                </label>
-              </div>
+              <label className=" w-28 h-28 mt-2 cursor-pointer text-gray-600 flex items-center justify-center border border-gray-300 rounded-md">
+                <div className="flex flex-col justify-center items-center gap-1">
+                  <svg
+                    className="w-8 h-8"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                    ></path>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    ></path>
+                  </svg>
+                  <p>{photos}/10</p>
+                </div>
+                <input
+                  {...register("photo")}
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  type="file"
+                />
+              </label>
               {photoPreview ? (
                 <div className="flex mt-2 items-center ml-3 gap-3">
                   {photoPreview.split(",").map((photo, idx) => (
@@ -345,8 +345,8 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
               />
             </div>
           </div>
-        </form>
-      </Layout>
+        </NewLayout>
+      </form>
       <div>
         {fade ? (
           <div className="fixed top-0 left-0 w-full h-full overflow-y-scroll bg-white z-10">
@@ -414,7 +414,7 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
           </div>
         ) : null}
       </div>
-    </div>
+    </>
   );
 };
 

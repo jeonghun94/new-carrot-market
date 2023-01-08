@@ -8,6 +8,7 @@ import Layout from "@components/layout";
 import client from "@libs/server/client";
 import useUser from "@libs/client/useUser";
 import Image from "next/image";
+import NewLayout from "@components/newLayout";
 
 interface ChatWithUserProduct extends Chat {
   seller: User;
@@ -31,7 +32,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
     });
   };
   return (
-    <Layout hasTabBar title={`채팅`}>
+    <NewLayout actionBar title="채팅" menuBar>
       {productChats.length > 0 ? (
         productChats.map((productChat, i) =>
           productChat.chatMessages.length > 0 ? (
@@ -99,7 +100,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
           <p>참여 중인 채팅이 없습니다.</p>
         </div>
       )}
-    </Layout>
+    </NewLayout>
   );
 };
 

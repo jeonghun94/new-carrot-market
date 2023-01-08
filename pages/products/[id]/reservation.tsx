@@ -9,6 +9,7 @@ import useUser from "@libs/client/useUser";
 import Image from "next/image";
 import { convertTime } from "@libs/client/utils";
 import { useState } from "react";
+import NewLayout from "@components/newLayout";
 
 interface ChatResponse extends Chat {
   purchaser: User;
@@ -43,7 +44,7 @@ const Reservation: NextPage<PageResponse> = ({ product, productChat }) => {
   const hasChat = productChat.length > 0;
 
   return (
-    <Layout canGoBack seoTitle={`${product.name}`} title="예약자 선택">
+    <NewLayout backBtn seoTitle={`${product.name}`} title="예약자 선택">
       <div className="h-screen -mb-10">
         <div className="flex justify-start items-center h-0.5/4 p-4 space-x-3 bg-gray-100 mt-2">
           <Image
@@ -128,7 +129,7 @@ const Reservation: NextPage<PageResponse> = ({ product, productChat }) => {
           </button>
         </div>
       </div>
-    </Layout>
+    </NewLayout>
   );
 };
 

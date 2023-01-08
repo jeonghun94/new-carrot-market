@@ -19,6 +19,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
+import NewLayout from "@components/newLayout";
 
 SwiperCore.use([Navigation, Pagination]);
 
@@ -107,7 +108,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
 
   return !popup ? (
     <div className="mb-24">
-      <Layout canGoBack seoTitle={`${product.name}`}>
+      <NewLayout actionBar backBtn seoTitle={`${product.name}`}>
         <Swiper
           spaceBetween={0}
           slidesPerView={1}
@@ -346,10 +347,15 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
             </div>
           </div>
         </div>
-      </Layout>
+      </NewLayout>
     </div>
   ) : (
-    <Layout canGoBack seoTitle={`${product.name}`} title="예약자 선택">
+    <NewLayout
+      actionBar
+      backBtn
+      title="예약자 선택"
+      seoTitle={`${product.name}`}
+    >
       <div className="h-screen -mb-10">
         <div className="flex justify-start items-center h-0.5/4 p-4 space-x-3 bg-gray-100 mt-2">
           <Image
@@ -433,7 +439,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
           </button>
         </div>
       </div>
-    </Layout>
+    </NewLayout>
   );
 };
 
