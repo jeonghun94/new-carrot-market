@@ -1,13 +1,30 @@
-import { NextRequest, NextResponse, userAgent } from "next/server";
-export function middleware(req: NextRequest) {
-  const ua = userAgent(req);
+import { getIronSession } from "iron-session/edge";
+import {
+  NextFetchEvent,
+  NextRequest,
+  NextResponse,
+  userAgent,
+} from "next/server";
 
-  //   console.log(ua);
-  // if (!ua.isBot) {
-  //   return NextResponse.json({ message: "Auth required" }, { status: 401 });
-  // }
+export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
+  const res = NextResponse.next();
+  const session = await getIronSession(req, res, {
+    cookieName: "carrotsession",
+    password: process.env.COOKIE_PASSWORD!,
+    cookieOptions: {
+      secure: process.env.NODE_ENV! === "production", // if you are using https
+    },
+  });
 
-  // if (req.url.includes("community") && req.cookies.get("carrotsession")) {
-  //   return NextResponse.redirect(`${req.nextUrl.origin}/`);
-  // }
-}
+  console.log("middleware", session.user, "미들웨어");
+
+  if (!session.user && !req.url.includes("/login")) {
+    // req.nextUrl.searchParams.set("from", "");
+    req.nextUrl.pathname = "/login";
+    return NextResponse.redirect(req.nextUrl);
+  }
+};
+
+export const config = {
+  matcher: ["/profile", "/chats"],
+};
