@@ -54,6 +54,7 @@ const ChatDetail: NextPage<ChatResponse> = ({ chats, product }) => {
       <div className="w-full border-b p-4 space-y-3">
         <div className="flex gap-3 w-full ">
           <Image
+            alt={`${product?.name}`}
             width={48}
             height={48}
             src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${

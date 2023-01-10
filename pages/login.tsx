@@ -8,7 +8,12 @@ const Home: NextPage = () => {
     <div>
       <div className="flex flex-col justify-center items-center w-full h-screen dark:bg-gray-700">
         <div className="mb-2 -mt-20">
-          <Image src={logo} width={84} height={108}></Image>
+          <Image
+            alt="이미지를 불러올 수 없습니다:("
+            src={logo}
+            width={84}
+            height={108}
+          />
         </div>
         <h1 className="text-xl font-semibold py-3 dark:text-white">
           당신 근처의 당근마켓

@@ -15,6 +15,7 @@ export default function ProductImage({
   return (
     <>
       <Image
+        alt="이미지를 불러올 수 없습니다:("
         width={width}
         height={height}
         src={

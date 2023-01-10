@@ -148,6 +148,7 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat, purchaserId }) => {
         <div className="w-full sticky top-12 mt-2 z-10 bg-white border-b p-4 space-y-3">
           <div className=" flex gap-3 w-full ">
             <Image
+              alt="이미지를 불러올 수 없습니다:("
               width={48}
               height={48}
               src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${

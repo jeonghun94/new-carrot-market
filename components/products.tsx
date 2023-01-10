@@ -68,6 +68,7 @@ export default function Products({
                 onClick={() => router.push(`/products/${product.id}`)}
               >
                 <Image
+                  alt="이미지를 불러올 수 없습니다:("
                   width={340}
                   height={270}
                   src={

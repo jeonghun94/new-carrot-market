@@ -34,6 +34,7 @@ const Profile: NextPage = () => {
           <div className="flex items-center gap-3">
             {user?.avatar ? (
               <Image
+                alt="이미지를 불러올 수 없습니다:("
                 src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${user?.avatar}/avatar`}
                 className="w-16 h-16 bg-slate-500 rounded-full"
                 width={40}
@@ -59,7 +60,12 @@ const Profile: NextPage = () => {
           <div className="flex justify-between w-full">
             <div className="flex justify-between items-center gap-1 text-orange-500 font-extrabold">
               <div>
-                <Image src={logo} width={13} height={15}></Image>
+                <Image
+                  alt="이미지를 불러올 수 없습니다:("
+                  src={logo}
+                  width={13}
+                  height={15}
+                />
               </div>
               PAY
             </div>

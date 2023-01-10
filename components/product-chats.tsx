@@ -46,6 +46,7 @@ export default function ProductChats({
       <div className="h-screen -mb-10">
         <div className="flex justify-start items-center h-0.5/4 p-4 space-x-3 bg-gray-100 mt-2">
           <Image
+            alt="이미지를 불러올 수 없습니다:("
             className="rounded-md"
             src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${
               product.image.split(",")[0]
@@ -85,6 +86,7 @@ export default function ProductChats({
                 />
                 {chat.purchaser.avatar ? (
                   <Image
+                    alt="이미지를 불러올 수 없습니다:("
                     width={48}
                     height={48}
                     className="rounded-full"

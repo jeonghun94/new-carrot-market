@@ -28,6 +28,7 @@ export default function Message({
       {!reversed ? (
         avatarUrl ? (
           <Image
+            alt="이미지를 불러올 수 없습니다:("
             width={33}
             height={33}
             src={

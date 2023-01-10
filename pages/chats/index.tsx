@@ -45,6 +45,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
               <div className="w-full flex justify-between space-x-7">
                 <div className="flex justify-start items-center space-x-4">
                   <Image
+                    alt="이미지를 불러올 수 없습니다:("
                     width={48}
                     height={48}
                     src={
@@ -84,6 +85,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
                     </div>
                   ) : null}
                   <Image
+                    alt="이미지를 불러올 수 없습니다:("
                     width={52}
                     height={52}
                     src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${productChat?.product?.image}/public`}

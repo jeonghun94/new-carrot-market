@@ -29,6 +29,7 @@ export default function Item({
       <a className="flex px-4 pt-5 cursor-pointer justify-between">
         <div className="flex space-x-4 ">
           <Image
+            alt="이미지를 불러올 수 없습니다:("
             width={120}
             height={114}
             src={

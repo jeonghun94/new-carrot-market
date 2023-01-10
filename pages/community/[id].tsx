@@ -159,6 +159,7 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
       <div className="flex mb-3 px-4 cursor-pointer pb-3  border-b items-center space-x-3">
         {data?.post?.user?.avatar ? (
           <Image
+            alt="이미지를 불러올 수 없습니다:("
             src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${data?.post?.user?.avatar}/avatar`}
             className="w-10 h-10 bg-slate-500 rounded-full"
             width={30}
@@ -319,6 +320,7 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
                   <div className="w-1/12">
                     {answer.user?.avatar ? (
                       <Image
+                        alt="이미지를 불러올 수 없습니다:("
                         src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${answer.user?.avatar}/avatar`}
                         className="w-16 h-16 rounded-full "
                         width={40}

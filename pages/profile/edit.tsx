@@ -109,6 +109,7 @@ const EditProfile: NextPage = () => {
           <div className="flex justify-center items-center">
             {avatarPreview ? (
               <Image
+                alt="이미지를 불러올 수 없습니다:("
                 src={avatarPreview}
                 className="relative rounded-full"
                 width={100}

@@ -180,6 +180,7 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
                 {photoPreview.split(",").map((photo, idx) => (
                   <div className="w-20 h-20 mr-3 relative" key={idx}>
                     <Image
+                      alt="이미지를 불러올 수 없습니다:("
                       src={photo}
                       layout="fill"
                       objectFit="cover"
