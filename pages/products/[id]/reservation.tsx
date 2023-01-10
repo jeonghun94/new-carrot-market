@@ -6,7 +6,7 @@ import { withSsrSession } from "@libs/server/withSession";
 import Image from "next/image";
 import { convertTime } from "@libs/client/utils";
 import { useState } from "react";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 interface ChatResponse extends Chat {
   purchaser: User;
@@ -40,7 +40,7 @@ const Reservation: NextPage<PageResponse> = ({ product, productChat }) => {
   const hasChat = productChat.length > 0;
 
   return (
-    <NewLayout
+    <Layout
       seoTitle={`${product.name} 예약자 선택`}
       title="예약자 선택"
       actionBar
@@ -132,7 +132,7 @@ const Reservation: NextPage<PageResponse> = ({ product, productChat }) => {
           </button>
         </div>
       </div>
-    </NewLayout>
+    </Layout>
   );
 };
 

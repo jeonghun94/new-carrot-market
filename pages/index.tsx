@@ -3,8 +3,8 @@ import { withSsrSession } from "@libs/server/withSession";
 import FloatingButton from "@components/buttons/floating-button";
 import useSWR from "swr";
 import { Product } from "@prisma/client";
-import NewLayout from "@components/layouts/layout";
-import ProductItems from "@components/product";
+import Layout from "@components/layouts/layout";
+import ProductItems from "@components/product/index";
 import { useState } from "react";
 
 export interface ProductWithCount extends Product {
@@ -27,7 +27,7 @@ const Home: NextPage<HomeProps> = ({ isLogin }) => {
   const { data } = useSWR<ProductResponse>("/api/products");
   const [items, setItems] = useState(data?.products);
   return (
-    <NewLayout seoTitle="상품목록" actionBar title="홈" menuBar>
+    <Layout seoTitle="상품목록" actionBar title="홈" menuBar>
       <div className="flex flex-col  divide-y">
         {data?.products?.map((product, index) => (
           <div key={index}>
@@ -65,7 +65,7 @@ const Home: NextPage<HomeProps> = ({ isLogin }) => {
           </FloatingButton>
         )}
       </div>
-    </NewLayout>
+    </Layout>
   );
 };
 

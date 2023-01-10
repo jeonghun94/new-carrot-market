@@ -6,7 +6,7 @@ import UserAvartar from "@components/user/avatar";
 import Link from "next/link";
 import { convertTime } from "@libs/client/utils";
 import { useRouter } from "next/router";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 interface UserWithIsMe extends User {
   isMe: boolean;
@@ -28,7 +28,7 @@ const UserProfile: NextPage<PageResponse> = ({ profile }) => {
   const router = useRouter();
 
   return (
-    <NewLayout
+    <Layout
       seoTitle={`${profile.name}님의 프로필`}
       title="프로필"
       actionBar
@@ -244,7 +244,7 @@ const UserProfile: NextPage<PageResponse> = ({ profile }) => {
           </div>
         </div>
       </div>
-    </NewLayout>
+    </Layout>
   );
 };
 

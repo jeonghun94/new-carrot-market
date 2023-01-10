@@ -7,7 +7,7 @@ import client from "@libs/server/client";
 import logo from "public/carrot-logo.png";
 import Image from "next/image";
 import Link from "next/link";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 interface ReviewWithUser extends Review {
   createdBy: User;
@@ -22,13 +22,7 @@ const Profile: NextPage = () => {
   const { user } = useUser();
   const { data } = useSWR<ReviewsResponse>("/api/reviews");
   return (
-    <NewLayout
-      seoTitle="프로필"
-      subTitle="나의 당근"
-      actionBar
-      backBtn
-      settingBtn
-    >
+    <Layout seoTitle="프로필" subTitle="나의 당근" actionBar backBtn settingBtn>
       <div className="mt-2 px-4">
         <div className="w-full flex justify-between items-center py-4 space-x-3">
           <div className="flex items-center gap-3">
@@ -261,7 +255,7 @@ const Profile: NextPage = () => {
           </Link>
         </div>
       </div>
-    </NewLayout>
+    </Layout>
   );
 };
 

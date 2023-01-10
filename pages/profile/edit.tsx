@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import useMutation from "@libs/client/useMutation";
 import Image from "next/image";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 interface EditProfileForm {
   email?: string;
@@ -98,7 +98,7 @@ const EditProfile: NextPage = () => {
   };
   return (
     <form onSubmit={handleSubmit(onValid)}>
-      <NewLayout
+      <Layout
         seoTitle="프로필 수정"
         title="프로필 수정"
         actionBar
@@ -157,7 +157,7 @@ const EditProfile: NextPage = () => {
           ) : null}
           {/* <Button text={loading ? "Loading..." : "완료"} /> */}
         </div>
-      </NewLayout>
+      </Layout>
     </form>
   );
 };

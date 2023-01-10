@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import useUser from "@libs/client/useUser";
 import Message from "@components/message";
 import Image from "next/image";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -127,7 +127,7 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat, purchaserId }) => {
   };
 
   return (
-    <NewLayout
+    <Layout
       seoTitle={`${product.user.name}님 과(와) 채팅`}
       title={<CustomTitle />}
       actionBar
@@ -248,7 +248,7 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat, purchaserId }) => {
           </form>
         </div>
       </div>
-    </NewLayout>
+    </Layout>
   );
 };
 

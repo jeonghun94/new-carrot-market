@@ -6,7 +6,7 @@ import { Post, PostCategory } from "@prisma/client";
 import { useRouter } from "next/router";
 import useCoords from "@libs/client/useCoords";
 import Image from "next/image";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 interface WriteForm {
   content: string;
@@ -117,7 +117,7 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
   return (
     <>
       <form onSubmit={handleSubmit(onValid)}>
-        <NewLayout
+        <Layout
           seoTitle="글 쓰기"
           title="동네생활 글쓰기"
           actionBar
@@ -228,7 +228,7 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
               rows={15}
             />
           </div>
-        </NewLayout>
+        </Layout>
       </form>
       <div>
         {fade ? (

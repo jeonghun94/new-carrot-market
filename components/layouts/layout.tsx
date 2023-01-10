@@ -1,7 +1,7 @@
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 import Head from "next/head";
 import MenuBar from "@components/menus/bottom-tab";
-import { useRouter } from "next/router";
 
 interface LayoutProps {
   title?: string | React.ReactNode;
@@ -21,7 +21,7 @@ interface LayoutProps {
   settingBtn?: boolean;
 }
 
-const NewLayout: NextPage<LayoutProps> = ({
+const Layout: NextPage<LayoutProps> = ({
   title,
   seoTitle,
   subTitle,
@@ -179,4 +179,4 @@ const NewLayout: NextPage<LayoutProps> = ({
   );
 };
 
-export default NewLayout;
+export default Layout;

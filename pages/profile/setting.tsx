@@ -1,9 +1,9 @@
 import type { NextPage } from "next";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 const ProfileSetting: NextPage = () => {
   return (
-    <NewLayout seoTitle="설정" title="설정" actionBar backBtn>
+    <Layout seoTitle="설정" title="설정" actionBar backBtn>
       <div className="px-4 divide-y-[1px] cursor-pointer">
         <div className="space-y-5 pt-0.5 pb-5">
           <p className="mt-4 py-1 text-sm font-bold">알림 설정</p>
@@ -29,7 +29,7 @@ const ProfileSetting: NextPage = () => {
           <p>탈퇴하기</p>
         </div>
       </div>
-    </NewLayout>
+    </Layout>
   );
 };
 

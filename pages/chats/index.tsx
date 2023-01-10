@@ -7,7 +7,7 @@ import noImage from "public/no-image.png";
 import client from "@libs/server/client";
 import useUser from "@libs/client/useUser";
 import Image from "next/image";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 interface ChatWithUserProduct extends Chat {
   seller: User;
@@ -31,7 +31,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
     });
   };
   return (
-    <NewLayout seoTitle="채팅목록" title="채팅" actionBar menuBar>
+    <Layout seoTitle="채팅목록" title="채팅" actionBar menuBar>
       {productChats.length > 0 ? (
         productChats.map((productChat, i) =>
           productChat.chatMessages.length > 0 ? (
@@ -101,7 +101,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
           <p>참여 중인 채팅이 없습니다.</p>
         </div>
       )}
-    </NewLayout>
+    </Layout>
   );
 };
 

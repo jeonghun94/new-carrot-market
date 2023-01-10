@@ -6,7 +6,7 @@ import { Product } from "@prisma/client";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import client from "@libs/server/client";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 interface UploadProductForm {
   name: string;
@@ -139,7 +139,7 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
   return (
     <>
       <form onSubmit={handleSubmit(onValid)}>
-        <NewLayout
+        <Layout
           seoTitle="상품등록"
           title="중고거래 글쓰기"
           actionBar
@@ -346,7 +346,7 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
               />
             </div>
           </div>
-        </NewLayout>
+        </Layout>
       </form>
       <div>
         {fade ? (

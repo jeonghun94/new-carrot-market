@@ -1,7 +1,7 @@
 import { ProductWithCount } from "pages";
 import useSWR from "swr";
-import EmptyLayout from "./layouts/empty";
-import Product from "./product";
+import EmptyLayout from "../layouts/empty";
+import Product from "../product";
 
 interface ProductListProps {
   kind: "favs" | "sales" | "purchases";
@@ -32,7 +32,6 @@ export default function ProductList({ kind }: ProductListProps) {
         title: "관심",
       },
     ];
-
     return titles.find((item) => item.kind === kind)?.title;
   };
 

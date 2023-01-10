@@ -6,7 +6,7 @@ import useMutation from "@libs/client/useMutation";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import useUser from "@libs/client/useUser";
-import Products from "@components/products";
+import Products from "@components/products/index";
 import client from "@libs/server/client";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -17,7 +17,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
+import noImage from "../../../public/no-image.png";
 
 SwiperCore.use([Navigation, Pagination]);
 
@@ -106,7 +107,13 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
 
   return !popup ? (
     <div className="mb-24">
-      <NewLayout seoTitle={`${product.name}`} actionBar backBtn>
+      <Layout
+        seoTitle={`${product.name}`}
+        title={product.name}
+        actionBar
+        backBtn
+        homeBtn
+      >
         <Swiper
           spaceBetween={0}
           slidesPerView={1}
@@ -118,7 +125,11 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
               <Image
                 alt="이미지를 불러올 수 없습니다:("
                 key={index}
-                src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${img}/public`}
+                src={
+                  product.image
+                    ? `https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${img}/public`
+                    : noImage
+                }
                 className="bg-slate-300 object-cover"
                 layout="responsive"
                 width={560}
@@ -347,15 +358,10 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
             </div>
           </div>
         </div>
-      </NewLayout>
+      </Layout>
     </div>
   ) : (
-    <NewLayout
-      actionBar
-      backBtn
-      title="예약자 선택"
-      seoTitle={`${product.name}`}
-    >
+    <Layout actionBar backBtn title="예약자 선택" seoTitle={`${product.name}`}>
       <div className="h-screen -mb-10">
         <div className="flex justify-start items-center h-0.5/4 p-4 space-x-3 bg-gray-100 mt-2">
           <Image
@@ -441,7 +447,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
           </button>
         </div>
       </div>
-    </NewLayout>
+    </Layout>
   );
 };
 

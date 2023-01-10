@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import useMap from "@libs/client/useMap";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 import useUser from "@libs/client/useUser";
 import useMutation from "@libs/client/useMutation";
 import { useRouter } from "next/router";
@@ -55,7 +55,7 @@ const IndexPage: NextPage = () => {
   };
 
   return (
-    <NewLayout seoTitle="동네 인증" title="동네 인증하기" actionBar backBtn>
+    <Layout seoTitle="동네 인증" title="동네 인증하기" actionBar backBtn>
       <div className="w-full h-96" id="map"></div>
       <div className="p-3 bg-orange-500 text-white text-sm text-center">
         <p>
@@ -89,7 +89,7 @@ const IndexPage: NextPage = () => {
           </>
         )}
       </div>
-    </NewLayout>
+    </Layout>
   );
 };
 

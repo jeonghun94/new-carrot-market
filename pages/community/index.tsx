@@ -6,7 +6,7 @@ import Link from "next/link";
 import FloatingButton from "@components/buttons/floating-button";
 import { convertTime } from "@libs/client/utils";
 import Image from "next/image";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 interface PostWithUser extends Post {
   user: User;
@@ -48,7 +48,7 @@ const Community: NextPage<PostsResponse> = ({
   }, [category]);
 
   return (
-    <NewLayout seoTitle="동네생활" title="동네생활" actionBar menuBar>
+    <Layout seoTitle="동네생활" title="동네생활" actionBar menuBar>
       <div
         className={`w-full flex justify-start items-center px-3 pt-5 pb-3.5 gap-3 border-b overflow-auto overflow-x-visible md:justify-between lg:justify-center `}
       >
@@ -174,7 +174,7 @@ const Community: NextPage<PostsResponse> = ({
           </svg>
         </FloatingButton>
       </div>
-    </NewLayout>
+    </Layout>
   );
 };
 

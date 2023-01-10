@@ -1,12 +1,12 @@
 import { NextPage } from "next";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 const Test: NextPage = () => {
   const btn = () => {
     return <button className="text-md">완료</button>;
   };
   return (
-    <NewLayout
+    <Layout
       // linkBtn
       // homeBtn
       // backBtn
@@ -19,7 +19,7 @@ const Test: NextPage = () => {
       linkBtn
     >
       <div className="p-2">Test</div>
-    </NewLayout>
+    </Layout>
   );
 };
 

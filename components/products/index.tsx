@@ -1,10 +1,9 @@
+import React from "react";
+import { useRouter } from "next/router";
+import { Product } from "@prisma/client";
 import { convertPrice } from "@libs/client/utils";
 import noImage from "public/no-image.png";
-import { Product } from "@prisma/client";
 import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import React from "react";
 
 export default function Products({
   products,

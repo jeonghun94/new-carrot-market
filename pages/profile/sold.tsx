@@ -6,9 +6,9 @@ import { useState } from "react";
 import UserAvartar from "@components/user/avatar";
 import TabMenus from "@components/menus/nav-tab";
 import EmptyLayout from "@components/layouts/empty";
-import ProductItems from "@components/product";
+import ProductItems from "@components/product/index";
 import Link from "next/link";
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 
 export interface ProductWithCount extends Product {
   _count: {
@@ -93,7 +93,7 @@ const Sold: NextPage<PageResponse> = ({ isMe, profile, products }) => {
   };
 
   return (
-    <NewLayout seoTitle="판매내역" actionBar backBtn>
+    <Layout seoTitle="판매내역" actionBar backBtn>
       <div className="flex justify-between items-center mt-2 p-3 h-24">
         <div className="flex flex-col items-start justify-between gap-2 font-semibold text-xl">
           {isMe ? (
@@ -182,7 +182,7 @@ const Sold: NextPage<PageResponse> = ({ isMe, profile, products }) => {
               </div>
             );
           })}
-    </NewLayout>
+    </Layout>
   );
 };
 

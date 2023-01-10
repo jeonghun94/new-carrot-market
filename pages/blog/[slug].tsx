@@ -1,4 +1,4 @@
-import NewLayout from "@components/layouts/layout";
+import Layout from "@components/layouts/layout";
 import { readdirSync } from "fs";
 import matter from "gray-matter";
 import { GetStaticProps, NextPage } from "next";
@@ -8,12 +8,12 @@ import { unified } from "unified";
 
 const Post: NextPage<{ post: string; data: any }> = ({ post, data }) => {
   return (
-    <NewLayout title={data.title} seoTitle={data.title} actionBar backBtn>
+    <Layout title={data.title} seoTitle={data.title} actionBar backBtn>
       <div
         className="blog-post-content"
         dangerouslySetInnerHTML={{ __html: post }}
       />
-    </NewLayout>
+    </Layout>
   );
 };
 
