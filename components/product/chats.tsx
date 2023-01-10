@@ -2,7 +2,7 @@ import { convertTime } from "@libs/client/utils";
 import { Chat, ChatMessage, Product, User } from "@prisma/client";
 import React, { useState } from "react";
 import Image from "next/image";
-import Layout from "./layout";
+import NewLayout from "../layouts/layout";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -42,7 +42,12 @@ export default function ProductChats({
 
   const hasChat = productChats.length > 0;
   return (
-    <Layout canGoBack seoTitle={`${product.name}`} title="예약자 선택">
+    <NewLayout
+      seoTitle={`${product.name}`}
+      title="예약자 선택"
+      actionBar
+      backBtn
+    >
       <div className="h-screen -mb-10">
         <div className="flex justify-start items-center h-0.5/4 p-4 space-x-3 bg-gray-100 mt-2">
           <Image
@@ -129,6 +134,6 @@ export default function ProductChats({
           </button>
         </div>
       </div>
-    </Layout>
+    </NewLayout>
   );
 }

@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import useMap from "@libs/client/useMap";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 import useUser from "@libs/client/useUser";
 import useMutation from "@libs/client/useMutation";
 import { useRouter } from "next/router";

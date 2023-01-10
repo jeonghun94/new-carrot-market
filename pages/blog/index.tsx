@@ -1,7 +1,7 @@
 import matter from "gray-matter";
 import { readdirSync, readFileSync } from "fs";
 import { NextPage } from "next";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 import Link from "next/link";
 
 interface Post {

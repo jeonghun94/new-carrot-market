@@ -1,7 +1,6 @@
 import { NextPage } from "next";
 import Head from "next/head";
-import MenuBar from "@components/menuBar";
-import Link from "next/link";
+import MenuBar from "@components/menus/bottom-tab";
 import { useRouter } from "next/router";
 
 interface LayoutProps {

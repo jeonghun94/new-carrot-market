@@ -7,7 +7,7 @@ import noImage from "public/no-image.png";
 import client from "@libs/server/client";
 import useUser from "@libs/client/useUser";
 import Image from "next/image";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 interface ChatWithUserProduct extends Chat {
   seller: User;

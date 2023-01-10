@@ -5,8 +5,8 @@ import { convertTime } from "@libs/client/utils";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import client from "@libs/server/client";
-import EmptyLayout from "@components/empty-layout";
-import NewLayout from "@components/newLayout";
+import EmptyLayout from "@components/layouts/empty";
+import NewLayout from "@components/layouts/layout";
 
 interface PostWithCategory extends Post {
   postCategory: PostCategory;

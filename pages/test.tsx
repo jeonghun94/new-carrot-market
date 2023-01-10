@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 const Test: NextPage = () => {
   const btn = () => {

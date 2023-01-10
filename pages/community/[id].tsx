@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import client from "@libs/server/client";
 import useUser from "@libs/client/useUser";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 interface AnswerWithUser extends Answer {
   user: User;

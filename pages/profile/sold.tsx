@@ -3,12 +3,12 @@ import { withSsrSession } from "@libs/server/withSession";
 import { Product, User } from "@prisma/client";
 import client from "@libs/server/client";
 import { useState } from "react";
-import UserAvartar from "@components/user-avatar";
-import TabMenus from "@components/tab-menus";
-import EmptyLayout from "@components/empty-layout";
+import UserAvartar from "@components/user/avatar";
+import TabMenus from "@components/menus/nav-tab";
+import EmptyLayout from "@components/layouts/empty";
 import ProductItems from "@components/product";
 import Link from "next/link";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 export interface ProductWithCount extends Product {
   _count: {

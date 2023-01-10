@@ -1,14 +1,11 @@
 import type { NextApiRequest, NextPage } from "next";
-import Layout from "@components/layout";
-import Message from "@components/message";
-import { NextRequest } from "next/server";
 import { Chat, Product, User } from "@prisma/client";
 import useUser from "@libs/client/useUser";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import Image from "next/image";
 import { convertPrice } from "@libs/client/utils";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 dayjs.locale("ko");
 
 interface ChatWithUser extends Chat {

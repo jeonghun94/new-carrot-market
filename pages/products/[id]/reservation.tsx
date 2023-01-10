@@ -6,7 +6,7 @@ import { withSsrSession } from "@libs/server/withSession";
 import Image from "next/image";
 import { convertTime } from "@libs/client/utils";
 import { useState } from "react";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 interface ChatResponse extends Chat {
   purchaser: User;

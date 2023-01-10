@@ -11,8 +11,6 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
     },
   });
 
-  console.log("middleware", session.user, "미들웨어");
-
   if (!session.user && !req.url.includes("/login")) {
     // req.nextUrl.searchParams.set("from", "");
     req.nextUrl.pathname = "/login";

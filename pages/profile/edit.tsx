@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import useMutation from "@libs/client/useMutation";
 import Image from "next/image";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 interface EditProfileForm {
   email?: string;

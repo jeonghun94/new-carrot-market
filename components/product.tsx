@@ -3,7 +3,7 @@ import { convertPrice, convertTime } from "@libs/client/utils";
 import Link from "next/link";
 import { ProductWithCount } from "pages/profile/sold";
 import { useEffect, useState } from "react";
-import ProductImage from "./product-image";
+import ProductImage from "./product/image";
 
 interface ProductProps {
   id: number;

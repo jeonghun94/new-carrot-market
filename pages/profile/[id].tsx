@@ -2,11 +2,11 @@ import type { NextPage, NextPageContext } from "next";
 import { withSsrSession } from "@libs/server/withSession";
 import { Review, Token, User } from "@prisma/client";
 import client from "@libs/server/client";
-import UserAvartar from "@components/user-avatar";
+import UserAvartar from "@components/user/avatar";
 import Link from "next/link";
 import { convertTime } from "@libs/client/utils";
 import { useRouter } from "next/router";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 interface UserWithIsMe extends User {
   isMe: boolean;

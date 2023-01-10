@@ -6,7 +6,7 @@ import { Post, PostCategory } from "@prisma/client";
 import { useRouter } from "next/router";
 import useCoords from "@libs/client/useCoords";
 import Image from "next/image";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 interface WriteForm {
   content: string;

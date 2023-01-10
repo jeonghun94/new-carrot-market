@@ -1,5 +1,4 @@
-import Layout from "@components/layout";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 import { readdirSync } from "fs";
 import matter from "gray-matter";
 import { GetStaticProps, NextPage } from "next";

@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import ProductList from "@components/product-list";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 const Loved: NextPage = () => {
   return (

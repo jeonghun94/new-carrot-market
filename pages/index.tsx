@@ -3,7 +3,7 @@ import { withSsrSession } from "@libs/server/withSession";
 import FloatingButton from "@components/buttons/floating-button";
 import useSWR from "swr";
 import { Product } from "@prisma/client";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 import ProductItems from "@components/product";
 import { useState } from "react";
 

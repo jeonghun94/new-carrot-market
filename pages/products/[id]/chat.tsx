@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import useUser from "@libs/client/useUser";
 import Message from "@components/message";
 import Image from "next/image";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 interface ProductWithUser extends Product {
   user: User;

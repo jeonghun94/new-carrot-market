@@ -6,7 +6,7 @@ import Link from "next/link";
 import FloatingButton from "@components/buttons/floating-button";
 import { convertTime } from "@libs/client/utils";
 import Image from "next/image";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 interface PostWithUser extends Post {
   user: User;

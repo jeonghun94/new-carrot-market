@@ -1,6 +1,6 @@
 import { ProductWithCount } from "pages";
 import useSWR from "swr";
-import EmptyLayout from "./empty-layout";
+import EmptyLayout from "./layouts/empty";
 import Product from "./product";
 
 interface ProductListProps {

@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 const ProfileSetting: NextPage = () => {
   return (

@@ -6,7 +6,7 @@ import { Product } from "@prisma/client";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import client from "@libs/server/client";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 interface UploadProductForm {
   name: string;

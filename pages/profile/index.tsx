@@ -7,7 +7,7 @@ import client from "@libs/server/client";
 import logo from "public/carrot-logo.png";
 import Image from "next/image";
 import Link from "next/link";
-import NewLayout from "@components/newLayout";
+import NewLayout from "@components/layouts/layout";
 
 interface ReviewWithUser extends Review {
   createdBy: User;
