@@ -4,7 +4,6 @@ import { Chat, ChatMessage, Product, User } from "@prisma/client";
 import { convertTime } from "@libs/client/utils";
 import { useRouter } from "next/router";
 import noImage from "public/no-image.png";
-import Layout from "@components/layout";
 import client from "@libs/server/client";
 import useUser from "@libs/client/useUser";
 import Image from "next/image";
@@ -32,7 +31,7 @@ const Chats: NextPage<ProductsChatsResponse> = ({ productChats }) => {
     });
   };
   return (
-    <NewLayout actionBar title="채팅" menuBar>
+    <NewLayout seoTitle="채팅목록" title="채팅" actionBar menuBar>
       {productChats.length > 0 ? (
         productChats.map((productChat, i) =>
           productChat.chatMessages.length > 0 ? (

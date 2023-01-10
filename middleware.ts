@@ -1,10 +1,5 @@
 import { getIronSession } from "iron-session/edge";
-import {
-  NextFetchEvent,
-  NextRequest,
-  NextResponse,
-  userAgent,
-} from "next/server";
+import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 
 export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
   const res = NextResponse.next();
@@ -12,7 +7,7 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
     cookieName: "carrotsession",
     password: process.env.COOKIE_PASSWORD!,
     cookieOptions: {
-      secure: process.env.NODE_ENV! === "production", // if you are using https
+      secure: process.env.NODE_ENV! === "production",
     },
   });
 
@@ -26,5 +21,5 @@ export const middleware = async (req: NextRequest, ev: NextFetchEvent) => {
 };
 
 export const config = {
-  matcher: ["/profile", "/chats"],
+  matcher: ["/profile", "/chats", "/community/"],
 };

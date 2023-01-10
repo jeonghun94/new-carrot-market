@@ -2,7 +2,6 @@ import type { NextPage } from "next";
 import useMap from "@libs/client/useMap";
 import NewLayout from "@components/newLayout";
 import useUser from "@libs/client/useUser";
-import { useEffect } from "react";
 import useMutation from "@libs/client/useMutation";
 import { useRouter } from "next/router";
 
@@ -56,7 +55,7 @@ const IndexPage: NextPage = () => {
   };
 
   return (
-    <NewLayout actionBar backBtn title="동네 인증하기">
+    <NewLayout seoTitle="동네 인증" title="동네 인증하기" actionBar backBtn>
       <div className="w-full h-96" id="map"></div>
       <div className="p-3 bg-orange-500 text-white text-sm text-center">
         <p>

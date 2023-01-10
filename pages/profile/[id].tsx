@@ -28,7 +28,12 @@ const UserProfile: NextPage<PageResponse> = ({ profile }) => {
   const router = useRouter();
 
   return (
-    <NewLayout actionBar backBtn title="프로필">
+    <NewLayout
+      seoTitle={`${profile.name}님의 프로필`}
+      title="프로필"
+      actionBar
+      backBtn
+    >
       <div className="mt-2">
         <div className="space-y-3 p-3">
           <div className="flex items-center gap-3">

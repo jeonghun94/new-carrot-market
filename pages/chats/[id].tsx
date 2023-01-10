@@ -50,7 +50,7 @@ const ChatDetail: NextPage<ChatResponse> = ({ chats, product }) => {
   };
 
   return (
-    <NewLayout actionBar backBtn title={<CustomTitle />}>
+    <NewLayout title={<CustomTitle />} actionBar backBtn>
       <div className="w-full border-b p-4 space-y-3">
         <div className="flex gap-3 w-full ">
           <Image

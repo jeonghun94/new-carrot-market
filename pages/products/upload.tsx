@@ -1,5 +1,4 @@
-import type { NextPage, NextPageContext } from "next";
-import Layout from "@components/layout";
+import type { NextPage } from "next";
 import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import { useEffect, useState } from "react";
@@ -141,9 +140,10 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
     <>
       <form onSubmit={handleSubmit(onValid)}>
         <NewLayout
+          seoTitle="상품등록"
+          title="중고거래 글쓰기"
           actionBar
           backBtn
-          title="중고거래 글쓰기"
           actionBtn={actionBtn()}
         >
           <div className="p-4">

@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import withHandler, { ResponseType } from "@libs/server/withHandler";
-import client from "@libs/server/client";
 import { withApiSession } from "@libs/server/withSession";
 
 async function handler(
@@ -8,9 +7,8 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ) {
   await req.session.destroy();
-  res.json({
-    ok: true,
-  });
+
+  res.redirect("/login");
 }
 
 export default withApiSession(

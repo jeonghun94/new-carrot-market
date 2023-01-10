@@ -98,7 +98,13 @@ const EditProfile: NextPage = () => {
   };
   return (
     <form onSubmit={handleSubmit(onValid)}>
-      <NewLayout actionBar backBtn title="프로필 수정" actionBtn={B()}>
+      <NewLayout
+        seoTitle="프로필 수정"
+        title="프로필 수정"
+        actionBar
+        backBtn
+        actionBtn={B()}
+      >
         <div className="py-10 px-4 space-y-4">
           <div className="flex justify-center items-center">
             {avatarPreview ? (

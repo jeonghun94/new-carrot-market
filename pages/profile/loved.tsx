@@ -4,7 +4,7 @@ import NewLayout from "@components/newLayout";
 
 const Loved: NextPage = () => {
   return (
-    <NewLayout actionBar backBtn title="관심목록">
+    <NewLayout seoTitle="관심목록" title="관심목록" actionBar backBtn>
       <ProductList kind="favs" />
     </NewLayout>
   );

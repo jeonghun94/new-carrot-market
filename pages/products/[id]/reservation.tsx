@@ -1,11 +1,8 @@
 import type { NextPage, NextPageContext } from "next";
-import { Category, Chat, ChatMessage, Product, User } from "@prisma/client";
+import { Chat, ChatMessage, Product, User } from "@prisma/client";
 import client from "@libs/server/client";
-import Layout from "@components/layout";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { withSsrSession } from "@libs/server/withSession";
-import useUser from "@libs/client/useUser";
 import Image from "next/image";
 import { convertTime } from "@libs/client/utils";
 import { useState } from "react";
@@ -23,7 +20,6 @@ interface PageResponse {
 
 const Reservation: NextPage<PageResponse> = ({ product, productChat }) => {
   const router = useRouter();
-  const { user } = useUser();
   const [purchaserId, setPurchaserId] = useState<number>(
     productChat[0].purchaser.id
   );
@@ -44,7 +40,12 @@ const Reservation: NextPage<PageResponse> = ({ product, productChat }) => {
   const hasChat = productChat.length > 0;
 
   return (
-    <NewLayout backBtn seoTitle={`${product.name}`} title="예약자 선택">
+    <NewLayout
+      seoTitle={`${product.name} 예약자 선택`}
+      title="예약자 선택"
+      actionBar
+      backBtn
+    >
       <div className="h-screen -mb-10">
         <div className="flex justify-start items-center h-0.5/4 p-4 space-x-3 bg-gray-100 mt-2">
           <Image

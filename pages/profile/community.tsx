@@ -6,7 +6,6 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import client from "@libs/server/client";
 import EmptyLayout from "@components/empty-layout";
-import Layout from "@components/layout";
 import NewLayout from "@components/newLayout";
 
 interface PostWithCategory extends Post {
@@ -60,7 +59,7 @@ const History: NextPage<PageResponse> = ({ posts, answers }) => {
   };
 
   return (
-    <NewLayout actionBar backBtn title="내 글 목록">
+    <NewLayout seoTitle="내 글 목록" title="내 글 목록" actionBar backBtn>
       <div className="flex flex-wrap ">
         <div className="w-full ">
           <ul

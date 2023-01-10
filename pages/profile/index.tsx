@@ -22,7 +22,13 @@ const Profile: NextPage = () => {
   const { user } = useUser();
   const { data } = useSWR<ReviewsResponse>("/api/reviews");
   return (
-    <NewLayout actionBar backBtn subTitle="나의 당근" settingBtn>
+    <NewLayout
+      seoTitle="프로필"
+      subTitle="나의 당근"
+      actionBar
+      backBtn
+      settingBtn
+    >
       <div className="mt-2 px-4">
         <div className="w-full flex justify-between items-center py-4 space-x-3">
           <div className="flex items-center gap-3">
@@ -229,25 +235,24 @@ const Profile: NextPage = () => {
               <div className="font-normal">내 동네 인증</div>
             </Link>
           </div>
-          {/* <Link href={"/profile/loved"}>
+          <Link href={"/api/logout"}>
             <div className="py-3 flex items-center gap-3 cursor-pointer">
               <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+                className="h-6 w-6"
+                fill="currentColor"
+                viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
               >
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
+                  clipRule="evenodd"
+                  fillRule="evenodd"
+                  d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                />
               </svg>
-              <div className="font-normal">동네 인증하기</div>
+              <div className="font-normal">로그아웃</div>
             </div>
-          </Link> */}
+          </Link>
         </div>
       </div>
     </NewLayout>

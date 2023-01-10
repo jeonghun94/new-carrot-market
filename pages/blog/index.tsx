@@ -1,7 +1,7 @@
-import Layout from "@components/layout";
 import matter from "gray-matter";
 import { readdirSync, readFileSync } from "fs";
 import { NextPage } from "next";
+import NewLayout from "@components/newLayout";
 import Link from "next/link";
 
 interface Post {
@@ -16,9 +16,8 @@ interface Test {
 }
 
 const Blog: NextPage<{ posts: Post[]; test: Test }> = ({ posts, test }) => {
-  // console.log(test);
   return (
-    <Layout title="Blog" seoTitle="Blog">
+    <NewLayout seoTitle="Blog" title="Blog" actionBar homeBtn>
       <h1 className="font-semibold text-center text-xl mt-5 mb-10">
         Latest Posts:
       </h1>
@@ -36,7 +35,7 @@ const Blog: NextPage<{ posts: Post[]; test: Test }> = ({ posts, test }) => {
           </Link>
         </div>
       ))}
-    </Layout>
+    </NewLayout>
   );
 };
 

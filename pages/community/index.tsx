@@ -5,12 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import FloatingButton from "@components/buttons/floating-button";
 import { convertTime } from "@libs/client/utils";
-import Layout from "@components/layout";
 import Image from "next/image";
-
-import useCoords from "@libs/client/useCoords";
-import useSWR from "swr";
-import TextSlice from "@components/text-slice";
 import NewLayout from "@components/newLayout";
 
 interface PostWithUser extends Post {
@@ -53,7 +48,7 @@ const Community: NextPage<PostsResponse> = ({
   }, [category]);
 
   return (
-    <NewLayout actionBar title="동네생활" menuBar>
+    <NewLayout seoTitle="동네생활" title="동네생활" actionBar menuBar>
       <div
         className={`w-full flex justify-start items-center px-3 pt-5 pb-3.5 gap-3 border-b overflow-auto overflow-x-visible md:justify-between lg:justify-center `}
       >

@@ -37,9 +37,7 @@ const NewLayout: NextPage<LayoutProps> = ({
   actionBtn,
   settingBtn,
 }) => {
-  const headTitle = `${
-    seoTitle ? `${seoTitle} | Carrot Market` : "Carrot Market"
-  }`;
+  const headTitle = `${seoTitle ? `당근마켓 - ${seoTitle}` : "당근마켓"}`;
   const router = useRouter();
   return (
     <>

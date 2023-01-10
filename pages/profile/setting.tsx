@@ -3,7 +3,7 @@ import NewLayout from "@components/newLayout";
 
 const ProfileSetting: NextPage = () => {
   return (
-    <NewLayout actionBar backBtn title="설정">
+    <NewLayout seoTitle="설정" title="설정" actionBar backBtn>
       <div className="px-4 divide-y-[1px] cursor-pointer">
         <div className="space-y-5 pt-0.5 pb-5">
           <p className="mt-4 py-1 text-sm font-bold">알림 설정</p>

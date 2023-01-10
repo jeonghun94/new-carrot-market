@@ -8,7 +8,6 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useUser from "@libs/client/useUser";
 import Message from "@components/message";
-import Layout from "@components/layout";
 import Image from "next/image";
 import NewLayout from "@components/newLayout";
 
@@ -128,7 +127,12 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat, purchaserId }) => {
   };
 
   return (
-    <NewLayout backBtn title={<CustomTitle />}>
+    <NewLayout
+      seoTitle={`${product.user.name}님 과(와) 채팅`}
+      title={<CustomTitle />}
+      actionBar
+      backBtn
+    >
       <div className="mt-1 ">
         <div
           className={data || chat.chatMessages.length > 0 ? "hidden" : "block"}
@@ -249,8 +253,14 @@ const ChatDetail: NextPage<PageResponse> = ({ product, chat, purchaserId }) => {
 
 export const getServerSideProps = withSsrSession(async function ({
   req,
+  res,
   query,
 }: NextPageContext) {
+  res?.setHeader(
+    "Cache-Control",
+    "public, s-maxage=10, stale-while-revalidate=59"
+  );
+
   let chat: any;
   const purchaserId = Number(query.purchaserId);
   const productId = Number(query.productId);

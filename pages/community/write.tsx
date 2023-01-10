@@ -1,6 +1,5 @@
 import type { NextPage, NextPageContext } from "next";
 import useMutation from "@libs/client/useMutation";
-import Layout from "@components/layout";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { Post, PostCategory } from "@prisma/client";
@@ -119,9 +118,10 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
     <>
       <form onSubmit={handleSubmit(onValid)}>
         <NewLayout
+          seoTitle="글 쓰기"
+          title="동네생활 글쓰기"
           actionBar
           backBtn
-          title="동네생활 글쓰기"
           actionBtn={actionBtn()}
         >
           <div

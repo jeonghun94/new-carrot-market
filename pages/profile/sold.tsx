@@ -3,7 +3,6 @@ import { withSsrSession } from "@libs/server/withSession";
 import { Product, User } from "@prisma/client";
 import client from "@libs/server/client";
 import { useState } from "react";
-
 import UserAvartar from "@components/user-avatar";
 import TabMenus from "@components/tab-menus";
 import EmptyLayout from "@components/empty-layout";
@@ -94,7 +93,7 @@ const Sold: NextPage<PageResponse> = ({ isMe, profile, products }) => {
   };
 
   return (
-    <NewLayout actionBar backBtn>
+    <NewLayout seoTitle="판매내역" actionBar backBtn>
       <div className="flex justify-between items-center mt-2 p-3 h-24">
         <div className="flex flex-col items-start justify-between gap-2 font-semibold text-xl">
           {isMe ? (

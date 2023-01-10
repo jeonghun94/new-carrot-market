@@ -4,15 +4,13 @@ import { cls, convertPrice, convertTime } from "@libs/client/utils";
 import { withSsrSession } from "@libs/server/withSession";
 import useMutation from "@libs/client/useMutation";
 import { useEffect, useState } from "react";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import useUser from "@libs/client/useUser";
 import Products from "@components/products";
 import client from "@libs/server/client";
-import Layout from "@components/layout";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
-
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore, { Navigation, Pagination } from "swiper";
 import "swiper/css";
@@ -108,7 +106,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
 
   return !popup ? (
     <div className="mb-24">
-      <NewLayout actionBar backBtn seoTitle={`${product.name}`}>
+      <NewLayout seoTitle={`${product.name}`} actionBar backBtn>
         <Swiper
           spaceBetween={0}
           slidesPerView={1}
