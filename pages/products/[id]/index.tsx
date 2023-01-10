@@ -107,13 +107,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
 
   return !popup ? (
     <div className="mb-24">
-      <Layout
-        seoTitle={`${product.name}`}
-        title={product.name}
-        actionBar
-        backBtn
-        homeBtn
-      >
+      <Layout seoTitle={`${product.name}`} actionBar backBtn>
         <Swiper
           spaceBetween={0}
           slidesPerView={1}
@@ -421,7 +415,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                   </p>
                   <p className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
                     마지막 대화{" "}
-                    {convertTime(chat.chatMessages[0].createdAt.toString())}
+                    {convertTime(chat.chatMessages[0]?.createdAt.toString())}
                   </p>
                 </div>
               </label>
