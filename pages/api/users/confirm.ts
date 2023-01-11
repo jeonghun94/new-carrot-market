@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import withHandler, { ResponseType } from "@libs/server/withHandler";
-import client from "@libs/server/client";
 import { withApiSession } from "@libs/server/withSession";
+import client from "@libs/server/client";
 
 async function handler(
   req: NextApiRequest,
@@ -13,11 +13,13 @@ async function handler(
       payload: token,
     },
   });
-  console.log(foundToken);
+
   if (!foundToken) return res.status(404).end();
+
   req.session.user = {
     id: foundToken.userId,
   };
+
   await req.session.save();
   await client.token.deleteMany({
     where: {

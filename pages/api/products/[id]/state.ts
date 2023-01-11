@@ -9,11 +9,22 @@ async function handler(
 ) {
   const {
     query: { id },
-    body: { state },
+    body: { state, purchaserId },
     session: { user },
   } = req;
 
+  console.log(purchaserId);
+
   const productId = Number(id);
+
+  if (purchaserId) {
+    await client.purchase.create({
+      data: {
+        userId: purchaserId,
+        productId,
+      },
+    });
+  }
 
   const exists = await client.product.findFirst({
     where: {

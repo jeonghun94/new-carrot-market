@@ -75,6 +75,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
 
   const [state, setState] = useState("Sale");
   const [popup, setPopup] = useState(false);
+  const [purchaserId, setPurchaserId] = useState(0);
   const [stateChange, setStateChange] = useState(false);
   const [chatAlert, setChatAlert] = useState(false);
   const [toggleFav] = useMutation(`/api/products/${router.query.id}/fav`);
@@ -88,17 +89,23 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
   };
 
   const onBtnClick = () => {
-    stateUpdate({ state });
+    stateUpdate({ state, purchaserId });
     setPopup(!popup);
   };
 
+  const onRadioClick = (purchaserId: number) => {
+    setPurchaserId(purchaserId);
+  };
+
   const onSelectChange = (e: any) => {
+    const state = e.target.value;
     setStateChange(true);
-    if (e.target.value !== "Sale") {
+    setState(state);
+    stateUpdate({ state });
+
+    if (state === "Completed") {
       setPopup(!popup);
     }
-    stateUpdate({ state: e.target.value });
-    setState(e.target.value);
   };
 
   useEffect(() => {
@@ -355,7 +362,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
       </Layout>
     </div>
   ) : (
-    <Layout actionBar backBtn title="예약자 선택" seoTitle={`${product.name}`}>
+    <Layout actionBar backBtn title="구매자 선택" seoTitle={`${product.name}`}>
       <div className="h-screen -mb-10">
         <div className="flex justify-start items-center h-0.5/4 p-4 space-x-3 bg-gray-100 mt-2">
           <Image
@@ -393,6 +400,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                   type="radio"
                   name="radioButton"
                   value={chat.purchaser.id}
+                  onChange={() => onRadioClick(chat.purchaser.id)}
                   defaultChecked={index === 0 ? true : false}
                   className="w-6 h-6 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 mr-2"
                 />
@@ -423,13 +431,13 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
               </label>
             ))
           )}
-          <p
+          {/* <p
             className={`flex justify-center text-gray-400 underline ${
               hasChat ? "mt-10" : null
             }`}
           >
             최근 채팅 목록에서 예약자 찾기
-          </p>
+          </p> */}
         </div>
         <div className="border-t border-gray-200 h-0.5/4 p-4 pb-8">
           <button
@@ -439,7 +447,7 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
               hasChat ? "orange-500 text-white" : "gray-100 text-gray-400"
             }  text-lg cursor-${!hasChat ? "not-allowed" : "pointer"} `}
           >
-            예약자 선택
+            구매자 선택
           </button>
         </div>
       </div>
