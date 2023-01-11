@@ -1,6 +1,6 @@
 import type { NextPage, NextPageContext } from "next";
 import { withSsrSession } from "@libs/server/withSession";
-import FloatingButton from "@components/buttons/floating-button";
+import FloatingButton from "@components/buttons/floating";
 import useSWR from "swr";
 import { Product } from "@prisma/client";
 import Layout from "@components/layouts/layout";

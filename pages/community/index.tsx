@@ -3,7 +3,7 @@ import client from "@libs/server/client";
 import { Post, PostCategory, User } from "@prisma/client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import FloatingButton from "@components/buttons/floating-button";
+import FloatingButton from "@components/buttons/floating";
 import { convertTime } from "@libs/client/utils";
 import Image from "next/image";
 import Layout from "@components/layouts/layout";

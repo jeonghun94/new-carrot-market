@@ -413,10 +413,12 @@ const ItemDetail: NextPage<ItemDetailResponse> = ({
                   <p className="ml-2 text-md font-bold ">
                     {chat.purchaser.name}
                   </p>
-                  <p className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                    마지막 대화{" "}
-                    {convertTime(chat.chatMessages[0]?.createdAt.toString())}
-                  </p>
+                  {chat.chatMessages.length > 0 && (
+                    <p className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                      마지막 대화{" "}
+                      {convertTime(chat.chatMessages[0]?.createdAt.toString())}
+                    </p>
+                  )}
                 </div>
               </label>
             ))
