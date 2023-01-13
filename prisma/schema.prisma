@@ -18,7 +18,7 @@ model User {
   email           String?       @unique
   name            String
   avatar          String?
-  temperature     Float?
+  temperature     Float?        @default(36.5)
   latitude        Float?
   longitude       Float?
   address         String?
@@ -41,6 +41,13 @@ model User {
   purchasers      Chat[]        @relation(name: "purchasers")
   sellers         Chat[]        @relation(name: "sellers")
   chatMessages    ChatMessage[]
+}
+
+model Manner {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  manner    String
 }
 
 model Token {

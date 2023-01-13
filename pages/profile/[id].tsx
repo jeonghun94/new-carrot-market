@@ -1,12 +1,14 @@
 import type { NextPage, NextPageContext } from "next";
 import { withSsrSession } from "@libs/server/withSession";
-import { Review, Token, User } from "@prisma/client";
+import { Manner, Review, Token, User } from "@prisma/client";
 import client from "@libs/server/client";
 import UserAvartar from "@components/user/avatar";
 import Link from "next/link";
 import { convertTime } from "@libs/client/utils";
 import { useRouter } from "next/router";
 import Layout from "@components/layouts/layout";
+import { useState } from "react";
+import MannerPopup from "@components/manner";
 
 interface UserWithIsMe extends User {
   isMe: boolean;
@@ -20,14 +22,18 @@ interface UserWithIsMe extends User {
   };
 }
 
-interface PageResponse extends User {
+export interface PageResponse extends User {
+  manners: Manner[];
   profile: UserWithIsMe;
 }
 
-const UserProfile: NextPage<PageResponse> = ({ profile }) => {
+const UserProfile: NextPage<PageResponse> = ({ profile, manners }) => {
+  const [manner, setManner] = useState(true);
   const router = useRouter();
 
-  return (
+  return manner ? (
+    <MannerPopup profile={profile} manners={manners} setManner={setManner} />
+  ) : (
     <Layout
       seoTitle={`${profile.name}님의 프로필`}
       title="프로필"
@@ -52,7 +58,10 @@ const UserProfile: NextPage<PageResponse> = ({ profile }) => {
               </Link>
             </button>
           ) : (
-            <button className="w-full p-2 rounded-md bg-gray-100">
+            <button
+              className="w-full p-2 rounded-md bg-gray-100"
+              onClick={() => setManner(!manner)}
+            >
               <span>매너 칭찬하기</span>
             </button>
           )}
@@ -271,9 +280,17 @@ export const getServerSideProps = withSsrSession(async function ({
     },
   });
 
+  const manners = await client.manner.findMany({
+    select: {
+      id: true,
+      manner: true,
+    },
+  });
+
   return {
     props: {
       profile: JSON.parse(JSON.stringify({ ...profile, isMe })),
+      manners: JSON.parse(JSON.stringify(manners)),
     },
   };
 });

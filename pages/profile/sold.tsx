@@ -77,6 +77,7 @@ const Sold: NextPage<PageResponse> = ({ isMe, profile, products }) => {
     guestValue: [
       {
         products: items,
+        comment: "전체",
       },
       {
         products: items.filter(
@@ -192,6 +193,7 @@ export const getServerSideProps = withSsrSession(async function ({
   req,
   query,
 }: NextPageContext) {
+  const isMe = req?.session.user;
   const userId = query.id ? Number(query.id) : req?.session?.user?.id;
 
   const profile = await client.user.findUnique({
@@ -221,9 +223,9 @@ export const getServerSideProps = withSsrSession(async function ({
 
   return {
     props: {
-      isMe: query.id ? false : true,
-      profile: JSON.parse(JSON.stringify(profile)),
       products: JSON.parse(JSON.stringify(products)),
+      profile: JSON.parse(JSON.stringify(profile)),
+      isMe,
     },
   };
 });

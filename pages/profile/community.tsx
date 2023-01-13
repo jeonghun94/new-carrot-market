@@ -63,7 +63,7 @@ const History: NextPage<PageResponse> = ({ posts, answers }) => {
       <div className="flex flex-wrap ">
         <div className="w-full ">
           <ul
-            className="flex mt-2 list-none flex-wrap flex-row "
+            className="flex mt-[1px] list-none flex-wrap flex-row "
             role="tablist"
           >
             {li(tab, 1, "게시글")}
