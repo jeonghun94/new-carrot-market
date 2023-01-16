@@ -41,13 +41,32 @@ model User {
   purchasers      Chat[]        @relation(name: "purchasers")
   sellers         Chat[]        @relation(name: "sellers")
   chatMessages    ChatMessage[]
+  writtenManners  Compliment[]  @relation(name: "writtenManners")
+  receivedManners Compliment[]  @relation(name: "receivedManners")
+}
+
+model Compliment {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  manner       Manner   @relation(fields: [mannerId], references: [id], onDelete: Cascade)
+  mannerId     Int
+  createdBy    User     @relation(name: "writtenManners", fields: [createdById], references: [id], onDelete: Cascade)
+  createdById  Int
+  createdFor   User     @relation(name: "receivedManners", fields: [createdForId], references: [id], onDelete: Cascade)
+  createdForId Int
+
+  @@index([mannerId])
+  @@index([createdById])
+  @@index([createdForId])
 }
 
 model Manner {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  manner    String
+  id         Int          @id @default(autoincrement())
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  manner     String
+  Compliment Compliment[]
 }
 
 model Token {

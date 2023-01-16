@@ -4,6 +4,8 @@ import UserAvartar from "./user/avatar";
 import Layout from "./layouts/layout";
 import Notice from "./notice";
 import { useState } from "react";
+import useMutation from "@libs/client/useMutation";
+import { data } from "autoprefixer";
 
 interface MannerProps {
   profile: User;
@@ -13,6 +15,8 @@ interface MannerProps {
 
 const Manner = ({ profile, manners, setManner }: MannerProps) => {
   const [selectedManner, setSelectedManner] = useState<Manner[]>([]);
+
+  const [manner, { loading }] = useMutation("/api/users/manner");
 
   const handleManner = (e: Manner) => {
     if (selectedManner.includes(e)) {
@@ -25,6 +29,23 @@ const Manner = ({ profile, manners, setManner }: MannerProps) => {
       setSelectedManner([...selectedManner, e]);
     }
   };
+
+  const hiddenManner = () => {
+    setManner(false);
+  };
+
+  const t = () => {
+    if (selectedManner.length === 0) {
+      alert("칭찬할 매너를 선택해주세요.");
+      return;
+    }
+
+    manner({
+      manners: selectedManner,
+      otherUserId: profile.id,
+    });
+  };
+
   return (
     <>
       <Layout seoTitle="매너 칭찬하기" title="매너 칭찬하기" actionBar backBtn>
@@ -64,12 +85,8 @@ const Manner = ({ profile, manners, setManner }: MannerProps) => {
         </div>
 
         <div className="fixed bottom-0 w-full flex flex-col  gap-1 p-3">
-          <BottomButton
-            onClick={() => console.log(selectedManner)}
-            text="칭찬하기"
-            accent
-          />
-          <BottomButton onClick={(e) => setManner(!e)} text="취소" />
+          <BottomButton onClick={t} text="칭찬하기" accent />
+          <BottomButton onClick={hiddenManner} text="취소" />
         </div>
       </Layout>
     </>
