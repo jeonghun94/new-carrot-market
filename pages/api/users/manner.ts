@@ -8,76 +8,52 @@ async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
-  const { manners, otherUserId } = req.body;
-
+  const { manners, otherUserId, mutation, compliments } = req.body;
   const userId = Number(req.session.user?.id);
 
-  // await client.compliment.deleteMany({});
-  // return;
+  if (mutation) {
+    await client.compliment.deleteMany({
+      where: {
+        createdById: userId,
+        createdForId: otherUserId,
+      },
+    });
 
-  // manners.forEach(async (manner: Manner) => {
-  //   await client.compliment.create({
-  //     data: {
-  //       mannerId: manner.id,
-  //       createdById: userId,
-  //       createdForId: otherUserId,
-  //     },
-  //   });
-  //   console.log("컴플리먼트 삽입");
-  // });
-
-  // manners.forEach(async (manner: Manner) => {
-  //   console.log("dsdsds");
-  //   await client.user.update({
-  //     where: {
-  //       id: otherUserId,
-  //     },
-  //     data: {
-  //       receivedManners: {
-  //         create: {
-  //           mannerId: manner.id,
-  //           createdById: userId,
-  //         },
-  //       },
-  //     },
-  //   });
-  //   console.log("리시브 삽입");
-  // });
-
-  manners.forEach(async (manner: Manner) => {
     await client.user.update({
       where: {
-        id: userId,
+        id: otherUserId,
       },
       data: {
-        writtenManners: {
-          connectOrCreate: {
-            where: {
-              id: manner.id,
-            },
-            create: {
-              mannerId: manner.id,
-              createdForId: otherUserId,
-            },
-          },
+        temperature: {
+          decrement: 0.3 * compliments.length,
         },
       },
     });
-    console.log("롸이튼 삽입");
-  });
+    res.json({ ok: true });
+    return;
+  } else {
+    manners.forEach(async (manner: Manner) => {
+      console.log(manner);
+      await client.compliment.create({
+        data: {
+          mannerId: manner.id,
+          createdById: userId,
+          createdForId: otherUserId,
+        },
+      });
+    });
 
-  console.log("매너 업데이트");
-
-  // await client.user.update({
-  //   where: {
-  //     id: otherUserId,
-  //   },
-  //   data: {
-  //     temperature: {
-  //       increment: 0.3 * manners.length,
-  //     },
-  //   },
-  // });
+    await client.user.update({
+      where: {
+        id: otherUserId,
+      },
+      data: {
+        temperature: {
+          increment: 0.3 * manners.length,
+        },
+      },
+    });
+  }
   res.json({ ok: true });
 }
 

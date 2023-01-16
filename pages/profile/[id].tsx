@@ -1,6 +1,6 @@
 import type { NextPage, NextPageContext } from "next";
 import { withSsrSession } from "@libs/server/withSession";
-import { Manner, Review, Token, User } from "@prisma/client";
+import { Compliment, Manner, Review, Token, User } from "@prisma/client";
 import client from "@libs/server/client";
 import UserAvartar from "@components/user/avatar";
 import Link from "next/link";
@@ -22,17 +22,34 @@ interface UserWithIsMe extends User {
   };
 }
 
-export interface PageResponse extends User {
-  manners: Manner[];
-  profile: UserWithIsMe;
+interface ComplimentWithManner extends Compliment {
+  manner: Manner;
 }
 
-const UserProfile: NextPage<PageResponse> = ({ profile, manners }) => {
-  const [manner, setManner] = useState(true);
+export interface PageResponse extends User {
+  profile: UserWithIsMe;
+  manners: Manner[];
+  compliments: ComplimentWithManner[];
+  alreadyCompliment: boolean;
+}
+
+const UserProfile: NextPage<PageResponse> = ({
+  profile,
+  manners,
+  compliments,
+  alreadyCompliment,
+}) => {
+  const [manner, setManner] = useState(false);
   const router = useRouter();
 
   return manner ? (
-    <MannerPopup profile={profile} manners={manners} setManner={setManner} />
+    <MannerPopup
+      profile={profile}
+      manners={manners}
+      setManner={setManner}
+      compliments={compliments}
+      alreadyCompliment={alreadyCompliment}
+    />
   ) : (
     <Layout
       seoTitle={`${profile.name}님의 프로필`}
@@ -160,8 +177,8 @@ const UserProfile: NextPage<PageResponse> = ({ profile, manners }) => {
             {new Intl.DateTimeFormat("ko-kr", {
               dateStyle: "long",
               timeZone: "Asia/Seoul",
-            }).format(new Date(profile.createdAt))}
-            )
+            }).format(new Date(profile.createdAt))}{" "}
+            가입)
           </p>
         </div>
         <div className="divide-y-[1px] divide-gray-100 font-semibold text-sm">
@@ -287,10 +304,28 @@ export const getServerSideProps = withSsrSession(async function ({
     },
   });
 
+  const compliments = await client.compliment.findMany({
+    where: {
+      createdById: Number(req?.session.user?.id),
+      AND: {
+        createdForId: Number(query.id),
+      },
+    },
+    include: {
+      manner: {
+        select: {
+          manner: true,
+        },
+      },
+    },
+  });
+
   return {
     props: {
       profile: JSON.parse(JSON.stringify({ ...profile, isMe })),
       manners: JSON.parse(JSON.stringify(manners)),
+      compliments: JSON.parse(JSON.stringify(compliments)),
+      alreadyCompliment: Boolean(compliments.length),
     },
   };
 });
