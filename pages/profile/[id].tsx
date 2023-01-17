@@ -9,21 +9,29 @@ import { useRouter } from "next/router";
 import Layout from "@components/layouts/layout";
 import { useState } from "react";
 import MannerPopup from "@components/manner";
+import { data } from "autoprefixer";
+
+interface ComplimentWithManner extends Compliment {
+  manner: Manner;
+}
 
 interface UserWithIsMe extends User {
   isMe: boolean;
   tokens: Token[];
   writtenReviews: Review[];
   receivedReviews: Review[];
+  receivedManners: ComplimentWithManner[];
   _count: {
     products: number;
     receivedReviews: number;
     writtenReviews: number;
+    receivedManners: number;
   };
 }
 
-interface ComplimentWithManner extends Compliment {
-  manner: Manner;
+interface MannerWithCount {
+  count: number;
+  manner: string;
 }
 
 export interface PageResponse extends User {
@@ -31,6 +39,7 @@ export interface PageResponse extends User {
   manners: Manner[];
   compliments: ComplimentWithManner[];
   alreadyCompliment: boolean;
+  mannerWithCounts: MannerWithCount[];
 }
 
 const UserProfile: NextPage<PageResponse> = ({
@@ -38,6 +47,7 @@ const UserProfile: NextPage<PageResponse> = ({
   manners,
   compliments,
   alreadyCompliment,
+  mannerWithCounts,
 }) => {
   const [manner, setManner] = useState(false);
   const router = useRouter();
@@ -182,8 +192,11 @@ const UserProfile: NextPage<PageResponse> = ({
           </p>
         </div>
         <div className="divide-y-[1px] divide-gray-100 font-semibold text-sm">
-          <div className="flex justify-between items-center p-5">
-            <p>활동 배지 12개</p>
+          <div
+            className="flex justify-between items-center p-5 cursor-pointer"
+            onClick={() => alert("활동 배지가 없습니다.")}
+          >
+            <p>활동 배지</p>
             <svg
               className="w-5 h-5"
               fill="none"
@@ -202,13 +215,21 @@ const UserProfile: NextPage<PageResponse> = ({
           <div
             className="flex justify-between items-center p-5 cursor-pointer"
             onClick={() => {
+              if (profile._count.products === 0)
+                return alert("판매 상품이 없습니다.");
+
               router.push({
                 pathname: "/profile/sold",
                 query: { id: profile.id },
               });
             }}
           >
-            <p>판매상품 {profile._count.products}개</p>
+            <p>
+              판매상품{" "}
+              {profile._count.products && profile._count.products > 0
+                ? profile._count.products + "개"
+                : ""}
+            </p>
             <svg
               className="w-5 h-5"
               fill="none"
@@ -226,7 +247,13 @@ const UserProfile: NextPage<PageResponse> = ({
           </div>
           <div>
             <div className="flex justify-between items-center p-5">
-              <p>받은 매너 평가</p>
+              <p>
+                받은 매너 평가{" "}
+                {profile._count.receivedManners &&
+                profile._count.receivedManners > 0
+                  ? profile._count.receivedManners + "개"
+                  : ""}
+              </p>
               <svg
                 className="w-5 h-5"
                 fill="none"
@@ -243,30 +270,34 @@ const UserProfile: NextPage<PageResponse> = ({
               </svg>
             </div>
 
-            {profile.writtenReviews.map((review) => (
-              <div
-                key={review.id}
-                className=" flex items-start gap-3 my-3 px-5"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-                <div className=" p-2 bg-gray-100 text-sm font-normal rounded-lg rounded-tl-none">
-                  <p>{review.review}</p>
+            {mannerWithCounts.length > 0 ? (
+              mannerWithCounts.map((mannerWithCount, index) => (
+                <div key={index} className=" flex items-start gap-3 my-3 px-5">
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                    />
+                  </svg>
+                  <span className="font-semibold">{mannerWithCount.count}</span>
+                  <div className=" p-2 bg-gray-100 text-sm font-normal rounded-lg rounded-tl-none">
+                    <p>{mannerWithCount.manner}</p>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="flex justify-center items-center py-16 ">
+                <p>받은 매너 평가가 없습니다.</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
@@ -284,18 +315,59 @@ export const getServerSideProps = withSsrSession(async function ({
       id: Number(query.id),
     },
     include: {
-      receivedReviews: true,
-      writtenReviews: true,
+      receivedManners: {
+        orderBy: {
+          mannerId: "desc",
+        },
+        include: {
+          manner: {
+            select: {
+              manner: true,
+            },
+          },
+        },
+      },
       _count: {
         select: {
-          receivedReviews: true,
-          writtenReviews: true,
+          receivedManners: true,
           products: true,
         },
       },
-      tokens: true,
+      tokens: {
+        select: {
+          createdAt: true,
+        },
+      },
     },
   });
+
+  const mannerWithCounts: any = new Array();
+  const mannersCount = await client.compliment.groupBy({
+    by: ["mannerId"],
+    where: {
+      createdForId: profile?.id,
+    },
+    orderBy: {
+      mannerId: "desc",
+    },
+    _count: {
+      id: true,
+    },
+  });
+
+  for await (const manner of mannersCount) {
+    const type = await client.manner.findUnique({
+      where: {
+        id: manner.mannerId,
+      },
+      select: {
+        manner: true,
+      },
+    });
+
+    const mannerWithCount = { count: manner._count.id, manner: type?.manner };
+    mannerWithCounts.push(mannerWithCount);
+  }
 
   const manners = await client.manner.findMany({
     select: {
@@ -326,6 +398,7 @@ export const getServerSideProps = withSsrSession(async function ({
       manners: JSON.parse(JSON.stringify(manners)),
       compliments: JSON.parse(JSON.stringify(compliments)),
       alreadyCompliment: Boolean(compliments.length),
+      mannerWithCounts: JSON.parse(JSON.stringify(mannerWithCounts)),
     },
   };
 });
