@@ -1,4 +1,4 @@
-import { Compliment, Manner, User } from "@prisma/client";
+import { Compliment as C, Manner, User } from "@prisma/client";
 import BottomButton from "./buttons/bottom";
 import UserAvartar from "./user/avatar";
 import Layout from "./layouts/layout";
@@ -7,7 +7,7 @@ import { useState } from "react";
 import useMutation from "@libs/client/useMutation";
 import MutationButton from "./buttons/mutation";
 import { useRouter } from "next/router";
-interface ComplimentWithManner extends Compliment {
+interface ComplimentWithManner extends C {
   manner: Manner;
 }
 
