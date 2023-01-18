@@ -62,7 +62,7 @@ const Community: NextPage<PostsResponse> = ({
           </div>
         ))}
       </div>
-      <div className="space-y-5 divide-y-[3px] ">
+      <div className="space-y-5 divide-y-[3px] mb-24">
         {posts && posts.length > 0 ? (
           posts?.map((post) => (
             <Link key={post.id} href={`/community/${post.id}`}>

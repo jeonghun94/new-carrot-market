@@ -393,7 +393,7 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
                 "Loading..."
               ) : (
                 <svg
-                  className="w-6 h-6"
+                  className="w-6 h-6 rounded-full"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

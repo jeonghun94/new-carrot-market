@@ -28,7 +28,7 @@ const Home: NextPage<HomeProps> = ({ isLogin }) => {
   const [items, setItems] = useState(data?.products);
   return (
     <Layout seoTitle="상품목록" actionBar title="홈" menuBar>
-      <div className="flex flex-col  divide-y">
+      <div className="flex flex-col divide-y mb-20">
         {data?.products?.map((product, index) => (
           <div key={index}>
             <ProductItems
