@@ -27,10 +27,13 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
   const { latitude, longitude } = useCoords();
   const { register, handleSubmit, watch } = useForm<WriteForm>();
   const [post, { loading, data }] = useMutation<WriteResponse>("/api/posts");
+
+  const [imageLoading, setImageLoading] = useState(false);
   const onValid = async (data: WriteForm) => {
     if (loading) return;
     const photoIds = [];
     if (photo.length > 0) {
+      setImageLoading(true);
       for (let i = 0; i < photo.length; i++) {
         const form = new FormData();
         const { uploadURL } = await (await fetch(`/api/files`)).json();
@@ -42,6 +45,7 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
         ).json();
         photoIds.push(id);
       }
+      setImageLoading(false);
     }
 
     post({
@@ -69,7 +73,6 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
 
   const categoryClick = (category: any) => {
     setCategory(category);
-    // setValue("categoryId", category.id);
     fadeInOut();
   };
 
@@ -101,14 +104,14 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
     return (
       <>
         <button
-          disabled={loading || category.id === 0 || !content}
+          disabled={loading || imageLoading || category.id === 0 || !content}
           className={
-            loading || category.id === 0 || !content
+            loading || imageLoading || category.id === 0 || !content
               ? `text-gray-300 cursor-not-allowed`
               : `text-orange-500 cursor-pointer`
           }
         >
-          {loading ? "Loading..." : "완료"}
+          {loading || imageLoading ? "Loading..." : "완료"}
         </button>
       </>
     );
@@ -233,11 +236,11 @@ const Write: NextPage<PageResponse> = ({ categories }) => {
       <div>
         {fade ? (
           <div
-            className="fixed top-0 left-0 w-full h-screen bg-transparent  overflow-y-scroll z-10"
+            className="fixed top-0 left-0 w-full h-screen bg-gray-800 bg-opacity-20  overflow-y-scroll z-10"
             onClick={fadeInOut}
           >
-            <div className="h-1/3 bg-slate-500 opacity-40"></div>
-            <div className="h-2/3 border-t-2 bg-white opacity-100 rounded-t-3xl">
+            <div className="h-1/3"></div>
+            <div className="h-2/3 bg-white opacity-100 rounded-t-3xl">
               <div className="px-5 py-7 text-lg font-semibold">
                 게시글의 주제를 선택해 주세요.
               </div>

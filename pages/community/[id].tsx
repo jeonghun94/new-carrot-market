@@ -10,6 +10,7 @@ import Image from "next/image";
 import client from "@libs/server/client";
 import useUser from "@libs/client/useUser";
 import Layout from "@components/layouts/layout";
+import UserAvartar from "@components/user/avatar";
 
 interface AnswerWithUser extends Answer {
   user: User;
@@ -157,17 +158,11 @@ const CommunityPostDetail: NextPage<CommunityWithCategory> = ({ post }) => {
         {post.postCategory.name}
       </span>
       <div className="flex mb-3 px-4 cursor-pointer pb-3  border-b items-center space-x-3">
-        {data?.post?.user?.avatar ? (
-          <Image
-            alt="이미지를 불러올 수 없습니다:("
-            src={`https://imagedelivery.net/jhi2XPYSyyyjQKL_zc893Q/${data?.post?.user?.avatar}/avatar`}
-            className="w-10 h-10 bg-slate-500 rounded-full"
-            width={30}
-            height={30}
-          />
-        ) : (
-          <div className="w-10 h-10 bg-slate-500 rounded-full" />
-        )}
+        <UserAvartar
+          avatar={String(data?.post?.user?.avatar)}
+          defaultImageSize={10}
+          imageSize={40}
+        />
         <div>
           <p className="text-sm font-medium text-gray-700">
             {data?.post?.user?.name}

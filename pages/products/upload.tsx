@@ -45,6 +45,7 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
 
   const [uploadProduct, { loading, data }] =
     useMutation<UploadProductMutation>("/api/products");
+  const [imageLoading, setImageLoading] = useState(false);
   const onValid = async ({
     name,
     price,
@@ -54,8 +55,9 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
     categoryId,
   }: UploadProductForm) => {
     if (loading) return;
+    const photoIds = [];
     if (photo && photo.length > 0) {
-      const photoIds = [];
+      setImageLoading(true);
       for (let i = 0; i < photo.length; i++) {
         const form = new FormData();
         const { uploadURL } = await (await fetch(`/api/files`)).json();
@@ -66,7 +68,9 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
           await fetch(uploadURL, { method: "POST", body: form })
         ).json();
         photoIds.push(id);
+        setImageLoading(false);
       }
+
       uploadProduct({
         name,
         price,
@@ -123,14 +127,14 @@ const Upload: NextPage<CategoryResponse> = ({ categories }) => {
     return (
       <>
         <button
-          disabled={loading || category.id === 0 || !content}
+          disabled={loading || imageLoading || category.id === 0 || !content}
           className={
-            loading || category.id === 0 || !content
+            loading || imageLoading || category.id === 0 || !content
               ? `text-gray-300 cursor-not-allowed`
               : `text-orange-500 cursor-pointer`
           }
         >
-          {loading ? "Loading..." : "완료"}
+          {loading || imageLoading ? "Loading..." : "완료"}
         </button>
       </>
     );
