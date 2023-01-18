@@ -10,6 +10,8 @@ import Layout from "@components/layouts/layout";
 import { useState } from "react";
 import MannerPopup from "@components/manner";
 import { data } from "autoprefixer";
+import useSWR, { SWRConfig } from "swr";
+import useMutation from "@libs/client/useMutation";
 
 interface ComplimentWithManner extends Compliment {
   manner: Manner;
@@ -49,9 +51,20 @@ const UserProfile: NextPage<PageResponse> = ({
   alreadyCompliment,
   mannerWithCounts,
 }) => {
+  const fetcher = (url: string) =>
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ otherUserId: profile.id }),
+    }).then((res) => res.json());
+
+  const { data } = useSWR("/api/manner", fetcher);
   const [manner, setManner] = useState(false);
   const router = useRouter();
 
+  console.log(data);
   return manner ? (
     <MannerPopup
       profile={profile}
@@ -270,8 +283,8 @@ const UserProfile: NextPage<PageResponse> = ({
               </svg>
             </div>
 
-            {mannerWithCounts.length > 0 ? (
-              mannerWithCounts.map((mannerWithCount, index) => (
+            {data.mannerWithCounts?.length > 0 ? (
+              data.mannerWithCounts.map((mannerWithCount, index) => (
                 <div key={index} className=" flex items-start gap-3 my-3 px-5">
                   <svg
                     className="w-5 h-5"
@@ -302,6 +315,34 @@ const UserProfile: NextPage<PageResponse> = ({
         </div>
       </div>
     </Layout>
+  );
+};
+
+const Page: NextPage<PageResponse> = ({
+  profile,
+  manners,
+  compliments,
+  alreadyCompliment,
+  mannerWithCounts,
+}) => {
+  return (
+    <SWRConfig
+      value={{
+        fallback: {
+          "/api/manner": {
+            ok: true,
+          },
+        },
+      }}
+    >
+      <UserProfile
+        profile={profile}
+        manners={manners}
+        compliments={compliments}
+        alreadyCompliment={alreadyCompliment}
+        mannerWithCounts={mannerWithCounts}
+      />
+    </SWRConfig>
   );
 };
 
@@ -403,4 +444,4 @@ export const getServerSideProps = withSsrSession(async function ({
   };
 });
 
-export default UserProfile;
+export default Page;
