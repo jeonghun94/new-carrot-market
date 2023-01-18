@@ -6,6 +6,7 @@ import Notice from "./notice";
 import { useState } from "react";
 import useMutation from "@libs/client/useMutation";
 import MutationButton from "./buttons/mutation";
+import { useRouter } from "next/router";
 interface ComplimentWithManner extends Compliment {
   manner: Manner;
 }
@@ -27,6 +28,7 @@ const Manner = ({
 }: MannerProps) => {
   const [selectedManner, setSelectedManner] = useState<Manner[]>([]);
   const [manner] = useMutation("/api/users/manner");
+  const router = useRouter();
 
   const handleManner = (e: Manner) => {
     if (selectedManner.includes(e)) {
