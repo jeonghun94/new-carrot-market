@@ -4,7 +4,6 @@ import noImage from "public/no-image.png";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 dayjs.locale("ko");
-
 interface MessageProps {
   message: string;
   reversed?: boolean;
