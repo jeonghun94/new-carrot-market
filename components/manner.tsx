@@ -1,4 +1,4 @@
-import { Manner, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import BottomButton from "./buttons/bottom";
 import UserAvartar from "./user/avatar";
 import Layout from "./layouts/layout";
@@ -15,6 +15,13 @@ interface Compliment {
   mannerId: number;
   createdById: number;
   createdForId: number;
+}
+
+interface Manner {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+  manner: string;
 }
 interface ComplimentWithManner extends Compliment {
   manner: Manner;
